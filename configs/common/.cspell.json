@@ -62,6 +62,7 @@
 
     "lefthook",
     "gitleaks",
+    "gitsign",
     "commitlint",
     "conventionalcommits",
     "cycjimmy",
@@ -99,7 +100,10 @@
     "readonly",
     "printf",
     "xargs",
+    "numstat",
+    "subshell",
     "substr",
+    "gpgsign",
     "nproc",
 
     "pytest",
