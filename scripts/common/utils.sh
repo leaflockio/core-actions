@@ -11,7 +11,7 @@
 supports_color() {
   [ -n "$NO_COLOR" ] && return 1
   case "$(uname -s)" in
-    MINGW*|CYGWIN*|MSYS*) return 1 ;;
+  MINGW* | CYGWIN* | MSYS*) return 1 ;;
   esac
   [ -t 1 ] && return 0
   return 1
@@ -27,7 +27,7 @@ else
   RED="" GREEN="" YELLOW="" BLUE="" RESET=""
 fi
 
-log_info()    { printf "${BLUE}ℹ  %s${RESET}\n" "$1"; }
-log_warn()    { printf "${YELLOW}⚠  %s${RESET}\n" "$1"; }
+log_info() { printf "${BLUE}ℹ  %s${RESET}\n" "$1"; }
+log_warn() { printf "${YELLOW}⚠  %s${RESET}\n" "$1"; }
 log_success() { printf "${GREEN}✔  %s${RESET}\n" "$1"; }
-log_error()   { printf "${RED}✖  %s${RESET}\n" "$1"; }
+log_error() { printf "${RED}✖  %s${RESET}\n" "$1"; }

@@ -99,11 +99,11 @@ if [ "$PARTIAL_STAGE" = "prompt" ]; then
   printf "Proceed with staged version? [y/N] "
   read -r REPLY
   case "$REPLY" in
-    y|Y) exit 0 ;;
-    *)
-      log_error "Commit aborted."
-      exit 1
-      ;;
+  y | Y) exit 0 ;;
+  *)
+    log_error "Commit aborted."
+    exit 1
+    ;;
   esac
 else
   log_error "Commit blocked. Stage or discard unstaged changes before committing."

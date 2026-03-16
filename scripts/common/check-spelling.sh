@@ -12,7 +12,7 @@
 
 if ! command -v cspell >/dev/null 2>&1; then
   log_error "cspell is not installed."
-  log_info  "Run: npm install -g cspell"
+  log_info "Run: npm install -g cspell"
   exit 1
 fi
 
@@ -26,7 +26,7 @@ log_info "Checking spelling..."
 if ! echo "$CHECK_FILES" | xargs cspell --no-progress --no-summary 2>&1; then
   echo ""
   log_error "Spelling errors detected."
-  log_info  "Fix the words above or add them to .cspell.json 'words' list."
+  log_info "Fix the words above or add them to .cspell.json 'words' list."
   exit 1
 fi
 

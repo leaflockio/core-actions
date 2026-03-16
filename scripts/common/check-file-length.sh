@@ -24,12 +24,12 @@ for f in $CHECK_FILES; do
 
   # Only check source files, skip binaries and generated files
   case "$f" in
-    *.png|*.jpg|*.gif|*.ico|*.svg|*.woff|*.woff2|*.ttf|*.eot) continue ;;
-    *.lock|*.min.js|*.min.css|*.map) continue ;;
-    CHANGELOG.md|LICENSE*) continue ;;
+  *.png | *.jpg | *.gif | *.ico | *.svg | *.woff | *.woff2 | *.ttf | *.eot) continue ;;
+  *.lock | *.min.js | *.min.css | *.map) continue ;;
+  CHANGELOG.md | LICENSE*) continue ;;
   esac
 
-  LINES=$(wc -l < "$f" | tr -d ' ')
+  LINES=$(wc -l <"$f" | tr -d ' ')
   if [ "$LINES" -gt "$MAX_FILE_LINES" ]; then
     log_error "File too long: $f ($LINES lines, max $MAX_FILE_LINES)"
     FAIL=1

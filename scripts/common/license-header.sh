@@ -28,7 +28,7 @@ CURRENT_YEAR=$(date +%Y)
 # Read org name from .license-config at repo root
 if [ ! -f ".license-config" ]; then
   log_error "Missing .license-config at repo root."
-  log_info  "Create one with: ORG_NAME=YourOrg"
+  log_info "Create one with: ORG_NAME=YourOrg"
   exit 1
 fi
 
@@ -36,7 +36,7 @@ ORG_NAME=$(grep '^ORG_NAME=' .license-config | cut -d= -f2)
 
 if [ -z "$ORG_NAME" ]; then
   log_error "ORG_NAME not set in .license-config."
-  log_info  "Add: ORG_NAME=YourOrg"
+  log_info "Add: ORG_NAME=YourOrg"
   exit 1
 fi
 
@@ -58,24 +58,24 @@ detect_license_type() {
 
 get_comment_style() {
   case "$1" in
-    *.sh|*.py)                                echo "hash" ;;
-    *.js|*.jsx|*.ts|*.tsx|*.go|*.css|*.scss)  echo "slash" ;;
-    *.html)                                   echo "html" ;;
-    *)                                        echo "" ;;
+  *.sh | *.py) echo "hash" ;;
+  *.js | *.jsx | *.ts | *.tsx | *.go | *.css | *.scss) echo "slash" ;;
+  *.html) echo "html" ;;
+  *) echo "" ;;
   esac
 }
 
 should_skip_file() {
   case "$1" in
-    *.json|*.yaml|*.yml|*.lock|*.toml|*.ini|*.cfg) return 0 ;;
-    *.md|*.txt) return 0 ;;
-    *.png|*.jpg|*.jpeg|*.gif|*.ico|*.svg) return 0 ;;
-    *.woff|*.woff2|*.ttf|*.eot|*.map) return 0 ;;
-    *.min.js|*.min.css) return 0 ;;
-    LICENSE*|CHANGELOG*) return 0 ;;
-    .gitignore|.prettierignore|.env*|.license-config) return 0 ;;
-    package.json|package-lock.json) return 0 ;;
-    node_modules/*|dist/*|build/*|coverage/*|.git/*) return 0 ;;
+  *.json | *.yaml | *.yml | *.lock | *.toml | *.ini | *.cfg) return 0 ;;
+  *.md | *.txt) return 0 ;;
+  *.png | *.jpg | *.jpeg | *.gif | *.ico | *.svg) return 0 ;;
+  *.woff | *.woff2 | *.ttf | *.eot | *.map) return 0 ;;
+  *.min.js | *.min.css) return 0 ;;
+  LICENSE* | CHANGELOG*) return 0 ;;
+  .gitignore | .prettierignore | .env* | .license-config) return 0 ;;
+  package.json | package-lock.json) return 0 ;;
+  node_modules/* | dist/* | build/* | coverage/* | .git/*) return 0 ;;
   esac
   return 1
 }
@@ -91,7 +91,7 @@ resolve_header_text() {
 
   if [ ! -f "$TEMPLATE_FILE" ]; then
     log_error "License header template not found: $TEMPLATE_FILE"
-    log_info  "Ensure configs/common/ contains the license header templates."
+    log_info "Ensure configs/common/ contains the license header templates."
     exit 1
   fi
 
@@ -101,29 +101,29 @@ resolve_header_text() {
 wrap_header() {
   STYLE="$1"
   case "$STYLE" in
-    hash)
-      while IFS= read -r line; do
-        if [ -z "$line" ]; then
-          echo "#"
-        else
-          echo "# $line"
-        fi
-      done
-      ;;
-    slash)
-      while IFS= read -r line; do
-        if [ -z "$line" ]; then
-          echo "//"
-        else
-          echo "// $line"
-        fi
-      done
-      ;;
-    html)
-      echo "<!--"
-      cat
-      echo "-->"
-      ;;
+  hash)
+    while IFS= read -r line; do
+      if [ -z "$line" ]; then
+        echo "#"
+      else
+        echo "# $line"
+      fi
+    done
+    ;;
+  slash)
+    while IFS= read -r line; do
+      if [ -z "$line" ]; then
+        echo "//"
+      else
+        echo "// $line"
+      fi
+    done
+    ;;
+  html)
+    echo "<!--"
+    cat
+    echo "-->"
+    ;;
   esac
 }
 
@@ -187,7 +187,7 @@ cmd_check() {
   if [ "$FAIL" -ne 0 ]; then
     echo ""
     log_error "Files missing license header."
-    log_info  "Run: license-header.sh add --all"
+    log_info "Run: license-header.sh add --all"
     exit 1
   fi
 
@@ -214,15 +214,15 @@ cmd_add() {
     # Preserve shebang if present
     FIRST_LINE=$(head -n 1 "$f")
     case "$FIRST_LINE" in
-      '#!'*)
-        echo "$FIRST_LINE" > "$TMPFILE"
-        printf "%s\n\n" "$HEADER" >> "$TMPFILE"
-        tail -n +2 "$f" >> "$TMPFILE"
-        ;;
-      *)
-        printf "%s\n\n" "$HEADER" > "$TMPFILE"
-        cat "$f" >> "$TMPFILE"
-        ;;
+    '#!'*)
+      echo "$FIRST_LINE" >"$TMPFILE"
+      printf "%s\n\n" "$HEADER" >>"$TMPFILE"
+      tail -n +2 "$f" >>"$TMPFILE"
+      ;;
+    *)
+      printf "%s\n\n" "$HEADER" >"$TMPFILE"
+      cat "$f" >>"$TMPFILE"
+      ;;
     esac
 
     mv "$TMPFILE" "$f"
@@ -277,11 +277,11 @@ cmd_migrate() {
   fi
 
   case "$TARGET_TYPE" in
-    open-source|private) ;;
-    *)
-      log_error "Invalid type: $TARGET_TYPE (use 'open-source' or 'private')"
-      exit 1
-      ;;
+  open-source | private) ;;
+  *)
+    log_error "Invalid type: $TARGET_TYPE (use 'open-source' or 'private')"
+    exit 1
+    ;;
   esac
 
   CURRENT_TYPE=$(detect_license_type)
@@ -311,44 +311,44 @@ cmd_migrate() {
 
     while IFS= read -r line; do
       if [ "$HEADER_DONE" -eq 1 ]; then
-        echo "$line" >> "$TMPFILE"
+        echo "$line" >>"$TMPFILE"
         continue
       fi
 
       # Keep shebangs
       case "$line" in
-        '#!'*)
-          echo "$line" >> "$TMPFILE"
-          continue
-          ;;
+      '#!'*)
+        echo "$line" >>"$TMPFILE"
+        continue
+        ;;
       esac
 
       # Detect header start
       case "$line" in
-        *Copyright*"$ORG_NAME"*)
-          IN_HEADER=1
-          continue
-          ;;
+      *Copyright*"$ORG_NAME"*)
+        IN_HEADER=1
+        continue
+        ;;
       esac
 
       if [ "$IN_HEADER" -eq 1 ]; then
         IS_COMMENT=0
         case "$STYLE" in
-          hash)  case "$line" in '#'*|'') IS_COMMENT=1 ;; esac ;;
-          slash) case "$line" in '//'*|'') IS_COMMENT=1 ;; esac ;;
-          html)  case "$line" in '<!--'*|'-->'*|'') IS_COMMENT=1 ;; esac ;;
+        hash) case "$line" in '#'* | '') IS_COMMENT=1 ;; esac ;;
+        slash) case "$line" in '//'* | '') IS_COMMENT=1 ;; esac ;;
+        html) case "$line" in '<!--'* | '-->'* | '') IS_COMMENT=1 ;; esac ;;
         esac
 
         if [ "$IS_COMMENT" -eq 1 ]; then
           continue
         else
           HEADER_DONE=1
-          echo "$line" >> "$TMPFILE"
+          echo "$line" >>"$TMPFILE"
         fi
       else
-        echo "$line" >> "$TMPFILE"
+        echo "$line" >>"$TMPFILE"
       fi
-    done < "$f"
+    done <"$f"
 
     mv "$TMPFILE" "$f"
   done
@@ -365,10 +365,10 @@ cmd_migrate() {
     if [ ! -f "LICENSE" ]; then
       TEMPLATE="${CONFIGS_DIR}/LICENSE-apache-2.0"
       if [ -f "$TEMPLATE" ]; then
-        sed "s/{YEAR}/$CURRENT_YEAR/g; s/{ORG}/$ORG_NAME/g" "$TEMPLATE" > LICENSE
+        sed "s/{YEAR}/$CURRENT_YEAR/g; s/{ORG}/$ORG_NAME/g" "$TEMPLATE" >LICENSE
       else
         log_error "License template not found: $TEMPLATE"
-        log_info  "Create a LICENSE file manually."
+        log_info "Create a LICENSE file manually."
       fi
       log_success "Created Apache 2.0 LICENSE file"
     fi
@@ -388,20 +388,20 @@ COMMAND="$1"
 shift 2>/dev/null || true
 
 case "$COMMAND" in
-  get)     cmd_get ;;
-  check)   cmd_check "$@" ;;
-  add)     cmd_add "$@" ;;
-  update)  cmd_update "$@" ;;
-  migrate) cmd_migrate "$@" ;;
-  *)
-    echo "Usage: license-header.sh <get|check|add|update|migrate> [args]"
-    echo ""
-    echo "Commands:"
-    echo "  get                     Print the license header for this repo"
-    echo "  check <file|--staged>   Validate header exists and matches repo type"
-    echo "  add <file|--all>        Add header to file(s) missing it"
-    echo "  update <file|--all>     Update copyright year in existing headers"
-    echo "  migrate <open-source|private>  Convert all files and LICENSE file"
-    exit 1
-    ;;
+get) cmd_get ;;
+check) cmd_check "$@" ;;
+add) cmd_add "$@" ;;
+update) cmd_update "$@" ;;
+migrate) cmd_migrate "$@" ;;
+*)
+  echo "Usage: license-header.sh <get|check|add|update|migrate> [args]"
+  echo ""
+  echo "Commands:"
+  echo "  get                     Print the license header for this repo"
+  echo "  check <file|--staged>   Validate header exists and matches repo type"
+  echo "  add <file|--all>        Add header to file(s) missing it"
+  echo "  update <file|--all>     Update copyright year in existing headers"
+  echo "  migrate <open-source|private>  Convert all files and LICENSE file"
+  exit 1
+  ;;
 esac

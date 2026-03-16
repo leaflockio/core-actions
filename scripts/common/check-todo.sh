@@ -26,8 +26,8 @@ for f in $CHECK_FILES; do
 
   # Skip binaries and generated files
   case "$f" in
-    *.png|*.jpg|*.gif|*.ico|*.svg|*.woff|*.woff2|*.ttf|*.eot) continue ;;
-    *.lock|*.min.js|*.min.css|*.map) continue ;;
+  *.png | *.jpg | *.gif | *.ico | *.svg | *.woff | *.woff2 | *.ttf | *.eot) continue ;;
+  *.lock | *.min.js | *.min.css | *.map) continue ;;
   esac
 
   # In staged mode, only check new lines from the diff
@@ -35,23 +35,23 @@ for f in $CHECK_FILES; do
   if [ "$CHECK_MODE" = "all" ]; then
     CONTENT=$(cat "$f" 2>/dev/null || true)
   else
-    CONTENT=$(git diff --cached -- "$f" \
-      | grep '^+' \
-      | grep -v '^+++' \
-      || true)
+    CONTENT=$(git diff --cached -- "$f" |
+      grep '^+' |
+      grep -v '^+++' ||
+      true)
   fi
 
   [ -z "$CONTENT" ] && continue
 
   # Find bare markers without a ticket reference like (#123) or (PROJ-123)
   # Skip lines where the marker appears inside quotes or as part of a variable name
-  BARE_TODOS=$(echo "$CONTENT" \
-    | grep -E '(TODO|FIXME)' \
-    | grep -vE '(TODO|FIXME)\([A-Za-z]*#?[0-9]+\)' \
-    | grep -vE "['\"].*TODO|TODO.*['\"]" \
-    | grep -vE "['\"].*FIXME|FIXME.*['\"]" \
-    | grep -vE '[A-Z_](TODO|FIXME)|(TODO|FIXME)[A-Z_]' \
-    || true)
+  BARE_TODOS=$(echo "$CONTENT" |
+    grep -E '(TODO|FIXME)' |
+    grep -vE '(TODO|FIXME)\([A-Za-z]*#?[0-9]+\)' |
+    grep -vE "['\"].*TODO|TODO.*['\"]" |
+    grep -vE "['\"].*FIXME|FIXME.*['\"]" |
+    grep -vE '[A-Z_](TODO|FIXME)|(TODO|FIXME)[A-Z_]' ||
+    true)
 
   if [ -n "$BARE_TODOS" ]; then
     log_error "Bare TODO/FIXME without ticket number in: $f"

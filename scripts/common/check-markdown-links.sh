@@ -15,7 +15,7 @@
 MD_FILES=""
 for f in $CHECK_FILES; do
   case "$f" in
-    *.md) MD_FILES="$MD_FILES $f" ;;
+  *.md) MD_FILES="$MD_FILES $f" ;;
   esac
 done
 
@@ -41,13 +41,13 @@ for file in $MD_FILES; do
 
     # External links: warn if unreachable
     case "$TARGET" in
-      http://*|https://*)
-        STATUS=$(curl -sL -o /dev/null -w '%{http_code}' --max-time "$LINK_CHECK_TIMEOUT" "$TARGET" 2>/dev/null || echo "000")
-        if [ "$STATUS" -ge 400 ] || [ "$STATUS" = "000" ]; then
-          log_warn "External link may be broken in $file:$LINE_NUM → $TARGET (HTTP $STATUS)"
-        fi
-        continue
-        ;;
+    http://* | https://*)
+      STATUS=$(curl -sL -o /dev/null -w '%{http_code}' --max-time "$LINK_CHECK_TIMEOUT" "$TARGET" 2>/dev/null || echo "000")
+      if [ "$STATUS" -ge 400 ] || [ "$STATUS" = "000" ]; then
+        log_warn "External link may be broken in $file:$LINE_NUM → $TARGET (HTTP $STATUS)"
+      fi
+      continue
+      ;;
     esac
 
     # Internal links: check if target exists
@@ -63,7 +63,7 @@ done
 if [ "$FAIL" -ne 0 ]; then
   echo ""
   log_error "Broken internal links in markdown files."
-  log_info  "Fix the paths above or remove the broken links."
+  log_info "Fix the paths above or remove the broken links."
   exit 1
 fi
 

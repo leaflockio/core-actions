@@ -15,7 +15,7 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 for PROTECTED_BRANCH in $PROTECTED_BRANCHES; do
   if [ "$BRANCH" = "$PROTECTED_BRANCH" ]; then
     log_error "Direct commits to '$BRANCH' are not allowed."
-    log_info  "Create a feature branch and open a PR."
+    log_info "Create a feature branch and open a PR."
     exit 1
   fi
 done

@@ -12,7 +12,7 @@
 
 if ! command -v gitleaks >/dev/null 2>&1; then
   log_error "gitleaks is not installed."
-  log_info  "Run: leaf setup"
+  log_info "Run: leaf setup"
   exit 1
 fi
 
@@ -26,7 +26,7 @@ if [ "$CHECK_MODE" = "all" ]; then
 else
   if ! gitleaks protect --staged --redact --verbose; then
     log_error "Secrets detected in staged changes. Commit blocked."
-    log_info  "Remove the secret and rotate it immediately if it was ever pushed."
+    log_info "Remove the secret and rotate it immediately if it was ever pushed."
     exit 1
   fi
 fi

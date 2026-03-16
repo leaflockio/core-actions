@@ -29,19 +29,19 @@ CHECK_MODE="staged"
 if [ -f ".hooks-config" ]; then
   while IFS='=' read -r key value; do
     case "$key" in
-      ''|\#*) continue ;;
+    '' | \#*) continue ;;
     esac
     case "$key" in
-      PARTIAL_STAGE)         PARTIAL_STAGE="$value" ;;
-      MAX_FILE_SIZE)         MAX_FILE_SIZE="$value" ;;
-      MAX_FILE_LINES)        MAX_FILE_LINES="$value" ;;
-      MAX_COMMIT_LINES)      MAX_COMMIT_LINES="$value" ;;
-      MAX_COMMIT_MSG_LENGTH) MAX_COMMIT_MSG_LENGTH="$value" ;;
-      PROTECTED_BRANCHES)    PROTECTED_BRANCHES="$value" ;;
-      LINK_CHECK_TIMEOUT)    LINK_CHECK_TIMEOUT="$value" ;;
-      CHECK_MODE)            CHECK_MODE="$value" ;;
+    PARTIAL_STAGE) PARTIAL_STAGE="$value" ;;
+    MAX_FILE_SIZE) MAX_FILE_SIZE="$value" ;;
+    MAX_FILE_LINES) MAX_FILE_LINES="$value" ;;
+    MAX_COMMIT_LINES) MAX_COMMIT_LINES="$value" ;;
+    MAX_COMMIT_MSG_LENGTH) MAX_COMMIT_MSG_LENGTH="$value" ;;
+    PROTECTED_BRANCHES) PROTECTED_BRANCHES="$value" ;;
+    LINK_CHECK_TIMEOUT) LINK_CHECK_TIMEOUT="$value" ;;
+    CHECK_MODE) CHECK_MODE="$value" ;;
     esac
-  done < .hooks-config
+  done <.hooks-config
 fi
 
 # ── File list ───────────────────────────────────────────────────────

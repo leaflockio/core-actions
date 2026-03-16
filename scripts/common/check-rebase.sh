@@ -27,7 +27,7 @@ BRANCH="${2:-$(git rev-parse --abbrev-ref HEAD)}"
 for _pb in $PROTECTED_BRANCHES; do
   if [ "$BRANCH" = "$_pb" ]; then
     log_error "Rebasing '$BRANCH' is not allowed."
-    log_info  "Protected branches must never be rebased."
+    log_info "Protected branches must never be rebased."
     exit 1
   fi
 done

@@ -26,7 +26,7 @@ for f in $CHECK_FILES; do
 
   # Skip binary-ish files
   case "$f" in
-    *.png|*.jpg|*.gif|*.ico|*.woff|*.woff2|*.ttf|*.eot|*.lock) continue ;;
+  *.png | *.jpg | *.gif | *.ico | *.woff | *.woff2 | *.ttf | *.eot | *.lock) continue ;;
   esac
 
   # In staged mode, only check new lines from the diff
@@ -34,10 +34,10 @@ for f in $CHECK_FILES; do
   if [ "$CHECK_MODE" = "all" ]; then
     CONTENT=$(cat "$f" 2>/dev/null || true)
   else
-    CONTENT=$(git diff --cached -- "$f" \
-      | grep '^+' \
-      | grep -v '^+++' \
-      || true)
+    CONTENT=$(git diff --cached -- "$f" |
+      grep '^+' |
+      grep -v '^+++' ||
+      true)
   fi
 
   [ -z "$CONTENT" ] && continue
@@ -45,16 +45,16 @@ for f in $CHECK_FILES; do
   # UNIX absolute paths: /word/word starting from root (not relative)
   # Requires space, quote, or start-of-line before the leading /
   # Excludes relative paths (../), command substitutions, .git/ paths
-  UNIX_MATCHES=$(echo "$CONTENT" \
-    | grep -E '(^|[[:space:]"'\''=])/[a-zA-Z][a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+' \
-    | grep -vE '^\+?\s*#!' \
-    | grep -vE '://' \
-    | grep -vE '/dev/null' \
-    | grep -vE '^\+?\s*(#|//|/\*|\*).*example' \
-    | grep -vE 'import |from |require\(' \
-    | grep -vE '/api/|/v[0-9]+/' \
-    | grep -vE '\$\(|\.git/' \
-    || true)
+  UNIX_MATCHES=$(echo "$CONTENT" |
+    grep -E '(^|[[:space:]"'\''=])/[a-zA-Z][a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+' |
+    grep -vE '^\+?\s*#!' |
+    grep -vE '://' |
+    grep -vE '/dev/null' |
+    grep -vE '^\+?\s*(#|//|/\*|\*).*example' |
+    grep -vE 'import |from |require\(' |
+    grep -vE '/api/|/v[0-9]+/' |
+    grep -vE '\$\(|\.git/' ||
+    true)
 
   if [ -n "$UNIX_MATCHES" ]; then
     log_error "Hardcoded UNIX path in: $f"
@@ -71,9 +71,9 @@ for f in $CHECK_FILES; do
   fi
 
   # Windows absolute paths: C:\, D:\, etc.
-  WIN_MATCHES=$(echo "$CONTENT" \
-    | grep -E '[A-Z]:\\[A-Za-z]' \
-    || true)
+  WIN_MATCHES=$(echo "$CONTENT" |
+    grep -E '[A-Z]:\\[A-Za-z]' ||
+    true)
 
   if [ -n "$WIN_MATCHES" ]; then
     log_error "Hardcoded Windows path in: $f"
@@ -93,7 +93,7 @@ done
 if [ "$FAIL" -ne 0 ]; then
   echo ""
   log_error "Hardcoded absolute paths detected."
-  log_info  "Replace with relative paths or environment variables."
+  log_info "Replace with relative paths or environment variables."
   exit 1
 fi
 

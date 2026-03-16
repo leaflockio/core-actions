@@ -12,7 +12,7 @@
 
 if ! command -v prettier >/dev/null 2>&1; then
   log_error "prettier is not installed."
-  log_info  "Run: npm install -g prettier"
+  log_info "Run: npm install -g prettier"
   exit 1
 fi
 
@@ -20,8 +20,9 @@ fi
 FORMAT_FILES=""
 for f in $CHECK_FILES; do
   case "$f" in
-    *.yml|*.yaml|*.json|*.md|*.js|*.jsx|*.ts|*.tsx|*.css|*.html)
-      FORMAT_FILES="$FORMAT_FILES $f" ;;
+  *.yml | *.yaml | *.json | *.md | *.js | *.jsx | *.ts | *.tsx | *.css | *.html)
+    FORMAT_FILES="$FORMAT_FILES $f"
+    ;;
   esac
 done
 
@@ -46,7 +47,7 @@ done
 if [ "$FAIL" -ne 0 ]; then
   echo ""
   log_error "Formatting errors detected."
-  log_info  "Run: prettier --write <file> to fix."
+  log_info "Run: prettier --write <file> to fix."
   exit 1
 fi
 

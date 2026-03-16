@@ -22,7 +22,7 @@ FAIL=0
 
 for f in $CHECK_FILES; do
   [ -f "$f" ] || continue
-  SIZE=$(wc -c < "$f")
+  SIZE=$(wc -c <"$f")
   if [ "$SIZE" -gt "$MAX_FILE_SIZE" ]; then
     log_error "File too large: $f (${SIZE} bytes, max ${MAX_FILE_SIZE})"
     FAIL=1
