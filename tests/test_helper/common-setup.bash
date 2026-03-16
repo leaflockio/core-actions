@@ -33,7 +33,7 @@ create_mock() {
   local body="${2:-exit 0}"
   local mock_path="${TEST_BIN_DIR}/${name}"
 
-  cat > "$mock_path" <<MOCK
+  cat >"$mock_path" <<MOCK
 #!/bin/sh
 ${body}
 MOCK

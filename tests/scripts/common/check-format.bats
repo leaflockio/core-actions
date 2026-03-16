@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -24,7 +24,7 @@ teardown() {
 
 @test "passes when no formattable files staged" {
   create_mock prettier
-  echo "hello" > data.bin
+  echo "hello" >data.bin
   git add data.bin
 
   run sh "$SCRIPT"
@@ -34,7 +34,7 @@ teardown() {
 
 @test "passes when prettier reports files are formatted" {
   create_mock prettier 'exit 0'
-  echo '{"key": "value"}' > config.json
+  echo '{"key": "value"}' >config.json
   git add config.json
 
   run sh "$SCRIPT"
@@ -44,7 +44,7 @@ teardown() {
 
 @test "fails when prettier reports unformatted files" {
   create_mock prettier 'exit 1'
-  echo '{"key":"value"}' > config.json
+  echo '{"key":"value"}' >config.json
   git add config.json
 
   run sh "$SCRIPT"
@@ -54,7 +54,7 @@ teardown() {
 
 @test "checks only formattable extensions" {
   create_mock prettier 'exit 1'
-  echo "data" > file.bin
+  echo "data" >file.bin
   git add file.bin
 
   run sh "$SCRIPT"

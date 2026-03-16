@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -43,7 +43,7 @@ teardown() {
       detect) exit 0 ;;
       *) exit 1 ;;
     esac'
-  echo "CHECK_MODE=all" > .hooks-config
+  echo "CHECK_MODE=all" >.hooks-config
   git add .hooks-config
 
   run sh "$SCRIPT"

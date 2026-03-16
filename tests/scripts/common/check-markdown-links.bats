@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "passes when no markdown files staged" {
-  echo "data" > file.txt
+  echo "data" >file.txt
   git add file.txt
 
   run sh "$SCRIPT"
@@ -26,8 +26,8 @@ teardown() {
 }
 
 @test "passes with valid internal link" {
-  echo "target content" > guide.md
-  cat > docs.md <<'EOF'
+  echo "target content" >guide.md
+  cat >docs.md <<'EOF'
 See the [guide](guide.md) for details.
 EOF
   git add docs.md guide.md
@@ -38,7 +38,7 @@ EOF
 }
 
 @test "detects broken internal link" {
-  cat > docs.md <<'EOF'
+  cat >docs.md <<'EOF'
 See the [guide](nonexistent.md) for details.
 EOF
   git add docs.md
@@ -50,7 +50,7 @@ EOF
 }
 
 @test "skips pure anchor links" {
-  cat > docs.md <<'EOF'
+  cat >docs.md <<'EOF'
 See the [section](#overview) below.
 EOF
   git add docs.md

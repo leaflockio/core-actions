@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -22,7 +22,7 @@ teardown() {
 }
 
 @test "passes with file under limit" {
-  seq 1 100 > short.js
+  seq 1 100 >short.js
   git add short.js
 
   run sh "$SCRIPT"
@@ -31,7 +31,7 @@ teardown() {
 }
 
 @test "blocks file exceeding default 2000 lines" {
-  seq 1 2001 > long.js
+  seq 1 2001 >long.js
   git add long.js
 
   run sh "$SCRIPT"
@@ -40,8 +40,8 @@ teardown() {
 }
 
 @test "respects custom MAX_FILE_LINES from .hooks-config" {
-  echo "MAX_FILE_LINES=50" > .hooks-config
-  seq 1 51 > medium.js
+  echo "MAX_FILE_LINES=50" >.hooks-config
+  seq 1 51 >medium.js
   git add medium.js .hooks-config
 
   run sh "$SCRIPT"
@@ -50,8 +50,8 @@ teardown() {
 }
 
 @test "skips binary and generated files" {
-  seq 1 3000 > image.png
-  seq 1 3000 > deps.lock
+  seq 1 3000 >image.png
+  seq 1 3000 >deps.lock
   git add image.png deps.lock
 
   run sh "$SCRIPT"
@@ -59,8 +59,8 @@ teardown() {
 }
 
 @test "skips CHANGELOG and LICENSE files" {
-  seq 1 3000 > CHANGELOG.md
-  seq 1 3000 > LICENSE
+  seq 1 3000 >CHANGELOG.md
+  seq 1 3000 >LICENSE
   git add CHANGELOG.md LICENSE
 
   run sh "$SCRIPT"

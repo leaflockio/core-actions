@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -22,7 +22,7 @@ teardown() {
 }
 
 @test "passes with relative paths" {
-  cat > app.js <<'EOF'
+  cat >app.js <<'EOF'
 const config = require("./config");
 const data = require("../shared/data");
 EOF
@@ -35,7 +35,7 @@ EOF
 
 @test "detects hardcoded UNIX absolute path" {
   # Build path dynamically to avoid triggering the hook on this file
-  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" > app.js
+  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
   git add app.js
 
   run sh "$SCRIPT"
@@ -46,7 +46,7 @@ EOF
 @test "detects hardcoded Windows absolute path" {
   # Build path dynamically to avoid triggering the hook on this file
   local winpath='C:'"\\Us"'ers'"\\j"'ohn'"\\p"'rojects'
-  printf 'const dir = "%s";\n' "$winpath" > app.js
+  printf 'const dir = "%s";\n' "$winpath" >app.js
   git add app.js
 
   run sh "$SCRIPT"
@@ -55,7 +55,7 @@ EOF
 }
 
 @test "skips URLs" {
-  cat > app.js <<'EOF'
+  cat >app.js <<'EOF'
 const url = "https://example.com/api/data";
 EOF
   git add app.js
@@ -65,7 +65,7 @@ EOF
 }
 
 @test "skips binary files" {
-  echo "binary" > image.png
+  echo "binary" >image.png
   git add image.png
 
   run sh "$SCRIPT"

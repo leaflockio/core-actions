@@ -6,7 +6,7 @@ setup() {
   init_test_repo
 
   # Initial commit so branches work
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 

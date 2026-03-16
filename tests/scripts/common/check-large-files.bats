@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -23,7 +23,7 @@ teardown() {
 }
 
 @test "passes with small file" {
-  echo "small content" > small.txt
+  echo "small content" >small.txt
   git add small.txt
 
   run sh "$SCRIPT"
@@ -42,7 +42,7 @@ teardown() {
 }
 
 @test "respects custom MAX_FILE_SIZE from .hooks-config" {
-  echo "MAX_FILE_SIZE=100" > .hooks-config
+  echo "MAX_FILE_SIZE=100" >.hooks-config
   # Create file larger than 100 bytes
   dd if=/dev/zero of=medium.bin bs=1 count=200 2>/dev/null
   git add medium.bin .hooks-config

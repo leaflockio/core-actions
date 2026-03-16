@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -32,7 +32,7 @@ teardown() {
 
 @test "passes when cspell reports no errors" {
   create_mock cspell 'exit 0'
-  echo "hello world" > doc.md
+  echo "hello world" >doc.md
   git add doc.md
 
   run sh "$SCRIPT"
@@ -46,7 +46,7 @@ teardown() {
   # Write misspelled content via variable to avoid cspell flagging this file
   local bad="spe"
   bad="${bad}ling er${bad:0:0}or"
-  printf '%s\n' "$bad" > doc.md
+  printf '%s\n' "$bad" >doc.md
   git add doc.md
 
   run sh "$SCRIPT"

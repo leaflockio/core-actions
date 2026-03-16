@@ -5,7 +5,7 @@ setup() {
   _common_setup
   init_test_repo
 
-  echo "init" > README.md
+  echo "init" >README.md
   git add README.md
   git commit -m "init"
 
@@ -31,7 +31,7 @@ teardown() {
 
 @test "exits 0 when patch has files not in staging" {
   mkdir -p "$(git rev-parse --git-dir)/info"
-  cat > "$(git rev-parse --git-dir)/info/lefthook-unstaged.patch" <<'EOF'
+  cat >"$(git rev-parse --git-dir)/info/lefthook-unstaged.patch" <<'EOF'
 diff --git a/untracked.txt b/untracked.txt
 --- a/untracked.txt
 +++ b/untracked.txt
@@ -45,11 +45,11 @@ EOF
 }
 
 @test "blocks when staged file also has unstaged changes" {
-  echo "original" > app.js
+  echo "original" >app.js
   git add app.js
 
   mkdir -p "$(git rev-parse --git-dir)/info"
-  cat > "$(git rev-parse --git-dir)/info/lefthook-unstaged.patch" <<'EOF'
+  cat >"$(git rev-parse --git-dir)/info/lefthook-unstaged.patch" <<'EOF'
 diff --git a/app.js b/app.js
 --- a/app.js
 +++ b/app.js

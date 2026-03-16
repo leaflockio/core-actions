@@ -22,7 +22,7 @@ get_config_var() {
   # POSIX sh allows setting $0 via: sh script arg — here we exec a
   # temporary script whose path lives alongside config.sh
   local wrapper="${SCRIPT_DIR}/.config-test-wrapper.sh"
-  cat > "$wrapper" <<EOF
+  cat >"$wrapper" <<EOF
 #!/bin/sh
 ${pre}
 . "\$(dirname "\$0")/config.sh"
@@ -46,7 +46,7 @@ EOF
 }
 
 @test "config reads overrides from .hooks-config" {
-  cat > .hooks-config <<'EOF'
+  cat >.hooks-config <<'EOF'
 MAX_FILE_SIZE=500000
 MAX_FILE_LINES=1000
 PROTECTED_BRANCHES=main develop
@@ -59,7 +59,7 @@ EOF
 }
 
 @test "config ignores comments and blank lines in .hooks-config" {
-  cat > .hooks-config <<'EOF'
+  cat >.hooks-config <<'EOF'
 # This is a comment
 MAX_FILE_SIZE=999
 
@@ -70,11 +70,11 @@ EOF
 }
 
 @test "config populates CHECK_FILES from staged files in staged mode" {
-  echo "hello" > test.txt
+  echo "hello" >test.txt
   git add test.txt
   git commit -m "init"
 
-  echo "world" > new.txt
+  echo "world" >new.txt
   git add new.txt
 
   local result
@@ -83,11 +83,11 @@ EOF
 }
 
 @test "config populates CHECK_FILES from all tracked files in all mode" {
-  echo "hello" > test.txt
+  echo "hello" >test.txt
   git add test.txt
   git commit -m "init"
 
-  echo "CHECK_MODE=all" > .hooks-config
+  echo "CHECK_MODE=all" >.hooks-config
 
   local result
   result="$(get_config_var CHECK_FILES)"
