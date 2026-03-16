@@ -1,0 +1,11 @@
+# Shell script specific hooks.
+# Always use alongside common.yml.
+
+pre-push:
+  parallel: true
+  commands:
+    lint-sh:
+      glob: '**/*.sh'
+      run: shellcheck {push_files}
+    test-sh:
+      run: npx bats --recursive tests/
