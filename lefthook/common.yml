@@ -36,6 +36,9 @@ pre-commit:
             run: bash scripts/common/check-spelling.sh
           - name: check-format
             run: bash scripts/common/check-format.sh
+          - name: check-markdown-lint
+            glob: '**/*.md'
+            run: markdownlint-cli2 {staged_files}
           - name: check-todo
             run: bash scripts/common/check-todo.sh
           - name: check-license-header
