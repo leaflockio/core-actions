@@ -72,7 +72,7 @@ teardown() {
 
   echo "UNCOMMITTED_PUSH=prompt" >.hooks-config
 
-  run sh "$SCRIPT" <<< "y"
+  run sh "$SCRIPT" <<<"y"
   [ "$status" -eq 0 ]
 }
 
@@ -84,7 +84,7 @@ teardown() {
 
   echo "UNCOMMITTED_PUSH=prompt" >.hooks-config
 
-  run sh "$SCRIPT" <<< "n"
+  run sh "$SCRIPT" <<<"n"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Push aborted"* ]]
 }
