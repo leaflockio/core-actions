@@ -1,11 +1,26 @@
 # Shell script specific hooks.
 # Always use alongside common.yml.
 
+pre-commit:
+  piped: true
+  jobs:
+    - name: parallel-checks
+      group:
+        parallel: true
+        jobs:
+          - name: format-sh
+            glob: '**/*.sh'
+            run: shfmt -d {staged_files}
+          - name: lint-sh
+            glob: '**/*.sh'
+            run: shellcheck -x --source-path=SCRIPTDIR {staged_files}
+
 pre-push:
-  parallel: true
-  commands:
-    lint-sh:
-      glob: '**/*.sh'
-      run: shellcheck {push_files}
-    test-sh:
-      run: npx bats --recursive tests/
+  piped: true
+  jobs:
+    - name: parallel-checks
+      group:
+        parallel: true
+        jobs:
+          - name: test-sh
+            run: npx bats --recursive tests/

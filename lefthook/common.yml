@@ -14,7 +14,8 @@ pre-commit:
     - name: check-partial-stage
       run: bash scripts/common/check-partial-stage.sh
       interactive: true
-    - group:
+    - name: parallel-checks
+      group:
         parallel: true
         jobs:
           - name: check-branch
@@ -61,7 +62,14 @@ pre-rebase:
       run: bash scripts/common/check-rebase.sh {1} {2}
 
 pre-push:
-  parallel: true
-  commands:
-    check-signing:
-      run: bash scripts/common/check-signing.sh
+  piped: true
+  jobs:
+    - name: check-uncommitted
+      run: bash scripts/common/check-uncommitted.sh
+      interactive: true
+    - name: parallel-checks
+      group:
+        parallel: true
+        jobs:
+          - name: check-signing
+            run: bash scripts/common/check-signing.sh
