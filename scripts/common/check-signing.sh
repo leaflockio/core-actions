@@ -28,7 +28,7 @@ check_commit() {
 }
 
 # Determine which commits to check
-REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name @{upstream} 2>/dev/null)
+REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)
 
 if [ -z "$REMOTE" ]; then
   if git rev-parse --verify origin/main >/dev/null 2>&1; then

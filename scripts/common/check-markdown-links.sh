@@ -32,7 +32,10 @@ for file in $MD_FILES; do
   FILE_DIR=$(dirname "$file")
 
   # Extract markdown links: [text](url-or-path)
-  grep -noE '\[([^]]*)\]\(([^)]+)\)' "$file" 2>/dev/null | while IFS= read -r match; do
+  MATCHES_FILE=$(mktemp)
+  grep -noE '\[([^]]*)\]\(([^)]+)\)' "$file" 2>/dev/null >"$MATCHES_FILE" || true
+
+  while IFS= read -r match; do
     LINE_NUM=$(echo "$match" | cut -d: -f1)
     TARGET=$(echo "$match" | sed 's/.*](\([^)]*\))/\1/' | sed 's/#.*//' | sed 's/?.*//')
 
@@ -57,7 +60,8 @@ for file in $MD_FILES; do
       log_error "Broken link in $file:$LINE_NUM → $TARGET"
       FAIL=1
     fi
-  done
+  done <"$MATCHES_FILE"
+  rm -f "$MATCHES_FILE"
 done
 
 if [ "$FAIL" -ne 0 ]; then

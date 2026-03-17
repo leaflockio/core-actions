@@ -7,6 +7,7 @@
 
 # Centralized hook configuration. Reads .hooks-config and sets defaults.
 # Source this in scripts that need configurable values.
+# shellcheck disable=SC2034 # Variables are used by scripts that source this file.
 
 SCRIPTS_DIR="$(dirname "$0")"
 
@@ -16,6 +17,7 @@ SCRIPTS_DIR="$(dirname "$0")"
 # ── Defaults ────────────────────────────────────────────────────────
 
 PARTIAL_STAGE="fail"
+UNCOMMITTED_PUSH="fail"
 MAX_FILE_SIZE=1000000
 MAX_FILE_LINES=2000
 MAX_COMMIT_LINES=400
@@ -33,6 +35,7 @@ if [ -f ".hooks-config" ]; then
     esac
     case "$key" in
     PARTIAL_STAGE) PARTIAL_STAGE="$value" ;;
+    UNCOMMITTED_PUSH) UNCOMMITTED_PUSH="$value" ;;
     MAX_FILE_SIZE) MAX_FILE_SIZE="$value" ;;
     MAX_FILE_LINES) MAX_FILE_LINES="$value" ;;
     MAX_COMMIT_LINES) MAX_COMMIT_LINES="$value" ;;

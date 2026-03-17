@@ -74,7 +74,6 @@ should_skip_file() {
   *.min.js | *.min.css) return 0 ;;
   LICENSE* | CHANGELOG*) return 0 ;;
   .gitignore | .prettierignore | .env* | .license-config) return 0 ;;
-  package.json | package-lock.json) return 0 ;;
   node_modules/* | dist/* | build/* | coverage/* | .git/*) return 0 ;;
   esac
   return 1
