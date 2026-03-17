@@ -18,60 +18,60 @@ teardown() {
 }
 
 @test "blocks commit on main branch" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Direct commits to 'main' are not allowed"* ]]
 }
 
 @test "blocks commit on master branch" {
   git checkout -b master
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Direct commits to 'master'"* ]]
 }
 
 @test "blocks commit on pre-main branch" {
   git checkout -b pre-main
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Direct commits to 'pre-main' are not allowed"* ]]
 }
 
 @test "blocks invalid branch name" {
   git checkout -b my-bad-branch
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Invalid branch name"* ]]
 }
 
 @test "passes with valid feature branch" {
   git checkout -b feature/123-add-login
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Branch check passed"* ]]
 }
 
 @test "passes with valid fix branch" {
   git checkout -b fix/87-login-redirect
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
 @test "passes with valid hotfix branch" {
   git checkout -b hotfix/201-payment-failure
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
 @test "blocks branch name missing issue number" {
   git checkout -b feature/add-login
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Invalid branch name"* ]]
 }
 
 @test "blocks branch name with uppercase" {
   git checkout -b feature/123-Add-Login
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
 }

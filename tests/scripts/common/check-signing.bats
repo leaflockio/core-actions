@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "fails when commit is not signed" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"is not signed"* ]]
 }

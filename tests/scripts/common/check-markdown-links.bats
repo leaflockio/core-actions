@@ -20,7 +20,7 @@ teardown() {
   echo "data" >file.txt
   git add file.txt
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"No markdown files to check"* ]]
 }
@@ -32,7 +32,7 @@ See the [guide](guide.md) for details.
 EOF
   git add docs.md guide.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Markdown link check passed"* ]]
 }
@@ -43,7 +43,7 @@ See the [guide](nonexistent.md) for details.
 EOF
   git add docs.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Broken link"* ]]
 }
@@ -54,6 +54,6 @@ See the [section](#overview) below.
 EOF
   git add docs.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

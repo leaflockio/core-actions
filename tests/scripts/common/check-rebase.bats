@@ -17,33 +17,33 @@ teardown() {
 }
 
 @test "blocks rebasing main branch" {
-  run sh "$SCRIPT" "pre-main" "main"
+  run bash "$SCRIPT" "pre-main" "main"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Rebasing 'main' is not allowed"* ]]
 }
 
 @test "blocks rebasing master branch" {
-  run sh "$SCRIPT" "pre-main" "master"
+  run bash "$SCRIPT" "pre-main" "master"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Rebasing 'master' is not allowed"* ]]
 }
 
 @test "blocks rebasing pre-main branch" {
-  run sh "$SCRIPT" "main" "pre-main"
+  run bash "$SCRIPT" "main" "pre-main"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Rebasing 'pre-main' is not allowed"* ]]
 }
 
 @test "allows rebasing feature branch with warning" {
   git checkout -b feature/42-add-tests
-  run sh "$SCRIPT" "pre-main" "feature/42-add-tests"
+  run bash "$SCRIPT" "pre-main" "feature/42-add-tests"
   [ "$status" -eq 0 ]
   [[ "$output" == *"--force-with-lease"* ]]
 }
 
 @test "uses current branch when second arg is empty" {
   # On main, should block
-  run sh "$SCRIPT" "pre-main"
+  run bash "$SCRIPT" "pre-main"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Rebasing 'main' is not allowed"* ]]
 }

@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "passes when no files to check" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Large file check passed"* ]]
 }
@@ -26,7 +26,7 @@ teardown() {
   echo "small content" >small.txt
   git add small.txt
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Large file check passed"* ]]
 }
@@ -36,7 +36,7 @@ teardown() {
   dd if=/dev/zero of=big.bin bs=1024 count=1025 2>/dev/null
   git add big.bin
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"File too large"* ]]
 }
@@ -47,7 +47,7 @@ teardown() {
   dd if=/dev/zero of=medium.bin bs=1 count=200 2>/dev/null
   git add medium.bin .hooks-config
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"File too large"* ]]
 }

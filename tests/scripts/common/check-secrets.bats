@@ -17,21 +17,21 @@ teardown() {
 }
 
 @test "fails when gitleaks is not installed" {
-  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" sh "$SCRIPT"
+  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"gitleaks is not installed"* ]]
 }
 
 @test "passes when gitleaks finds no secrets in staged mode" {
   create_mock gitleaks 'exit 0'
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"No secrets found"* ]]
 }
 
 @test "fails when gitleaks detects secrets in staged mode" {
   create_mock gitleaks 'exit 1'
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Secrets detected"* ]]
 }
@@ -46,7 +46,7 @@ teardown() {
   echo "CHECK_MODE=all" >.hooks-config
   git add .hooks-config
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"No secrets found"* ]]
 }
@@ -59,6 +59,6 @@ teardown() {
       *) exit 1 ;;
     esac'
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

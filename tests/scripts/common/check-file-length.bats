@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "passes when no files to check" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -25,7 +25,7 @@ teardown() {
   seq 1 100 >short.js
   git add short.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"File length check passed"* ]]
 }
@@ -34,7 +34,7 @@ teardown() {
   seq 1 2001 >long.js
   git add long.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"File too long"* ]]
 }
@@ -44,7 +44,7 @@ teardown() {
   seq 1 51 >medium.js
   git add medium.js .hooks-config
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"File too long"* ]]
 }
@@ -54,7 +54,7 @@ teardown() {
   seq 1 3000 >deps.lock
   git add image.png deps.lock
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -63,6 +63,6 @@ teardown() {
   seq 1 3000 >LICENSE
   git add CHANGELOG.md LICENSE
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

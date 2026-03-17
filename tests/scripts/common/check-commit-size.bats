@@ -20,7 +20,7 @@ teardown() {
   echo "CHECK_MODE=all" >.hooks-config
   git add .hooks-config
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -28,7 +28,7 @@ teardown() {
   seq 1 10 >small.js
   git add small.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" != *"Commit changes"* ]]
 }
@@ -41,7 +41,7 @@ teardown() {
   seq 1 20 >big.js
   git add big.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Commit changes"* ]]
   [[ "$output" == *"splitting into smaller"* ]]
@@ -51,7 +51,7 @@ teardown() {
   seq 1 500 >app.test.js
   git add app.test.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" != *"Commit changes"* ]]
 }

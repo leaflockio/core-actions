@@ -26,7 +26,7 @@ teardown() {
   git add file.txt
   git commit -m "add file"
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -38,7 +38,7 @@ teardown() {
   # Dirty a different file that is not part of the push
   echo "changed" >README.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -50,7 +50,7 @@ teardown() {
   # Modify the same file without committing
   echo "local fix" >file.txt
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"uncommitted local changes"* ]]
   [[ "$output" == *"file.txt"* ]]
@@ -60,7 +60,7 @@ teardown() {
   # All commits are already pushed, dirty file is not in any push diff
   echo "dirty" >>README.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -72,7 +72,7 @@ teardown() {
 
   echo "UNCOMMITTED_PUSH=prompt" >.hooks-config
 
-  run sh "$SCRIPT" <<<"y"
+  run bash "$SCRIPT" <<<"y"
   [ "$status" -eq 0 ]
 }
 
@@ -84,7 +84,7 @@ teardown() {
 
   echo "UNCOMMITTED_PUSH=prompt" >.hooks-config
 
-  run sh "$SCRIPT" <<<"n"
+  run bash "$SCRIPT" <<<"n"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Push aborted"* ]]
 }
@@ -97,6 +97,6 @@ teardown() {
   git commit -m "add file"
   echo "dirty" >file.txt
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

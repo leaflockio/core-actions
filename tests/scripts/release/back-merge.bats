@@ -59,7 +59,7 @@ WRAPPER
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Back-merge complete"* ]]
 
@@ -75,7 +75,7 @@ WRAPPER
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
   # Check merge commit message on pre-main
@@ -90,7 +90,7 @@ WRAPPER
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
   git checkout pre-main
@@ -104,7 +104,7 @@ WRAPPER
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
   # Verify remote pre-main has the VERSION file
@@ -128,14 +128,14 @@ WRAPPER
 
   git checkout main
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Back-merge conflict detected"* ]]
   [[ "$output" == *"Manual resolution required"* ]]
 }
 
 @test "succeeds when main and pre-main are already in sync" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Back-merge complete"* ]]
 }
@@ -155,7 +155,7 @@ WRAPPER
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
   # Verify both files exist on pre-main

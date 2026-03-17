@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "passes when no files to check" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -28,7 +28,7 @@ const data = require("../shared/data");
 EOF
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Path check passed"* ]]
 }
@@ -38,7 +38,7 @@ EOF
   printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Hardcoded UNIX path"* ]]
 }
@@ -49,7 +49,7 @@ EOF
   printf 'const dir = "%s";\n' "$winpath" >app.js
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Hardcoded Windows path"* ]]
 }
@@ -60,7 +60,7 @@ const url = "https://example.com/api/data";
 EOF
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -68,6 +68,6 @@ EOF
   echo "binary" >image.png
   git add image.png
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "fails when prettier is not installed" {
-  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" sh "$SCRIPT"
+  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"prettier is not installed"* ]]
 }
@@ -27,7 +27,7 @@ teardown() {
   echo "hello" >data.bin
   git add data.bin
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"No files to format check"* ]]
 }
@@ -37,7 +37,7 @@ teardown() {
   echo '{"key": "value"}' >config.json
   git add config.json
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Formatting check passed"* ]]
 }
@@ -47,7 +47,7 @@ teardown() {
   echo '{"key":"value"}' >config.json
   git add config.json
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Not formatted"* ]]
 }
@@ -57,6 +57,6 @@ teardown() {
   echo "data" >file.bin
   git add file.bin
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

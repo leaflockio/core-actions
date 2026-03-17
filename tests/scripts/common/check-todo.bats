@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "passes when no files to check" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -28,7 +28,7 @@ teardown() {
 EOF
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"TODO check passed"* ]]
 }
@@ -39,7 +39,7 @@ EOF
   printf '// %s fix this later\n' "$marker" >app.js
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Bare TODO/FIXME without ticket"* ]]
 }
@@ -49,7 +49,7 @@ EOF
   printf '// %s broken on edge case\n' "$marker" >app.js
   git add app.js
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Bare TODO/FIXME without ticket"* ]]
 }
@@ -60,6 +60,6 @@ EOF
   printf '%s no ticket\n' "$marker" >deps.lock
   git add image.png deps.lock
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }

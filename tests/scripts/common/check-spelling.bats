@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "fails when cspell is not installed" {
-  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" sh "$SCRIPT"
+  run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"cspell is not installed"* ]]
 }
@@ -25,7 +25,7 @@ teardown() {
 @test "passes when no files to check" {
   create_mock cspell
   # No staged files
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"No files to spell check"* ]]
 }
@@ -35,7 +35,7 @@ teardown() {
   echo "hello world" >doc.md
   git add doc.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Spelling check passed"* ]]
 }
@@ -49,7 +49,7 @@ teardown() {
   printf '%s\n' "$bad" >doc.md
   git add doc.md
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Spelling errors detected"* ]]
 }

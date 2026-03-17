@@ -17,7 +17,7 @@ teardown() {
 }
 
 @test "exits 0 when no patch file exists" {
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -25,7 +25,7 @@ teardown() {
   mkdir -p "$(git rev-parse --git-dir)/info"
   touch "$(git rev-parse --git-dir)/info/lefthook-unstaged.patch"
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -40,7 +40,7 @@ diff --git a/untracked.txt b/untracked.txt
 +new
 EOF
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
 
@@ -58,7 +58,7 @@ diff --git a/app.js b/app.js
 +modified
 EOF
 
-  run sh "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"modified after staging"* ]]
 }
