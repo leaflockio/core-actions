@@ -127,8 +127,42 @@ wrap_header() {
 }
 
 file_has_header() {
+  head -n 10 "$1" | grep -q "Copyright [0-9]\{4\}"
+}
+
+# Validates year, org, and license type match current values.
+# Returns 0 if valid, 1 if not. Sets HEADER_ISSUE with the reason.
+validate_header() {
   HEAD_LINES=$(head -n 10 "$1")
-  echo "$HEAD_LINES" | grep -q "Copyright [0-9]\{4\} $ORG_NAME"
+  HEADER_ISSUE=""
+
+  # Check year
+  if ! echo "$HEAD_LINES" | grep -q "Copyright $CURRENT_YEAR"; then
+    HEADER_ISSUE="outdated year"
+    return 1
+  fi
+
+  # Check org
+  if ! echo "$HEAD_LINES" | grep -q "Copyright $CURRENT_YEAR $ORG_NAME"; then
+    HEADER_ISSUE="wrong org (expected $ORG_NAME)"
+    return 1
+  fi
+
+  # Check license type matches expected template
+  EXPECTED_TYPE=$(detect_license_type)
+  if [ "$EXPECTED_TYPE" = "private" ]; then
+    if ! echo "$HEAD_LINES" | grep -q "proprietary and confidential"; then
+      HEADER_ISSUE="wrong license type (expected proprietary)"
+      return 1
+    fi
+  else
+    if ! echo "$HEAD_LINES" | grep -q "open source"; then
+      HEADER_ISSUE="wrong license type (expected open-source)"
+      return 1
+    fi
+  fi
+
+  return 0
 }
 
 get_all_source_files() {
@@ -180,13 +214,18 @@ cmd_check() {
     if ! file_has_header "$f"; then
       log_error "Missing license header: $f"
       FAIL=1
+    elif ! validate_header "$f"; then
+      log_error "$f — $HEADER_ISSUE"
+      FAIL=1
     fi
   done
 
   if [ "$FAIL" -ne 0 ]; then
     echo ""
-    log_error "Files missing license header."
-    log_info "Run: license-header.sh add --all"
+    log_error "License header issues detected."
+    log_info "Run: license-header.sh update --all   (fix year)"
+    log_info "Run: license-header.sh add --all      (add missing headers)"
+    log_info "Run: license-header.sh migrate <type> (change license type)"
     exit 1
   fi
 
