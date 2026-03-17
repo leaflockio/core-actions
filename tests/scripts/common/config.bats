@@ -36,6 +36,7 @@ EOF
 
 @test "config sets default values" {
   [ "$(get_config_var PARTIAL_STAGE)" = "fail" ]
+  [ "$(get_config_var UNCOMMITTED_PUSH)" = "fail" ]
   [ "$(get_config_var MAX_FILE_SIZE)" = "1000000" ]
   [ "$(get_config_var MAX_FILE_LINES)" = "2000" ]
   [ "$(get_config_var MAX_COMMIT_LINES)" = "400" ]

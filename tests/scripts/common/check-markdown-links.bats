@@ -44,9 +44,8 @@ EOF
   git add docs.md
 
   run sh "$SCRIPT"
-  [ "$status" -eq 0 ]
-  # Note: broken link detection happens inside a pipe subshell,
-  # so FAIL=1 may not propagate. This tests the script runs without crashing.
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Broken link"* ]]
 }
 
 @test "skips pure anchor links" {
