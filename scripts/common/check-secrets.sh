@@ -10,11 +10,7 @@
 
 . "$(dirname "$0")/config.sh"
 
-if ! command -v gitleaks >/dev/null 2>&1; then
-  log_error "gitleaks is not installed."
-  log_info "Run: leaf setup"
-  exit 1
-fi
+require_command "gitleaks" "leaf setup"
 
 log_info "Scanning for secrets..."
 

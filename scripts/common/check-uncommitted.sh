@@ -28,17 +28,7 @@ fi
 
 # Files included in commits being pushed
 # Compare local HEAD against the remote tracking branch
-REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)
-
-if [ -z "$REMOTE" ]; then
-  if git rev-parse --verify origin/main >/dev/null 2>&1; then
-    REMOTE="origin/main"
-  elif git rev-parse --verify origin/master >/dev/null 2>&1; then
-    REMOTE="origin/master"
-  else
-    exit 0
-  fi
-fi
+REMOTE=$(get_remote_branch) || exit 0
 
 PUSH_FILES=$(git diff --name-only "$REMOTE"..HEAD 2>/dev/null)
 
@@ -74,15 +64,8 @@ log_info "To discard changes:  git checkout -- <file>"
 echo ""
 
 if [ "$UNCOMMITTED_PUSH" = "prompt" ]; then
-  printf "Push anyway? [y/N] "
-  read -r REPLY
-  case "$REPLY" in
-  y | Y) exit 0 ;;
-  *)
-    log_error "Push aborted."
-    exit 1
-    ;;
-  esac
+  prompt_yn "Push anyway?" "Push aborted." || exit 1
+  exit 0
 fi
 
 log_error "Push blocked. Commit or discard uncommitted changes before pushing."

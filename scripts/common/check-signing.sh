@@ -28,16 +28,12 @@ check_commit() {
 }
 
 # Determine which commits to check
-REMOTE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)
+REMOTE=$(get_remote_branch)
 
-if [ -z "$REMOTE" ]; then
-  if git rev-parse --verify origin/main >/dev/null 2>&1; then
-    COMMITS=$(git rev-list origin/main..HEAD 2>/dev/null)
-  else
-    COMMITS=$(git rev-list HEAD 2>/dev/null)
-  fi
-else
+if [ -n "$REMOTE" ]; then
   COMMITS=$(git rev-list "$REMOTE"..HEAD 2>/dev/null)
+else
+  COMMITS=$(git rev-list HEAD 2>/dev/null)
 fi
 
 # If called from post-commit with no upstream yet, just check HEAD

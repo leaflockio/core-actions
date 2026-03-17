@@ -96,15 +96,7 @@ log_info "  git apply .git/info/lefthook-unstaged.patch"
 echo ""
 
 if [ "$PARTIAL_STAGE" = "prompt" ]; then
-  printf "Proceed with staged version? [y/N] "
-  read -r REPLY
-  case "$REPLY" in
-  y | Y) exit 0 ;;
-  *)
-    log_error "Commit aborted."
-    exit 1
-    ;;
-  esac
+  prompt_yn "Proceed with staged version?" "Commit aborted." || exit 1
 else
   log_error "Commit blocked. Stage or discard unstaged changes before committing."
   exit 1

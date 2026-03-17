@@ -10,11 +10,7 @@
 
 . "$(dirname "$0")/config.sh"
 
-if ! command -v prettier >/dev/null 2>&1; then
-  log_error "prettier is not installed."
-  log_info "Run: npm install -g prettier"
-  exit 1
-fi
+require_command "prettier" "npm install -g prettier"
 
 # Filter CHECK_FILES to formattable extensions
 FORMAT_FILES=""

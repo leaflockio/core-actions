@@ -10,11 +10,7 @@
 
 . "$(dirname "$0")/config.sh"
 
-if ! command -v cspell >/dev/null 2>&1; then
-  log_error "cspell is not installed."
-  log_info "Run: npm install -g cspell"
-  exit 1
-fi
+require_command "cspell" "npm install -g cspell"
 
 if [ -z "$CHECK_FILES" ]; then
   log_success "No files to spell check."

@@ -25,21 +25,9 @@ for f in $CHECK_FILES; do
   [ -f "$f" ] || continue
 
   # Skip binaries and generated files
-  case "$f" in
-  *.png | *.jpg | *.gif | *.ico | *.svg | *.woff | *.woff2 | *.ttf | *.eot) continue ;;
-  *.lock | *.min.js | *.min.css | *.map) continue ;;
-  esac
+  is_skippable_file "$f" && continue
 
-  # In staged mode, only check new lines from the diff
-  # In all mode, check the full file
-  if [ "$CHECK_MODE" = "all" ]; then
-    CONTENT=$(cat "$f" 2>/dev/null || true)
-  else
-    CONTENT=$(git diff --cached -- "$f" |
-      grep '^+' |
-      grep -v '^+++' ||
-      true)
-  fi
+  CONTENT=$(get_file_content "$f" "$CHECK_MODE")
 
   [ -z "$CONTENT" ] && continue
 

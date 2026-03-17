@@ -24,13 +24,11 @@ UPSTREAM="$1"
 BRANCH="${2:-$(git rev-parse --abbrev-ref HEAD)}"
 
 # Block rebasing protected branches
-for _pb in $PROTECTED_BRANCHES; do
-  if [ "$BRANCH" = "$_pb" ]; then
-    log_error "Rebasing '$BRANCH' is not allowed."
-    log_info "Protected branches must never be rebased."
-    exit 1
-  fi
-done
+if is_protected_branch "$BRANCH"; then
+  log_error "Rebasing '$BRANCH' is not allowed."
+  log_info "Protected branches must never be rebased."
+  exit 1
+fi
 
 # Warn about force push safety
 log_warn "After rebasing, push with --force-with-lease (never --force)."

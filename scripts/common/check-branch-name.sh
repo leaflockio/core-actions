@@ -25,9 +25,7 @@ fi
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Skip protected branches — they have their own naming
-for _pb in $PROTECTED_BRANCHES; do
-  [ "$BRANCH" = "$_pb" ] && exit 0
-done
+is_protected_branch "$BRANCH" && exit 0
 
 NAMING_PATTERN='^(feature|fix|chore|docs|refactor|hotfix)/[0-9]+-[a-z0-9-]+$'
 
