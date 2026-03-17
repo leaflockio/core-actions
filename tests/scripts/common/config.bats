@@ -21,7 +21,7 @@ get_config_var() {
   local pre="${2:-}"
   # POSIX sh allows setting $0 via: sh script arg — here we exec a
   # temporary script whose path lives alongside config.sh
-  local wrapper="${SCRIPT_DIR}/.config-test-wrapper.sh"
+  local wrapper="${SCRIPT_DIR}/.config-test-wrapper-$$.sh"
   cat >"$wrapper" <<EOF
 #!/bin/sh
 ${pre}
