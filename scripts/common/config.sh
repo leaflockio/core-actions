@@ -50,7 +50,7 @@ if [ -f ".hooks-config" ]; then
     COVERAGE_SRC) COVERAGE_SRC="$value" ;;
     CHECK_MODE) CHECK_MODE="$value" ;;
     esac
-  done <.hooks-config
+  done <<<"$(cat .hooks-config)"
 fi
 
 # ── File list ───────────────────────────────────────────────────────
