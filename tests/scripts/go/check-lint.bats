@@ -4,7 +4,7 @@ setup() {
   load "../../test_helper/common-setup"
   _common_setup
 
-  SCRIPT="${PROJECT_ROOT}/scripts/go/lint.sh"
+  SCRIPT="${PROJECT_ROOT}/scripts/go/check-lint.sh"
 }
 
 teardown() {
