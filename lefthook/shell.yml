@@ -22,5 +22,5 @@ pre-push:
       group:
         parallel: true
         jobs:
-          - name: test-sh
-            run: npx bats --recursive tests/
+          - name: coverage
+            run: PERCENT=$(bash scripts/coverage.sh --docker) && bash scripts/common/check-coverage.sh "$PERCENT"
