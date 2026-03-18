@@ -108,7 +108,7 @@ WRAPPER
   [ "$status" -eq 0 ]
 
   # Verify remote pre-main has the VERSION file
-  VERIFY_DIR=$(mktemp -d)
+  VERIFY_DIR="${TEST_TEMP_DIR}/verify"
   git clone --branch pre-main "${TEST_TEMP_DIR}/remote.git" "$VERIFY_DIR" 2>/dev/null
   [ -f "$VERIFY_DIR/VERSION" ]
 }

@@ -17,16 +17,15 @@ teardown() {
 get_config_var() {
   local var="$1"
   local pre="${2:-}"
-  local wrapper="${SCRIPT_DIR}/.config-test-wrapper-$$.sh"
+  local wrapper="${TEST_TEMP_DIR}/.config-test-wrapper-$$.sh"
   cat >"$wrapper" <<EOF
 #!/usr/bin/env bash
 ${pre}
-. "\$(dirname "\${BASH_SOURCE[0]}")/config.sh"
+. "${SCRIPT_DIR}/config.sh"
 eval 'printf "%s\n" "\$${var}"'
 EOF
   local result
   result=$(cd "$REPO_DIR" && bash "$wrapper")
-  rm -f "$wrapper"
   printf '%s' "$result"
 }
 
