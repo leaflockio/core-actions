@@ -13,23 +13,19 @@ teardown() {
   _common_teardown
 }
 
-# Source config.sh in a subshell where $0 is set to a path inside
-# scripts/common/ so that dirname "$0" resolves correctly.
 # Usage: get_config_var VAR_NAME [PRE_COMMANDS]
 get_config_var() {
   local var="$1"
   local pre="${2:-}"
-  # POSIX sh allows setting $0 via: sh script arg — here we exec a
-  # temporary script whose path lives alongside config.sh
   local wrapper="${SCRIPT_DIR}/.config-test-wrapper-$$.sh"
   cat >"$wrapper" <<EOF
-#!/bin/sh
+#!/usr/bin/env bash
 ${pre}
-. "\$(dirname "\$0")/config.sh"
+. "\$(dirname "\${BASH_SOURCE[0]}")/config.sh"
 eval 'printf "%s\n" "\$${var}"'
 EOF
   local result
-  result=$(cd "$REPO_DIR" && sh "$wrapper")
+  result=$(cd "$REPO_DIR" && bash "$wrapper")
   rm -f "$wrapper"
   printf '%s' "$result"
 }
