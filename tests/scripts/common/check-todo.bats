@@ -56,7 +56,7 @@ EOF
 
 @test "passes with PROJ-style ticket reference" {
   cat >app.js <<'EOF'
-// TODO(PROJ789) migrate to new API
+// TODO(PROJ-789) migrate to new API
 EOF
   git add app.js
 

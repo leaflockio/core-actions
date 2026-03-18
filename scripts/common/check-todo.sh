@@ -34,7 +34,7 @@ for f in $CHECK_FILES; do
   # Find bare markers without a ticket reference like (#123) or (PROJ-123)
   # Skip lines where the marker appears inside quotes or as part of a variable name
   BARE_TODOS=$(echo "$CONTENT" | grep -E '(TODO|FIXME)' || true)
-  BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '(TODO|FIXME)\([A-Za-z]*#?[0-9]+\)' || true)
+  BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '(TODO|FIXME)\([A-Za-z]*-?#?[0-9]+\)' || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE "['\"].*TODO|TODO.*['\"]" || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE "['\"].*FIXME|FIXME.*['\"]" || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '[A-Z_](TODO|FIXME)|(TODO|FIXME)[A-Z_]' || true)
