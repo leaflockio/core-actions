@@ -88,8 +88,10 @@ PASSED=${PASSED:-0}
 FAILED=${FAILED:-0}
 TOTAL=$((PASSED + FAILED))
 
+ELAPSED=$(($(date +%s) - START_TIME))
+
 if [ "$FAILED" -gt 0 ]; then
-  log_error "Tests: ${PASSED} passed, ${FAILED} failed (${TOTAL} total)" >&2
+  log_error "Tests: ${PASSED} passed, ${FAILED} failed (${TOTAL} total) in ${ELAPSED}s" >&2
   echo "" >&2
   grep '^not ok ' "$OUTPUT_FILE" | while read -r line; do
     log_error "  $line" >&2
@@ -99,7 +101,7 @@ if [ "$FAILED" -gt 0 ]; then
   done
   echo "" >&2
 else
-  log_success "Tests: ${PASSED} passed (${TOTAL} total)" >&2
+  log_success "Tests: ${PASSED} passed (${TOTAL} total) in ${ELAPSED}s" >&2
 fi
 
 # Validate all tests were discovered and executed
@@ -123,9 +125,7 @@ COVERAGE_FILE=$(find "$REPO_ROOT/coverage" -name "coverage.json" -not -path "*/k
 if [ -n "$COVERAGE_FILE" ]; then
   REPORT_DIR=$(dirname "$COVERAGE_FILE")
   PERCENT=$(jq -r '.percent_covered' "$COVERAGE_FILE")
-  ELAPSED=$(($(date +%s) - START_TIME))
   log_success "Coverage: ${PERCENT}%" >&2
-  log_info "Completed in ${ELAPSED}s" >&2
   log_info "Report: ${REPORT_DIR}/index.html" >&2
 
   # Output percentage to stdout for callers
