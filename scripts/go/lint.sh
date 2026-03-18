@@ -5,15 +5,15 @@
 # software, via any medium, is strictly prohibited without prior
 # written permission from Leaflock.
 
-# Runs go vet on the entire module.
+# Runs golangci-lint on the entire module.
 
 . "$(dirname "$0")/../common/utils.sh"
 
-log_info "Running go vet..."
+log_info "Running golangci-lint..."
 
-if ! go vet ./...; then
-  log_error "go vet found issues. Fix them before committing."
+if ! golangci-lint run ./...; then
+  log_error "golangci-lint found issues. Fix them before committing."
   exit 1
 fi
 
-log_success "go vet passed."
+log_success "golangci-lint passed."
