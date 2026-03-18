@@ -51,6 +51,16 @@ teardown() {
   [[ "$output" == *"No secrets found"* ]]
 }
 
+@test "fails when gitleaks detects secrets in all mode" {
+  create_mock gitleaks 'exit 1'
+  echo "CHECK_MODE=all" >.hooks-config
+  git add .hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Secrets detected"* ]]
+}
+
 @test "uses protect --staged in staged mode" {
   # Mock gitleaks that checks for 'protect' argument
   create_mock gitleaks '
