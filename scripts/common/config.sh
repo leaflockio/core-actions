@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2026 Leaflock. All rights reserved.
 # This source code is proprietary and confidential.
 # Unauthorized copying, modification, distribution, or use of this
@@ -9,7 +9,7 @@
 # Source this in scripts that need configurable values.
 # shellcheck disable=SC2034 # Variables are used by scripts that source this file.
 
-SCRIPTS_DIR="$(dirname "$0")"
+SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 # Load logging utilities
 . "$SCRIPTS_DIR/utils.sh"

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2026 Leaflock. All rights reserved.
 # This source code is proprietary and confidential.
 # Unauthorized copying, modification, distribution, or use of this

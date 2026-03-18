@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2026 Leaflock. All rights reserved.
 # This source code is proprietary and confidential.
 # Unauthorized copying, modification, distribution, or use of this
@@ -46,7 +46,7 @@ for f in $CHECK_FILES; do
     # Match each flagged line against the file to get line numbers
     echo "$BARE_TODOS" | while IFS= read -r line; do
       # Strip the leading + from diff output for matching
-      CLEAN=$(echo "$line" | sed 's/^+//')
+      CLEAN="${line#+}"
       LINE_NUM=$(grep -nF "$CLEAN" "$f" 2>/dev/null | head -1 | cut -d: -f1)
       if [ -n "$LINE_NUM" ]; then
         echo "  $f:$LINE_NUM: $CLEAN"

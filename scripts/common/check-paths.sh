@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2026 Leaflock. All rights reserved.
 # This source code is proprietary and confidential.
 # Unauthorized copying, modification, distribution, or use of this
@@ -48,7 +48,7 @@ for f in $CHECK_FILES; do
   if [ -n "$UNIX_MATCHES" ]; then
     log_error "Hardcoded UNIX path in: $f"
     echo "$UNIX_MATCHES" | while IFS= read -r line; do
-      CLEAN=$(echo "$line" | sed 's/^+//')
+      CLEAN="${line#+}"
       LINE_NUM=$(grep -nF "$CLEAN" "$f" 2>/dev/null | head -1 | cut -d: -f1)
       if [ -n "$LINE_NUM" ]; then
         echo "  $f:$LINE_NUM: $CLEAN"
@@ -67,7 +67,7 @@ for f in $CHECK_FILES; do
   if [ -n "$WIN_MATCHES" ]; then
     log_error "Hardcoded Windows path in: $f"
     echo "$WIN_MATCHES" | while IFS= read -r line; do
-      CLEAN=$(echo "$line" | sed 's/^+//')
+      CLEAN="${line#+}"
       LINE_NUM=$(grep -nF "$CLEAN" "$f" 2>/dev/null | head -1 | cut -d: -f1)
       if [ -n "$LINE_NUM" ]; then
         echo "  $f:$LINE_NUM: $CLEAN"

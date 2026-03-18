@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2026 Leaflock. All rights reserved.
 # This source code is proprietary and confidential.
 # Unauthorized copying, modification, distribution, or use of this
@@ -23,17 +23,16 @@ for arg in "$@"; do
   esac
 done
 
-# Load logging utilities
-. "$REPO_ROOT/scripts/common/utils.sh"
+. "$REPO_ROOT/scripts/common/config.sh"
 
 mkdir -p "$REPO_ROOT/coverage"
 
 # Build kcov flags from COVERAGE_SRC (space-separated paths)
-KCOV_DOCKER_FLAGS=""
-KCOV_NATIVE_FLAGS=""
+KCOV_DOCKER_FLAGS=()
+KCOV_NATIVE_FLAGS=()
 for src in $COVERAGE_SRC; do
-  KCOV_DOCKER_FLAGS="$KCOV_DOCKER_FLAGS --bash-parse-files-in-dir=/repo/$src/ --include-pattern=/repo/$src/"
-  KCOV_NATIVE_FLAGS="$KCOV_NATIVE_FLAGS --bash-parse-files-in-dir=$REPO_ROOT/$src/ --include-pattern=$REPO_ROOT/$src/"
+  KCOV_DOCKER_FLAGS+=(--bash-parse-files-in-dir="/repo/$src/" --include-pattern="/repo/$src/")
+  KCOV_NATIVE_FLAGS+=(--bash-parse-files-in-dir="$REPO_ROOT/$src/" --include-pattern="$REPO_ROOT/$src/")
 done
 
 log_info "Running tests under kcov..." >&2
@@ -64,11 +63,10 @@ DOCKERFILE
     -v "${REPO_ROOT}:/repo" \
     -w /repo \
     "$IMAGE_NAME" \
-    sh -c "kcov --bash-dont-parse-binary-dir $KCOV_DOCKER_FLAGS /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --recursive /repo/tests/" \
+    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --recursive /repo/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 else
-  # shellcheck disable=SC2086 # Word splitting intended — flags built from COVERAGE_SRC
-  kcov --bash-dont-parse-binary-dir $KCOV_NATIVE_FLAGS "$REPO_ROOT/coverage" bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
+  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
