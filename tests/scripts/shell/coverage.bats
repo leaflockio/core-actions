@@ -38,6 +38,11 @@ mock_bats_count() {
       exit 0
     fi
   "
+  create_mock npx "
+    CMD=\"\$1\"
+    shift
+    exec \"\$(dirname \"\$0\")/\$CMD\" \"\$@\"
+  "
 }
 
 # Helper: create a mock kcov that produces TAP output
