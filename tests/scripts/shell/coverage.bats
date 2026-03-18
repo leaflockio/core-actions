@@ -6,6 +6,9 @@ setup() {
 
   SCRIPT="${PROJECT_ROOT}/scripts/shell/coverage.sh"
 
+  # Point coverage output to temp dir so tests don't touch real coverage/
+  export COVERAGE_OUTPUT_DIR="${TEST_TEMP_DIR}/coverage"
+
   # Create coverage JSON in temp dir (not the real project coverage/)
   COVERAGE_DIR="${TEST_TEMP_DIR}/coverage/bats.test"
   mkdir -p "$COVERAGE_DIR"
@@ -24,6 +27,17 @@ JSON
 
 teardown() {
   _common_teardown
+}
+
+# Mock bats --count to return expected test count
+mock_bats_count() {
+  local count="${1:-3}"
+  create_mock bats "
+    if [ \"\$1\" = \"--count\" ]; then
+      echo \"${count}\"
+      exit 0
+    fi
+  "
 }
 
 # Helper: create a mock kcov that produces TAP output
@@ -46,6 +60,7 @@ mock_docker_all_passing() {
 }
 
 @test "fails when --docker and Docker is not running" {
+  mock_bats_count 1
   create_mock docker 'exit 1'
   run bash "$SCRIPT" --docker
   [ "$status" -eq 1 ]
@@ -53,6 +68,7 @@ mock_docker_all_passing() {
 }
 
 @test "native mode runs kcov and outputs coverage percent" {
+  mock_bats_count 3
   mock_kcov_passing
   create_mock jq 'echo "88.07"'
   create_mock nproc 'echo "4"'
@@ -62,6 +78,7 @@ mock_docker_all_passing() {
 }
 
 @test "exits non-zero when tests fail in native mode" {
+  mock_bats_count 3
   mock_kcov_failing
   create_mock nproc 'echo "4"'
   run bash "$SCRIPT"
@@ -69,6 +86,7 @@ mock_docker_all_passing() {
 }
 
 @test "reports test failure count in stderr" {
+  mock_bats_count 3
   mock_kcov_failing
   create_mock nproc 'echo "4"'
   run bash -c "export PATH=\"${TEST_BIN_DIR}:\$PATH\"; bash \"$SCRIPT\" 2>&1"
@@ -77,6 +95,7 @@ mock_docker_all_passing() {
 }
 
 @test "docker mode runs kcov via docker and outputs coverage percent" {
+  mock_bats_count 3
   mock_docker_all_passing
   create_mock jq 'echo "88.07"'
   run bash "$SCRIPT" --docker
@@ -84,11 +103,44 @@ mock_docker_all_passing() {
   [[ "$output" == *"88.07"* ]]
 }
 
+@test "docker mode builds image when it does not exist" {
+  mock_bats_count 1
+  create_mock docker '
+    case "$1" in
+      info) exit 0 ;;
+      image) exit 1 ;;
+      build) exit 0 ;;
+      run) printf "1..1\nok 1 test one in 100ms\n" ;;
+    esac
+  '
+  create_mock jq 'echo "88.07"'
+  run bash "$SCRIPT" --docker
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Building coverage image"* ]]
+}
+
 @test "fails when no coverage JSON found" {
+  mock_bats_count 3
   mock_kcov_passing
   create_mock nproc 'echo "4"'
   create_mock find ''
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Could not determine coverage"* ]]
+}
+
+@test "fails when test count does not match expected" {
+  mock_bats_count 10
+  mock_kcov_passing
+  create_mock nproc 'echo "4"'
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Expected 10 tests but only 3 ran"* ]]
+}
+
+@test "fails when no tests found" {
+  mock_bats_count 0
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"No tests found"* ]]
 }

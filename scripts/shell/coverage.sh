@@ -25,7 +25,18 @@ done
 
 . "$REPO_ROOT/scripts/common/config.sh"
 
-mkdir -p "$REPO_ROOT/coverage"
+COVERAGE_OUTPUT_DIR="${COVERAGE_OUTPUT_DIR:-$REPO_ROOT/coverage}"
+
+# Clean stale coverage data so reports always reflect the current run
+rm -rf "$COVERAGE_OUTPUT_DIR"
+mkdir -p "$COVERAGE_OUTPUT_DIR"
+
+# Get expected test count before running
+EXPECTED_TESTS=$(bats --count --recursive "$REPO_ROOT/tests/")
+if [ -z "$EXPECTED_TESTS" ] || [ "$EXPECTED_TESTS" -eq 0 ]; then
+  log_error "No tests found." >&2
+  exit 1
+fi
 
 # Build kcov flags from COVERAGE_SRC (space-separated paths)
 KCOV_DOCKER_FLAGS=()
@@ -35,7 +46,7 @@ for src in $COVERAGE_SRC; do
   KCOV_NATIVE_FLAGS+=(--bash-parse-files-in-dir="$REPO_ROOT/$src/" --include-pattern="$REPO_ROOT/$src/")
 done
 
-log_info "Running tests under kcov..." >&2
+log_info "Running tests under kcov (${EXPECTED_TESTS} tests)..." >&2
 START_TIME=$(date +%s)
 
 OUTPUT_FILE=$(mktemp)
@@ -71,8 +82,8 @@ else
 fi
 
 # Display clean test results (TAP lines only)
-PASSED=$(grep -Ec '^ok [0-9]' "$OUTPUT_FILE")
-FAILED=$(grep -Ec '^not ok [0-9]' "$OUTPUT_FILE")
+PASSED=$(grep -Ec '^ok [0-9]' "$OUTPUT_FILE" || true)
+FAILED=$(grep -Ec '^not ok [0-9]' "$OUTPUT_FILE" || true)
 PASSED=${PASSED:-0}
 FAILED=${FAILED:-0}
 TOTAL=$((PASSED + FAILED))
@@ -91,10 +102,19 @@ else
   log_success "Tests: ${PASSED} passed (${TOTAL} total)" >&2
 fi
 
+# Validate all tests were discovered and executed
+if [ "$TOTAL" -ne "$EXPECTED_TESTS" ]; then
+  log_error "Expected ${EXPECTED_TESTS} tests but only ${TOTAL} ran." >&2
+  log_warn "This is likely a flaky test discovery issue. Retry the command." >&2
+  rm -f "$OUTPUT_FILE"
+  exit 1
+fi
+
 rm -f "$OUTPUT_FILE"
 
-# Fail if any tests failed
+# Fail if kcov or tests failed
 if [ "$KCOV_EXIT" -ne 0 ] || [ "$FAILED" -gt 0 ]; then
+  log_error "kcov exited with code ${KCOV_EXIT}." >&2
   exit 1
 fi
 
