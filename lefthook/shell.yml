@@ -23,4 +23,4 @@ pre-push:
         parallel: true
         jobs:
           - name: coverage
-            run: PERCENT=$(bash scripts/coverage.sh --docker) && bash scripts/common/check-coverage.sh "$PERCENT"
+            run: PERCENT=$(bash scripts/shell/coverage.sh --docker) && bash scripts/common/check-coverage.sh "$PERCENT"
