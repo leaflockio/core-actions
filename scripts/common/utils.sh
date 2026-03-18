@@ -9,6 +9,7 @@
 # Use: . "$(dirname "$0")/config.sh"
 
 supports_color() {
+  [ -n "$FORCE_COLOR" ] && return 0
   [ -n "$NO_COLOR" ] && return 1
   case "$(uname -s)" in
   MINGW* | CYGWIN* | MSYS*) return 1 ;;
@@ -104,7 +105,6 @@ get_file_content() {
   else
     git diff --cached -- "$1" |
       grep '^+' |
-      grep -v '^+++' ||
-      true
+      grep -v '^+++' || true
   fi
 }

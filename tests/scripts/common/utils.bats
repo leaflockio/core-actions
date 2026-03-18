@@ -24,6 +24,12 @@ teardown() {
   [ "$status" -eq 1 ]
 }
 
+@test "supports_color returns 1 on Windows (MINGW)" {
+  create_mock uname 'echo "MINGW64_NT-10.0"'
+  run bash -c 'unset NO_COLOR; . "$1" && supports_color' _ "${PROJECT_ROOT}/scripts/common/utils.sh"
+  [ "$status" -eq 1 ]
+}
+
 # --- color variables ---
 
 @test "color variables are empty when NO_COLOR is set" {
@@ -32,6 +38,21 @@ teardown() {
   [ -z "$YELLOW" ]
   [ -z "$BLUE" ]
   [ -z "$RESET" ]
+}
+
+@test "color variables are set when color is supported" {
+  run bash -c 'FORCE_COLOR=1 . "$1" && echo "$RED|$GREEN|$YELLOW|$BLUE|$RESET"' _ "${PROJECT_ROOT}/scripts/common/utils.sh"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'\033[0;31m'* ]]
+  [[ "$output" == *'\033[0;32m'* ]]
+  [[ "$output" == *'\033[1;33m'* ]]
+  [[ "$output" == *'\033[0;34m'* ]]
+  [[ "$output" == *'\033[0m'* ]]
+}
+
+@test "FORCE_COLOR overrides no-tty detection" {
+  run bash -c 'export FORCE_COLOR=1; . "$1"; supports_color' _ "${PROJECT_ROOT}/scripts/common/utils.sh"
+  [ "$status" -eq 0 ]
 }
 
 # --- log_info ---
@@ -135,6 +156,22 @@ teardown() {
   run get_remote_branch
   [ "$status" -eq 0 ]
   [ "$output" = "origin/main" ]
+}
+
+@test "get_remote_branch falls back to origin/master" {
+  init_test_repo
+  echo "init" >README.md
+  git add README.md
+  git commit -m "init"
+
+  # Rename default branch to master so origin/main doesn't exist
+  git branch -m main master
+  git remote add origin "${TEST_TEMP_DIR}/repo"
+  git fetch origin
+
+  run get_remote_branch
+  [ "$status" -eq 0 ]
+  [ "$output" = "origin/master" ]
 }
 
 @test "get_remote_branch returns 1 when no remote exists" {
