@@ -71,3 +71,36 @@ EOF
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
+
+@test "prints UNIX path without line number when grep cannot match" {
+  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
+  git add app.js
+  echo "completely different content" >app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}
+
+@test "prints Windows path without line number when grep cannot match" {
+  local winpath='C:'"\\Us"'ers'"\\j"'ohn'"\\p"'rojects'
+  printf 'const dir = "%s";\n' "$winpath" >app.js
+  git add app.js
+  echo "completely different content" >app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded Windows path"* ]]
+}
+
+@test "detects hardcoded paths in all mode" {
+  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
+  git add app.js
+  git commit -m "add file"
+
+  echo "CHECK_MODE=all" >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}

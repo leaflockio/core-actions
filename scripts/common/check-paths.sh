@@ -34,16 +34,14 @@ for f in $CHECK_FILES; do
   # UNIX absolute paths: /word/word starting from root (not relative)
   # Requires space, quote, or start-of-line before the leading /
   # Excludes relative paths (../), command substitutions, .git/ paths
-  UNIX_MATCHES=$(echo "$CONTENT" |
-    grep -E '(^|[[:space:]"'\''=])/[a-zA-Z][a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+' |
-    grep -vE '^\+?\s*#!' |
-    grep -vE '://' |
-    grep -vE '/dev/null' |
-    grep -vE '^\+?\s*(#|//|/\*|\*).*example' |
-    grep -vE 'import |from |require\(' |
-    grep -vE '/api/|/v[0-9]+/' |
-    grep -vE '\$\(|\.git/' ||
-    true)
+  UNIX_MATCHES=$(echo "$CONTENT" | grep -E '(^|[[:space:]"'\''=])/[a-zA-Z][a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '^\+?\s*#!' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '://' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '/dev/null' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '^\+?\s*(#|//|/\*|\*).*example' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE 'import |from |require\(' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '/api/|/v[0-9]+/' || true)
+  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '\$\(|\.git/' || true)
 
   if [ -n "$UNIX_MATCHES" ]; then
     log_error "Hardcoded UNIX path in: $f"
@@ -60,9 +58,7 @@ for f in $CHECK_FILES; do
   fi
 
   # Windows absolute paths: C:\, D:\, etc.
-  WIN_MATCHES=$(echo "$CONTENT" |
-    grep -E '[A-Z]:\\[A-Za-z]' ||
-    true)
+  WIN_MATCHES=$(echo "$CONTENT" | grep -E '[A-Z]:\\[A-Za-z]' || true)
 
   if [ -n "$WIN_MATCHES" ]; then
     log_error "Hardcoded Windows path in: $f"
