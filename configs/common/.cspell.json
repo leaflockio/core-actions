@@ -102,6 +102,7 @@
     "printf",
     "xargs",
     "numstat",
+    "ACMR",
     "subshell",
     "substr",
     "gpgsign",
@@ -119,6 +120,7 @@
     "gunicorn",
 
     "gofmt",
+    "coverprofile",
     "gomod",
     "gosum",
     "golangci",
@@ -128,6 +130,7 @@
 
     "dockerignore",
     "dockerfile",
+    "Procfile",
     "healthcheck",
     "kubernetes",
 
