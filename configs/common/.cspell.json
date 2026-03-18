@@ -70,6 +70,7 @@
     "ghaction",
     "netlify",
     "codecov",
+    "kcov",
 
     "premain",
     "backmerge",
