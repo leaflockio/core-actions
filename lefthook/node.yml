@@ -1,0 +1,19 @@
+# Node.js / JavaScript / TypeScript specific hooks.
+# Always use alongside common.yml.
+
+pre-commit:
+  piped: true
+  jobs:
+    - name: node-checks
+      group:
+        parallel: true
+        jobs:
+          - name: check-naming
+            run: bash scripts/node/check-naming.sh
+          - name: lint-staged
+            run: bash scripts/node/lint-staged.sh
+
+pre-push:
+  jobs:
+    - name: coverage
+      run: bash scripts/node/coverage.sh
