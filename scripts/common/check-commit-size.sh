@@ -24,11 +24,10 @@ if [ "$CHECK_MODE" = "all" ]; then
 fi
 
 # Count insertions and deletions from staged changes, excluding test/generated files
-TOTAL_CHANGED=$(git diff --cached --numstat |
-  grep -vE '\.(test|spec)\.(ts|tsx|js|jsx|py|go)' |
-  grep -vE '(\.lock|CHANGELOG|LICENSE)' |
-  awk '{ added += $1; deleted += $2 } END { print added + deleted }' \
-    2>/dev/null)
+TOTAL_CHANGED=$(git diff --cached --numstat 2>/dev/null || true)
+TOTAL_CHANGED=$(echo "$TOTAL_CHANGED" | grep -vE '\.(test|spec)\.(ts|tsx|js|jsx|py|go)' || true)
+TOTAL_CHANGED=$(echo "$TOTAL_CHANGED" | grep -vE '(\.lock|CHANGELOG|LICENSE)' || true)
+TOTAL_CHANGED=$(echo "$TOTAL_CHANGED" | awk '{ added += $1; deleted += $2 } END { print added + deleted }')
 
 TOTAL_CHANGED="${TOTAL_CHANGED:-0}"
 
