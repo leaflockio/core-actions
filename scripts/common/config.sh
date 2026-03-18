@@ -24,6 +24,8 @@ MAX_COMMIT_LINES=400
 MAX_COMMIT_MSG_LENGTH=72
 PROTECTED_BRANCHES="main master pre-main"
 LINK_CHECK_TIMEOUT=5
+COVERAGE_MAX_DROP=0.05
+COVERAGE_FLOOR=95
 CHECK_MODE="staged"
 
 # ── Override from .hooks-config ─────────────────────────────────────
@@ -42,6 +44,8 @@ if [ -f ".hooks-config" ]; then
     MAX_COMMIT_MSG_LENGTH) MAX_COMMIT_MSG_LENGTH="$value" ;;
     PROTECTED_BRANCHES) PROTECTED_BRANCHES="$value" ;;
     LINK_CHECK_TIMEOUT) LINK_CHECK_TIMEOUT="$value" ;;
+    COVERAGE_MAX_DROP) COVERAGE_MAX_DROP="$value" ;;
+    COVERAGE_FLOOR) COVERAGE_FLOOR="$value" ;;
     CHECK_MODE) CHECK_MODE="$value" ;;
     esac
   done <.hooks-config
