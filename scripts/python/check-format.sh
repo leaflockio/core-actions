@@ -13,7 +13,7 @@
 STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$')
 
 if [ -z "$STAGED" ]; then
-  log_info "No Python files staged."
+  log_info "No Python files staged for format check."
   exit 0
 fi
 
@@ -25,4 +25,4 @@ if ! echo "$STAGED" | xargs ruff format --check; then
   exit 1
 fi
 
-log_success "Format check passed."
+log_success "Python format check passed."

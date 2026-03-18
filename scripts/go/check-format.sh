@@ -12,7 +12,7 @@
 STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.go$')
 
 if [ -z "$STAGED" ]; then
-  log_info "No Go files staged."
+  log_info "No Go files staged for format check."
   exit 0
 fi
 

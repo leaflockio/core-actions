@@ -12,8 +12,8 @@
 log_info "Running golangci-lint..."
 
 if ! golangci-lint run ./...; then
-  log_error "golangci-lint found issues. Fix them before committing."
+  log_error "Go lint check failed. Fix the issues above."
   exit 1
 fi
 
-log_success "golangci-lint passed."
+log_success "Go lint check passed."

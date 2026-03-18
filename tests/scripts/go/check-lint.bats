@@ -16,7 +16,7 @@ teardown() {
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"golangci-lint passed"* ]]
+  [[ "$output" == *"Go lint check passed"* ]]
 }
 
 @test "fails when golangci-lint fails" {
@@ -24,7 +24,7 @@ teardown() {
 
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"golangci-lint found issues"* ]]
+  [[ "$output" == *"Go lint check failed"* ]]
 }
 
 @test "shows running message" {

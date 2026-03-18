@@ -33,7 +33,7 @@ teardown() {
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Lint passed"* ]]
+  [[ "$output" == *"Python lint check passed"* ]]
 }
 
 @test "fails when ruff check fails" {
@@ -44,7 +44,7 @@ teardown() {
 
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Lint failed"* ]]
+  [[ "$output" == *"Python lint check failed"* ]]
 }
 
 @test "shows running message" {

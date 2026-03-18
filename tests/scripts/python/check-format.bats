@@ -33,7 +33,7 @@ teardown() {
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Format check passed"* ]]
+  [[ "$output" == *"Python format check passed"* ]]
 }
 
 @test "fails when ruff format check fails" {

@@ -57,10 +57,7 @@ if [ -z "$STASHED_FILES" ]; then
   exit 0
 fi
 
-# Get currently staged files
-STAGED=$(git diff --cached --name-only --diff-filter=ACM)
-
-if [ -z "$STAGED" ]; then
+if [ -z "$CHECK_FILES" ]; then
   exit 0
 fi
 
@@ -68,7 +65,7 @@ fi
 PARTIAL=""
 COUNT=0
 for f in $STASHED_FILES; do
-  if echo "$STAGED" | grep -qx "$f"; then
+  if echo "$CHECK_FILES" | grep -qx "$f"; then
     PARTIAL="${PARTIAL}  - ${f}
 "
     COUNT=$((COUNT + 1))

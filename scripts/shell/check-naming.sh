@@ -12,7 +12,7 @@
 STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.sh$')
 
 if [ -z "$STAGED" ]; then
-  log_info "No shell files staged."
+  log_info "No shell files staged for naming check."
   exit 0
 fi
 

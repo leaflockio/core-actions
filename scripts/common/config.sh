@@ -59,5 +59,5 @@ fi
 if [ "$CHECK_MODE" = "all" ]; then
   CHECK_FILES=$(git ls-files)
 else
-  CHECK_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+  CHECK_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
 fi
