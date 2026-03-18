@@ -1,0 +1,109 @@
+#!/bin/sh
+# Copyright 2026 Leaflock. All rights reserved.
+# This source code is proprietary and confidential.
+# Unauthorized copying, modification, distribution, or use of this
+# software, via any medium, is strictly prohibited without prior
+# written permission from Leaflock.
+
+# Runs bats tests under kcov for shell script coverage.
+# Outputs coverage percentage to stdout on success.
+# All logs go to stderr so callers can capture the percentage.
+# Usage:
+#   bash scripts/shell/coverage.sh            # native (CI / Linux)
+#   bash scripts/shell/coverage.sh --docker   # via Docker container (local macOS)
+
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+IMAGE_NAME="leaflock/kcov-bats"
+USE_DOCKER=false
+
+# Parse flags
+for arg in "$@"; do
+  case "$arg" in
+  --docker) USE_DOCKER=true ;;
+  esac
+done
+
+# Load logging utilities
+. "$REPO_ROOT/scripts/common/utils.sh"
+
+mkdir -p "$REPO_ROOT/coverage"
+
+log_info "Running tests under kcov..." >&2
+START_TIME=$(date +%s)
+
+OUTPUT_FILE=$(mktemp)
+KCOV_EXIT=0
+
+if [ "$USE_DOCKER" = true ]; then
+  # Verify Docker daemon is running
+  if ! docker info >/dev/null 2>&1; then
+    log_error "Docker is not running." >&2
+    log_warn "Please start Docker Desktop (or the Docker daemon) and try again." >&2
+    rm -f "$OUTPUT_FILE"
+    exit 1
+  fi
+
+  # Build the image once if it doesn't exist
+  if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+    log_info "Building coverage image (one-time setup)..." >&2
+    docker build -t "$IMAGE_NAME" - <<'DOCKERFILE'
+FROM kcov/kcov
+RUN apt-get update -qq && apt-get install -y -qq bats git parallel >/dev/null 2>&1
+DOCKERFILE
+  fi
+
+  docker run --rm \
+    -v "${REPO_ROOT}:/repo" \
+    -w /repo \
+    "$IMAGE_NAME" \
+    sh -c 'kcov --bash-dont-parse-binary-dir --include-pattern=/repo/scripts/common/ /repo/coverage /usr/bin/bats --jobs "$(nproc)" --timing --recursive /repo/tests/' \
+    >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
+else
+  kcov --bash-dont-parse-binary-dir --include-pattern="$REPO_ROOT/scripts/common/" "$REPO_ROOT/coverage" bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
+    >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
+fi
+
+# Display clean test results (TAP lines only)
+PASSED=$(grep -Ec '^ok [0-9]' "$OUTPUT_FILE")
+FAILED=$(grep -Ec '^not ok [0-9]' "$OUTPUT_FILE")
+PASSED=${PASSED:-0}
+FAILED=${FAILED:-0}
+TOTAL=$((PASSED + FAILED))
+
+if [ "$FAILED" -gt 0 ]; then
+  log_error "Tests: ${PASSED} passed, ${FAILED} failed (${TOTAL} total)" >&2
+  echo "" >&2
+  grep '^not ok ' "$OUTPUT_FILE" | while read -r line; do
+    log_error "  $line" >&2
+  done
+  grep -A 3 '^not ok ' "$OUTPUT_FILE" | grep '^#' | while read -r line; do
+    log_info "  $line" >&2
+  done
+  echo "" >&2
+else
+  log_success "Tests: ${PASSED} passed (${TOTAL} total)" >&2
+fi
+
+rm -f "$OUTPUT_FILE"
+
+# Fail if any tests failed
+if [ "$KCOV_EXIT" -ne 0 ] || [ "$FAILED" -gt 0 ]; then
+  exit 1
+fi
+
+# Extract total coverage percentage from kcov JSON summary
+COVERAGE_FILE=$(find "$REPO_ROOT/coverage" -name "coverage.json" -not -path "*/kcov-merged/*" | head -1)
+if [ -n "$COVERAGE_FILE" ]; then
+  REPORT_DIR=$(dirname "$COVERAGE_FILE")
+  PERCENT=$(jq -r '.percent_covered' "$COVERAGE_FILE")
+  ELAPSED=$(($(date +%s) - START_TIME))
+  log_success "Coverage: ${PERCENT}%" >&2
+  log_info "Completed in ${ELAPSED}s" >&2
+  log_info "Report: ${REPORT_DIR}/index.html" >&2
+
+  # Output percentage to stdout for callers
+  echo "$PERCENT"
+else
+  log_error "Could not determine coverage." >&2
+  exit 1
+fi

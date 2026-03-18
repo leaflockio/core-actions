@@ -1,0 +1,94 @@
+#!/usr/bin/env bats
+
+setup() {
+  load "../../test_helper/common-setup"
+  _common_setup
+
+  SCRIPT="${PROJECT_ROOT}/scripts/shell/coverage.sh"
+
+  # Create coverage JSON in temp dir (not the real project coverage/)
+  COVERAGE_DIR="${TEST_TEMP_DIR}/coverage/bats.test"
+  mkdir -p "$COVERAGE_DIR"
+  cat >"${COVERAGE_DIR}/coverage.json" <<'JSON'
+{
+  "percent_covered": "88.07",
+  "covered_lines": 406,
+  "total_lines": 461,
+  "command": "bats"
+}
+JSON
+
+  # Mock find to return our temp coverage JSON
+  create_mock find "echo \"${COVERAGE_DIR}/coverage.json\""
+}
+
+teardown() {
+  _common_teardown
+}
+
+# Helper: create a mock kcov that produces TAP output
+mock_kcov_passing() {
+  create_mock kcov 'printf "1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n"'
+}
+
+mock_kcov_failing() {
+  create_mock kcov 'printf "1..3\nok 1 test one in 100ms\nnot ok 2 test two in 200ms\n# (in test file tests/foo.bats, line 10)\nok 3 test three in 150ms\n"; exit 1'
+}
+
+mock_docker_all_passing() {
+  create_mock docker '
+    case "$1" in
+      info) exit 0 ;;
+      image) exit 0 ;;
+      run) printf "1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n" ;;
+    esac
+  '
+}
+
+@test "fails when --docker and Docker is not running" {
+  create_mock docker 'exit 1'
+  run bash "$SCRIPT" --docker
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Docker is not running"* ]]
+}
+
+@test "native mode runs kcov and outputs coverage percent" {
+  mock_kcov_passing
+  create_mock jq 'echo "88.07"'
+  create_mock nproc 'echo "4"'
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"88.07"* ]]
+}
+
+@test "exits non-zero when tests fail in native mode" {
+  mock_kcov_failing
+  create_mock nproc 'echo "4"'
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+}
+
+@test "reports test failure count in stderr" {
+  mock_kcov_failing
+  create_mock nproc 'echo "4"'
+  run bash -c "export PATH=\"${TEST_BIN_DIR}:\$PATH\"; bash \"$SCRIPT\" 2>&1"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"1 failed"* ]]
+}
+
+@test "docker mode runs kcov via docker and outputs coverage percent" {
+  mock_docker_all_passing
+  create_mock jq 'echo "88.07"'
+  run bash "$SCRIPT" --docker
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"88.07"* ]]
+}
+
+@test "fails when no coverage JSON found" {
+  mock_kcov_passing
+  create_mock nproc 'echo "4"'
+  create_mock find ''
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Could not determine coverage"* ]]
+}
