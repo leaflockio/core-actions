@@ -60,7 +60,7 @@ for file in $MD_FILES; do
       log_error "Broken link in $file:$LINE_NUM → $TARGET"
       FAIL=1
     fi
-  done <"$MATCHES_FILE"
+  done <<<"$(cat "$MATCHES_FILE")"
   rm -f "$MATCHES_FILE"
 done
 

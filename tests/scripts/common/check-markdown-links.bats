@@ -48,6 +48,30 @@ EOF
   [[ "$output" == *"Broken link"* ]]
 }
 
+@test "warns on broken external link" {
+  create_mock curl 'echo "404"'
+  cat >docs.md <<'EOF'
+Check [example](https://broken.invalid/page) link.
+EOF
+  git add docs.md
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"External link may be broken"* ]]
+}
+
+@test "passes with reachable external link" {
+  create_mock curl 'echo "200"'
+  cat >docs.md <<'EOF'
+Check [example](https://example.com) link.
+EOF
+  git add docs.md
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Markdown link check passed"* ]]
+}
+
 @test "skips pure anchor links" {
   cat >docs.md <<'EOF'
 See the [section](#overview) below.
