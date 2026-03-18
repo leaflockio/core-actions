@@ -54,6 +54,62 @@ EOF
   [[ "$output" == *"Bare TODO/FIXME without ticket"* ]]
 }
 
+@test "passes with PROJ-style ticket reference" {
+  cat >app.js <<'EOF'
+// TODO(PROJ789) migrate to new API
+EOF
+  git add app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"TODO check passed"* ]]
+}
+
+@test "skips TODO inside quoted strings" {
+  local marker="TO""DO"
+  printf "const msg = '%s: not a real marker'\n" "$marker" >app.js
+  git add app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "skips TODO as part of variable name" {
+  local marker="TO""DO"
+  printf '%s_LIST="items"\n' "$marker" >app.sh
+  git add app.sh
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "blocks bare TODO in all mode" {
+  local marker="TO""DO"
+  printf '// %s fix later\n' "$marker" >app.js
+  git add app.js
+  git commit -m "add file"
+
+  echo "CHECK_MODE=all" >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Bare TODO/FIXME without ticket"* ]]
+}
+
+@test "prints line without number when grep cannot match" {
+  local marker="TO""DO"
+  # Stage a file with the marker
+  printf '// %s fix this\n' "$marker" >app.js
+  git add app.js
+  # Overwrite the file so the staged content no longer matches the working copy
+  echo "completely different content" >app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  # Should show the line without a line number prefix
+  [[ "$output" == *"fix this"* ]]
+}
+
 @test "skips binary and generated files" {
   local marker="TO""DO"
   printf '%s no ticket\n' "$marker" >image.png
