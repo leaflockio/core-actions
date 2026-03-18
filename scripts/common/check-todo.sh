@@ -8,8 +8,8 @@
 # Blocks commits containing bare to-do or fix-me markers without a ticket number.
 # Every marker must have a trackable issue reference in parentheses.
 #
-# Accepted: marker(#123), marker(PROJ-789)
-# Rejected: bare marker without parenthesized ticket
+# Accepted: marker(#123), marker(KEY-789)
+# Rejected: bare marker, marker(123), marker(username)
 #
 # In staged mode: checks only new lines from the diff.
 # In all mode: checks full file content.
@@ -31,10 +31,10 @@ for f in $CHECK_FILES; do
 
   [ -z "$CONTENT" ] && continue
 
-  # Find bare markers without a ticket reference like (#123) or (PROJ-123)
+  # Find bare markers without a ticket reference like (#123) or (KEY-123)
   # Skip lines where the marker appears inside quotes or as part of a variable name
   BARE_TODOS=$(echo "$CONTENT" | grep -E '(TODO|FIXME)' || true)
-  BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '(TODO|FIXME)\([A-Za-z]*-?#?[0-9]+\)' || true)
+  BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '(TODO|FIXME)\((#[0-9]+|[A-Z]+-[0-9]+)\)' || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE "['\"].*TODO|TODO.*['\"]" || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE "['\"].*FIXME|FIXME.*['\"]" || true)
   BARE_TODOS=$(echo "$BARE_TODOS" | grep -vE '[A-Z_](TODO|FIXME)|(TODO|FIXME)[A-Z_]' || true)
@@ -59,7 +59,7 @@ done
 
 if [ "$FAIL" -ne 0 ]; then
   echo ""
-  log_info "Every marker must reference a ticket: TODO(#123) or FIXME(PROJ-456)"
+  log_info "Every marker must reference a ticket: marker(#123) or marker(KEY-456)"
   exit 1
 fi
 

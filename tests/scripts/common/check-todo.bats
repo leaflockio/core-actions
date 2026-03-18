@@ -65,6 +65,16 @@ EOF
   [[ "$output" == *"TODO check passed"* ]]
 }
 
+@test "blocks TODO with bare number" {
+  local marker="TO""DO"
+  printf '// %s(123) missing hash prefix\n' "$marker" >app.js
+  git add app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Bare TODO/FIXME without ticket"* ]]
+}
+
 @test "skips TODO inside quoted strings" {
   local marker="TO""DO"
   printf "const msg = '%s: not a real marker'\n" "$marker" >app.js
