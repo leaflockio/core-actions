@@ -32,7 +32,7 @@ rm -rf "$COVERAGE_OUTPUT_DIR"
 mkdir -p "$COVERAGE_OUTPUT_DIR"
 
 # Get expected test count before running
-EXPECTED_TESTS=$(bats --count --recursive "$REPO_ROOT/tests/")
+EXPECTED_TESTS=$(npx bats --count --recursive "$REPO_ROOT/tests/")
 if [ -z "$EXPECTED_TESTS" ] || [ "$EXPECTED_TESTS" -eq 0 ]; then
   log_error "No tests found." >&2
   exit 1
