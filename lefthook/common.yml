@@ -28,6 +28,8 @@ pre-commit:
             run: bash scripts/common/check-commit-size.sh
           - name: check-secrets
             run: bash scripts/common/check-secrets.sh
+          - name: check-sensitive-files
+            run: bash scripts/common/check-sensitive-files.sh
           - name: check-paths
             run: bash scripts/common/check-paths.sh
           - name: check-todo
