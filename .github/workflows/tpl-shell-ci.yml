@@ -1,0 +1,41 @@
+name: Shell CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version (for bats via npm)
+        type: string
+        required: false
+        default: '22'
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint shell scripts
+        run: npm run lint:sh
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install kcov
+        run: sudo apt-get install -y -qq kcov
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
