@@ -29,6 +29,20 @@ EOF
   printf '%s' "$result"
 }
 
+# Usage: run_config [PRE_COMMANDS]
+# Runs config.sh in a standalone script and captures exit code + output.
+run_config() {
+  local pre="${1:-}"
+  local wrapper="${TEST_TEMP_DIR}/.config-run-wrapper-$$.sh"
+  cat >"$wrapper" <<EOF
+#!/usr/bin/env bash
+cd "$REPO_DIR"
+${pre}
+. "${SCRIPT_DIR}/config.sh"
+EOF
+  run bash "$wrapper"
+}
+
 @test "config sets default values" {
   [ "$(get_config_var PARTIAL_STAGE)" = "fail" ]
   [ "$(get_config_var UNCOMMITTED_PUSH)" = "fail" ]
@@ -88,4 +102,45 @@ EOF
   local result
   result="$(get_config_var CHECK_FILES)"
   echo "$result" | grep -q "test.txt"
+}
+
+# ── CHECK_MODE: pr ────────────────────────────────────────────────
+
+@test "pr mode populates CHECK_FILES from diff against PR_BASE_SHA" {
+  echo "base" >base.txt
+  git add base.txt
+  git commit -m "base commit"
+
+  BASE_SHA=$(git rev-parse HEAD)
+
+  # Create a feature branch so three-dot diff has a real merge-base
+  git checkout -b feature
+  echo "pr change" >pr-file.txt
+  git add pr-file.txt
+  git commit -m "pr commit"
+
+  local result
+  result="$(get_config_var CHECK_FILES "export CHECK_MODE=pr; export PR_BASE_SHA=${BASE_SHA}")"
+  echo "$result" | grep -q "pr-file.txt"
+  ! echo "$result" | grep -q "base.txt"
+}
+
+@test "pr mode fails when PR_BASE_SHA is not set" {
+  echo "file" >file.txt
+  git add file.txt
+  git commit -m "init"
+
+  run_config 'export CHECK_MODE=pr; unset PR_BASE_SHA'
+  [ "$status" -ne 0 ]
+  echo "$output" | grep -q "PR_BASE_SHA"
+}
+
+@test "pr mode fails when PR_BASE_SHA is empty" {
+  echo "file" >file.txt
+  git add file.txt
+  git commit -m "init"
+
+  run_config 'export CHECK_MODE=pr; export PR_BASE_SHA=""'
+  [ "$status" -ne 0 ]
+  echo "$output" | grep -q "PR_BASE_SHA"
 }

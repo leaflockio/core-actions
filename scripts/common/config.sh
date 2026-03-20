@@ -16,18 +16,18 @@ SCRIPTS_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 # ── Defaults ────────────────────────────────────────────────────────
 
-PARTIAL_STAGE="fail"
-UNCOMMITTED_PUSH="fail"
-MAX_FILE_SIZE=1000000
-MAX_FILE_LINES=2000
-MAX_COMMIT_LINES=400
-MAX_COMMIT_MSG_LENGTH=72
-PROTECTED_BRANCHES="main master pre-main"
-LINK_CHECK_TIMEOUT=5
-COVERAGE_MAX_DROP=0.05
-COVERAGE_FLOOR=95
-COVERAGE_SRC="scripts"
-CHECK_MODE="staged"
+PARTIAL_STAGE="${PARTIAL_STAGE:-fail}"
+UNCOMMITTED_PUSH="${UNCOMMITTED_PUSH:-fail}"
+MAX_FILE_SIZE="${MAX_FILE_SIZE:-1000000}"
+MAX_FILE_LINES="${MAX_FILE_LINES:-2000}"
+MAX_COMMIT_LINES="${MAX_COMMIT_LINES:-400}"
+MAX_COMMIT_MSG_LENGTH="${MAX_COMMIT_MSG_LENGTH:-72}"
+PROTECTED_BRANCHES="${PROTECTED_BRANCHES:-main master pre-main}"
+LINK_CHECK_TIMEOUT="${LINK_CHECK_TIMEOUT:-5}"
+COVERAGE_MAX_DROP="${COVERAGE_MAX_DROP:-0.05}"
+COVERAGE_FLOOR="${COVERAGE_FLOOR:-95}"
+COVERAGE_SRC="${COVERAGE_SRC:-scripts}"
+CHECK_MODE="${CHECK_MODE:-staged}"
 
 # ── Override from .hooks-config ─────────────────────────────────────
 
@@ -56,8 +56,18 @@ fi
 # ── File list ───────────────────────────────────────────────────────
 # Populated based on CHECK_MODE. Scripts filter locally as needed.
 
-if [ "$CHECK_MODE" = "all" ]; then
+case "$CHECK_MODE" in
+all)
   CHECK_FILES=$(git ls-files)
-else
+  ;;
+pr)
+  if [ -z "${PR_BASE_SHA:-}" ]; then
+    log_error "CHECK_MODE=pr requires PR_BASE_SHA to be set."
+    exit 1
+  fi
+  CHECK_FILES=$(git diff --name-only --diff-filter=ACMR "$PR_BASE_SHA"...HEAD)
+  ;;
+*)
   CHECK_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
-fi
+  ;;
+esac
