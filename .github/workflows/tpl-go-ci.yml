@@ -1,0 +1,72 @@
+name: Go CI
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: Go version to use
+        type: string
+        required: false
+        default: '1.22'
+
+      working-directory:
+        description: Directory containing go.mod
+        type: string
+        required: false
+        default: '.'
+
+      lint-command:
+        description: Command to run for linting
+        type: string
+        required: false
+        default: golangci-lint run
+
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/go/setup
+        with:
+          go-version: ${{ inputs.go-version }}
+          working-directory: ${{ inputs.working-directory }}
+
+      - name: Lint
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.lint-command }}
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Run coverage
+        working-directory: ${{ inputs.working-directory }}
+        run: bash .core-actions/scripts/go/coverage.sh
