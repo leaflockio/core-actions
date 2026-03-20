@@ -1,0 +1,114 @@
+name: Quality
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version (for cspell, prettier, markdownlint)
+        type: string
+        required: false
+        default: '22'
+
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+    secrets:
+      GITLEAKS_LICENSE:
+        description: License key for Gitleaks secret scanner
+        required: false
+
+jobs:
+  gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/ci/quality-gate
+        with:
+          scripts-dir: .core-actions/scripts/common
+          pr-base-sha: ${{ github.event.pull_request.base.sha }}
+
+  lint:
+    name: Quality Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install tools
+        run: npm ci
+
+      - uses: ./.core-actions/actions/ci/quality-lint
+        with:
+          scripts-dir: .core-actions/scripts/common
+          pr-base-sha: ${{ github.event.pull_request.base.sha }}
+
+  links:
+    name: Quality Links
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/ci/quality-links
+        with:
+          scripts-dir: .core-actions/scripts/common
+          pr-base-sha: ${{ github.event.pull_request.base.sha }}
+
+  actionlint:
+    name: Action Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install actionlint
+        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+
+      - name: Lint GitHub Actions
+        run: ./actionlint
+
+  gitleaks:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: leaflockio/core-actions/actions/common/gitleaks@main
+        with:
+          license: ${{ secrets.GITLEAKS_LICENSE }}
+          require-license: ${{ secrets.GITLEAKS_LICENSE != '' && 'true' || 'false' }}
