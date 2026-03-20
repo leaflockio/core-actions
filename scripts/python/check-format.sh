@@ -8,18 +8,18 @@
 # Checks staged Python files are formatted with ruff.
 # Requires: ruff
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$')
+FILES=$(echo "$CHECK_FILES" | grep '\.py$')
 
-if [ -z "$STAGED" ]; then
-  log_info "No Python files staged for format check."
+if [ -z "$FILES" ]; then
+  log_info "No Python files to check for formatting."
   exit 0
 fi
 
 log_info "Checking Python formatting..."
 
-if ! echo "$STAGED" | xargs ruff format --check; then
+if ! echo "$FILES" | xargs ruff format --check; then
   log_error "Formatting issues found."
   log_info "Run: ruff format ."
   exit 1

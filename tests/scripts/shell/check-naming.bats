@@ -16,13 +16,13 @@ teardown() {
   _common_teardown
 }
 
-@test "passes when no shell files staged" {
+@test "passes when no shell files to check" {
   echo "" >config.yml
   git add config.yml
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"No shell files staged"* ]]
+  [[ "$output" == *"No shell files to check"* ]]
 }
 
 @test "passes with kebab-case file" {

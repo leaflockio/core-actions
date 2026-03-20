@@ -16,13 +16,13 @@ teardown() {
   _common_teardown
 }
 
-@test "passes when no Python files staged" {
+@test "passes when no Python files to check" {
   echo "" >config.yml
   git add config.yml
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"No Python files staged"* ]]
+  [[ "$output" == *"No Python files to check"* ]]
 }
 
 @test "passes when ruff check succeeds" {

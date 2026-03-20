@@ -7,12 +7,12 @@
 
 # Enforces snake_case file and folder naming for Python projects.
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$')
+FILES=$(echo "$CHECK_FILES" | grep '\.py$')
 
-if [ -z "$STAGED" ]; then
-  log_info "No Python files staged."
+if [ -z "$FILES" ]; then
+  log_info "No Python files to check for naming."
   exit 0
 fi
 
@@ -56,6 +56,6 @@ while IFS= read -r FILE; do
     log_info "Use snake_case (e.g. user_service.py)"
     FAIL=1
   fi
-done <<<"$STAGED"
+done <<<"$FILES"
 
 [ "$FAIL" -eq 0 ] && log_success "Python naming check passed." || exit 1

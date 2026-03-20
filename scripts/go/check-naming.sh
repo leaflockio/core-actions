@@ -7,12 +7,12 @@
 
 # Enforces snake_case file and lowercase folder naming for Go projects.
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.go$')
+FILES=$(echo "$CHECK_FILES" | grep '\.go$')
 
-if [ -z "$STAGED" ]; then
-  log_info "No Go files staged."
+if [ -z "$FILES" ]; then
+  log_info "No Go files to check for naming."
   exit 0
 fi
 
@@ -49,6 +49,6 @@ while IFS= read -r FILE; do
     log_info "Use snake_case (e.g. user_service.go, user_service_test.go)"
     FAIL=1
   fi
-done <<<"$STAGED"
+done <<<"$FILES"
 
 [ "$FAIL" -eq 0 ] && log_success "Go naming check passed." || exit 1

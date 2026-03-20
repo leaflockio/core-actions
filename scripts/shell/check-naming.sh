@@ -7,12 +7,12 @@
 
 # Enforces kebab-case naming for shell scripts.
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.sh$')
+FILES=$(echo "$CHECK_FILES" | grep '\.sh$')
 
-if [ -z "$STAGED" ]; then
-  log_info "No shell files staged for naming check."
+if [ -z "$FILES" ]; then
+  log_info "No shell files to check for naming."
   exit 0
 fi
 
@@ -26,6 +26,6 @@ while IFS= read -r FILE; do
     log_info "Use kebab-case (e.g. check-branch.sh, run-tests.sh)"
     FAIL=1
   fi
-done <<<"$STAGED"
+done <<<"$FILES"
 
 [ "$FAIL" -eq 0 ] && log_success "Shell naming check passed." || exit 1

@@ -19,12 +19,12 @@
 #   - Config/test/spec files: *.config.*, *.test.*, *.spec.*
 #   - camelCase utilities: setupTests.ts, reportWebVitals.ts
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx|cjs|mjs)$' | grep -v '^\.github/')
+FILES=$(echo "$CHECK_FILES" | grep -E '\.(js|jsx|ts|tsx|cjs|mjs)$' | grep -v '^\.github/')
 
-if [ -z "$STAGED" ]; then
-  log_info "No JS/TS files staged for naming check."
+if [ -z "$FILES" ]; then
+  log_info "No JS/TS files to check for naming."
   exit 0
 fi
 
@@ -91,6 +91,6 @@ while IFS= read -r FILE; do
   log_error "Invalid JS/TS filename: $FILE"
   log_info "Use kebab-case (my-utils.ts), PascalCase for components (MyComponent.tsx), or useCamelCase for hooks (useTheme.ts)"
   FAIL=1
-done <<<"$STAGED"
+done <<<"$FILES"
 
 [ "$FAIL" -eq 0 ] && log_success "Node naming check passed." || exit 1

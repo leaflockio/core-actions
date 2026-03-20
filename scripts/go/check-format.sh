@@ -7,16 +7,16 @@
 
 # Checks that staged Go files are formatted with gofmt.
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.go$')
+FILES=$(echo "$CHECK_FILES" | grep '\.go$')
 
-if [ -z "$STAGED" ]; then
-  log_info "No Go files staged for format check."
+if [ -z "$FILES" ]; then
+  log_info "No Go files to check for formatting."
   exit 0
 fi
 
-UNFORMATTED=$(echo "$STAGED" | xargs gofmt -l)
+UNFORMATTED=$(echo "$FILES" | xargs gofmt -l)
 
 if [ -n "$UNFORMATTED" ]; then
   log_error "Unformatted Go files detected:"

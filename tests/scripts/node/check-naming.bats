@@ -18,13 +18,13 @@ teardown() {
 
 # --- No staged files ---
 
-@test "passes when no JS/TS files staged" {
+@test "passes when no JS/TS files to check" {
   echo "" >config.yml
   git add config.yml
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"No JS/TS files staged"* ]]
+  [[ "$output" == *"No JS/TS files to check"* ]]
 }
 
 # --- Kebab-case files ---
