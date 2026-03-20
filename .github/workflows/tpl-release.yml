@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version (semantic-release runs on Node)
+        type: string
+        required: false
+        default: '22'
+
+      working-directory:
+        description: Directory containing package.json
+        type: string
+        required: false
+        default: '.'
+
+      extra-plugins:
+        description: >
+          Space-separated list of extra semantic-release plugins to install
+        type: string
+        required: false
+        default: '@semantic-release/changelog @semantic-release/git conventional-changelog-conventionalcommits'
+
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+    secrets:
+      APP_ID:
+        description: GitHub App ID for locket-ci
+        required: true
+
+      APP_PRIVATE_KEY:
+        description: GitHub App private key for locket-ci
+        required: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/common/app-token
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: ./.core-actions/actions/release/semantic-release
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          node-version: ${{ inputs.node-version }}
+          working-directory: ${{ inputs.working-directory }}
+          extra-plugins: ${{ inputs.extra-plugins }}
