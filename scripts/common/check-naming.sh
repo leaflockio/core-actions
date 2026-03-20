@@ -18,12 +18,12 @@
 #   - No-extension uppercase files allowed (LICENSE, CODEOWNERS)
 #   - Exceptions: Dockerfile, Makefile, Procfile, dotfiles
 
-. "$(dirname "$0")/utils.sh"
+. "$(dirname "$0")/config.sh"
 
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -v '^\.github/')
+FILES=$(echo "$CHECK_FILES" | grep -v '^\.github/')
 
-if [ -z "$STAGED" ]; then
-  log_success "No files staged for naming check."
+if [ -z "$FILES" ]; then
+  log_success "No files to check for naming."
   exit 0
 fi
 
@@ -87,6 +87,6 @@ while IFS= read -r FILE; do
     log_info "Use kebab-case (e.g. my-file.yml, setup-config.json)"
     FAIL=1
   fi
-done <<<"$STAGED"
+done <<<"$FILES"
 
 [ "$FAIL" -eq 0 ] && log_success "Naming check passed." || exit 1

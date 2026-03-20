@@ -18,10 +18,10 @@ teardown() {
 
 # --- No staged files ---
 
-@test "passes when no files staged" {
+@test "passes when no files to check" {
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"No files staged"* ]]
+  [[ "$output" == *"No files to check"* ]]
 }
 
 # --- Kebab-case files ---
@@ -237,4 +237,39 @@ teardown() {
   [ "$status" -eq 1 ]
   [[ "$output" == *"BadFile.json"* ]]
   [[ "$output" == *"has space.md"* ]]
+}
+
+# --- CHECK_MODE: pr ---
+
+@test "pr mode only checks files changed since base" {
+  echo "" >OldBad.yml
+  git add OldBad.yml
+  git commit -m "old commit"
+
+  BASE_SHA=$(git rev-parse HEAD)
+
+  git checkout -b feature
+  echo "" >good-file.yml
+  git add good-file.yml
+  git commit -m "pr commit"
+
+  CHECK_MODE=pr PR_BASE_SHA="$BASE_SHA" run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "pr mode catches invalid files in PR diff" {
+  echo "" >existing.yml
+  git add existing.yml
+  git commit -m "base"
+
+  BASE_SHA=$(git rev-parse HEAD)
+
+  git checkout -b feature
+  echo "" >BadName.yml
+  git add BadName.yml
+  git commit -m "pr commit"
+
+  CHECK_MODE=pr PR_BASE_SHA="$BASE_SHA" run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid filename"* ]]
 }
