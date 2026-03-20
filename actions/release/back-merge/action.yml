@@ -27,7 +27,7 @@ runs:
       id: merge
       shell: bash
       run: |
-        if sh "${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"; then
+        if bash "${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"; then
           echo "result=success" >> "${GITHUB_OUTPUT}"
         else
           echo "result=conflict" >> "${GITHUB_OUTPUT}"
