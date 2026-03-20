@@ -1,0 +1,38 @@
+name: Back-merge
+description: >
+  Merges main into pre-main after a production release or hotfix merge
+  to keep pre-main up to date with version bumps, changelog changes,
+  and any hotfix patches.
+
+inputs:
+  token:
+    description: GitHub App token for pushing to protected branches
+    required: true
+
+outputs:
+  back_merge_result:
+    description: Result of the back-merge ('success' or 'conflict')
+    value: ${{ steps.merge.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout (full history)
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.token }}
+
+    - name: Back-merge main into pre-main
+      id: merge
+      shell: bash
+      run: |
+        if sh "${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"; then
+          echo "result=success" >> "${GITHUB_OUTPUT}"
+        else
+          echo "result=conflict" >> "${GITHUB_OUTPUT}"
+          exit 1
+        fi
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
