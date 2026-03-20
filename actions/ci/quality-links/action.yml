@@ -1,0 +1,22 @@
+name: Quality Links
+description: >
+  Validates markdown links across the repository.
+  Uses curl (available on runners by default) with configurable timeouts.
+
+inputs:
+  scripts-dir:
+    description: Path to the core-actions scripts/common/ directory
+    required: true
+  pr-base-sha:
+    description: Base commit SHA of the pull request (for file-scoped checks)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Markdown links
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-markdown-links.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
