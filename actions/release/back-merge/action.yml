@@ -36,3 +36,4 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
+        LEFTHOOK: 0
