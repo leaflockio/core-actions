@@ -108,7 +108,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: leaflockio/core-actions/actions/common/gitleaks@main
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/common/gitleaks
         with:
           license: ${{ secrets.GITLEAKS_LICENSE }}
           require-license: ${{ secrets.GITLEAKS_LICENSE != '' && 'true' || 'false' }}
