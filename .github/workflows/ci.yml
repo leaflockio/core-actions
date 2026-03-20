@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [pre-main, main]
+
+jobs:
+  branch-policy:
+    uses: ./.github/workflows/tpl-branch-policy.yml
+
+  quality:
+    uses: ./.github/workflows/tpl-common-ci.yml
+    secrets:
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  shell:
+    uses: ./.github/workflows/tpl-shell-ci.yml
