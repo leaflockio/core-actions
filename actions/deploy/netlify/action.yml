@@ -1,0 +1,48 @@
+name: Deploy to Netlify
+description: >
+  Deploys a built site to Netlify. Wraps nwtgck/actions-netlify
+  with standardized inputs.
+
+inputs:
+  auth-token:
+    description: Netlify auth token
+    required: true
+
+  site-id:
+    description: Netlify site ID (differs per environment)
+    required: true
+
+  publish-dir:
+    description: Directory containing the built site
+    required: false
+    default: './dist'
+
+  production:
+    description: Whether this is a production deploy
+    required: false
+    default: 'true'
+
+  environment:
+    description: Environment name for the deployment summary (e.g. QA, Production)
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3
+      with:
+        publish-dir: ${{ inputs.publish-dir }}
+        production-deploy: ${{ inputs.production }}
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ inputs.auth-token }}
+        NETLIFY_SITE_ID: ${{ inputs.site-id }}
+
+    - name: Deployment summary
+      if: inputs.environment != ''
+      shell: bash
+      env:
+        ENVIRONMENT: ${{ inputs.environment }}
+      run: |
+        echo "## ${ENVIRONMENT} Deployment Complete" >> "$GITHUB_STEP_SUMMARY"
