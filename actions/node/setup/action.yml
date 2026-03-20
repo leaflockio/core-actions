@@ -1,0 +1,44 @@
+name: Setup Node.js
+description: >
+  Checks out the repository, sets up Node.js with dependency caching, and installs
+  dependencies. Used as a building block in all Node.js CI workflows.
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '22'
+
+  working-directory:
+    description: >
+      Directory containing package.json. Defaults to repo root.
+      Set this for monorepos where the app lives in a subdirectory.
+    required: false
+    default: '.'
+
+  install-command:
+    description: >
+      Command used to install dependencies. Override if you use yarn, pnpm, or a
+      custom install script.
+    required: false
+    default: 'npm ci'
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INSTALL_CMD: ${{ inputs.install-command }}
+      run: $INSTALL_CMD

@@ -1,0 +1,65 @@
+name: Setup Python
+description: >
+  Checks out the repository and sets up Python with dependency caching.
+  Supports pip and Poetry. Used as a building block in all Python CI workflows.
+
+inputs:
+  python-version:
+    description: Python version to use
+    required: false
+    default: '3.12'
+
+  working-directory:
+    description: >
+      Directory containing requirements.txt or pyproject.toml. Defaults to repo root.
+    required: false
+    default: '.'
+
+  package-manager:
+    description: >
+      Package manager to use. Accepted values: pip, poetry.
+      Determines the default install command and cache strategy.
+    required: false
+    default: pip
+
+  install-command:
+    description: >
+      Override the default install command. When not set, defaults to
+      'pip install -r requirements.txt' for pip or 'poetry install' for poetry.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: ${{ inputs.package-manager }}
+        cache-dependency-path: |
+          ${{ inputs.working-directory }}/requirements*.txt
+          ${{ inputs.working-directory }}/pyproject.toml
+
+    - name: Install Poetry
+      if: inputs.package-manager == 'poetry'
+      shell: bash
+      run: pip install poetry
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INSTALL_CMD: ${{ inputs.install-command }}
+        PKG_MANAGER: ${{ inputs.package-manager }}
+      run: |
+        if [ -n "$INSTALL_CMD" ]; then
+          $INSTALL_CMD
+        elif [ "$PKG_MANAGER" = "poetry" ]; then
+          poetry install
+        else
+          pip install -r requirements.txt
+        fi
