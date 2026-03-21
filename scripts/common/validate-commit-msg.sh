@@ -63,13 +63,16 @@ if [ -n "$1" ]; then
   exit 0
 fi
 
-REMOTE=$(get_remote_branch)
-if [ -z "$REMOTE" ]; then
-  log_error "No remote branch found to compare against."
-  exit 1
+if [ -n "${PR_BASE_SHA:-}" ]; then
+  COMMITS=$(git rev-list "$PR_BASE_SHA"..HEAD --no-merges 2>/dev/null)
+else
+  REMOTE=$(get_remote_branch)
+  if [ -z "$REMOTE" ]; then
+    log_error "No remote branch found to compare against."
+    exit 1
+  fi
+  COMMITS=$(git rev-list "$REMOTE"..HEAD 2>/dev/null)
 fi
-
-COMMITS=$(git rev-list "$REMOTE"..HEAD 2>/dev/null)
 if [ -z "$COMMITS" ]; then
   log_success "No new commits to validate."
   exit 0

@@ -25,13 +25,15 @@ runs:
       shell: bash
       run: bash "${{ inputs.scripts-dir }}/validate-commit-msg.sh"
       env:
-        CHECK_MODE: all
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
 
     - name: Commit signing
       shell: bash
       run: bash "${{ inputs.scripts-dir }}/check-signing.sh"
       env:
-        CHECK_MODE: all
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
 
     - name: Large files
       shell: bash

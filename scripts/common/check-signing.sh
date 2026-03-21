@@ -27,13 +27,15 @@ check_commit() {
   fi
 }
 
-# Determine which commits to check
-REMOTE=$(get_remote_branch)
-
-if [ -n "$REMOTE" ]; then
-  COMMITS=$(git rev-list "$REMOTE"..HEAD 2>/dev/null)
+if [ -n "${PR_BASE_SHA:-}" ]; then
+  COMMITS=$(git rev-list "$PR_BASE_SHA"..HEAD --no-merges 2>/dev/null)
 else
-  COMMITS=$(git rev-list HEAD 2>/dev/null)
+  REMOTE=$(get_remote_branch)
+  if [ -n "$REMOTE" ]; then
+    COMMITS=$(git rev-list "$REMOTE"..HEAD 2>/dev/null)
+  else
+    COMMITS=$(git rev-list HEAD 2>/dev/null)
+  fi
 fi
 
 # If called from post-commit with no upstream yet, just check HEAD
