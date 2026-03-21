@@ -15,6 +15,12 @@ on:
         required: false
         default: '.'
 
+      golangci-lint-version:
+        description: golangci-lint version to install
+        type: string
+        required: false
+        default: '1.62.2'
+
       lint-command:
         description: Command to run for linting
         type: string
@@ -48,6 +54,15 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
           working-directory: ${{ inputs.working-directory }}
+
+      - name: Install golangci-lint
+        env:
+          GOLANGCI_VERSION: ${{ inputs.golangci-lint-version }}
+        run: |
+          curl -sSfL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_VERSION}/golangci-lint-${GOLANGCI_VERSION}-linux-amd64.tar.gz" -o golangci-lint.tar.gz
+          tar -xzf golangci-lint.tar.gz --strip-components=1 "golangci-lint-${GOLANGCI_VERSION}-linux-amd64/golangci-lint"
+          mv golangci-lint "$(go env GOPATH)/bin/"
+          rm golangci-lint.tar.gz
 
       - name: Lint
         working-directory: ${{ inputs.working-directory }}

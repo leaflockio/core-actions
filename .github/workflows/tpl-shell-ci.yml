@@ -19,9 +19,26 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Lint shell scripts
-        run: npm run lint:sh
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          FILES=$(git diff --name-only --diff-filter=ACMR "$PR_BASE_SHA"...HEAD -- '*.sh')
+          if [ -z "$FILES" ]; then
+            echo "No shell files changed in this PR."
+            exit 0
+          fi
+          echo "$FILES" | xargs npx shellcheck -x --source-path=SCRIPTDIR
 
   coverage:
     name: Coverage

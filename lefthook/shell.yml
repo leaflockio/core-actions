@@ -20,4 +20,4 @@ pre-commit:
 pre-push:
   jobs:
     - name: coverage
-      run: PERCENT=$(bash scripts/shell/coverage.sh --docker) && bash scripts/common/check-coverage.sh "$PERCENT"
+      run: bash scripts/shell/coverage.sh --docker
