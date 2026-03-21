@@ -22,7 +22,7 @@ fi
 BASELINE_FILE=".coverage-baseline"
 
 # Floor check — absolute minimum
-BELOW_FLOOR=$(awk "BEGIN { print ($PERCENT < $COVERAGE_FLOOR) ? 1 : 0 }")
+BELOW_FLOOR=$(awk -v p="$PERCENT" -v f="$COVERAGE_FLOOR" 'BEGIN { print (p < f) ? 1 : 0 }')
 if [ "$BELOW_FLOOR" -eq 1 ]; then
   log_error "Coverage ${PERCENT}% is below floor threshold (${COVERAGE_FLOOR}%)."
   exit 1
@@ -35,24 +35,27 @@ if [ ! -f "$BASELINE_FILE" ]; then
   exit 0
 fi
 
-BASELINE=$(cat "$BASELINE_FILE" | tr -d '[:space:]')
+BASELINE=$(tr -d '[:space:]' <"$BASELINE_FILE")
 if [ -z "$BASELINE" ]; then
   log_warn "Empty ${BASELINE_FILE}. Skipping delta check."
   log_info "Coverage: ${PERCENT}%"
   exit 0
 fi
 
-DROP=$(awk "BEGIN { printf \"%.2f\", $BASELINE - $PERCENT }")
-EXCEEDED=$(awk "BEGIN { print ($DROP > $COVERAGE_MAX_DROP) ? 1 : 0 }")
+DROP=$(awk -v b="$BASELINE" -v p="$PERCENT" 'BEGIN { printf "%.2f", b - p }')
+EXCEEDED=$(awk -v d="$DROP" -v m="$COVERAGE_MAX_DROP" 'BEGIN { print (d > m) ? 1 : 0 }')
 
 if [ "$EXCEEDED" -eq 1 ]; then
   log_error "Coverage dropped ${DROP}% (${BASELINE}% → ${PERCENT}%). Max allowed drop: ${COVERAGE_MAX_DROP}%."
   exit 1
 fi
 
-IMPROVED=$(awk "BEGIN { print ($DROP < 0) ? 1 : 0 }")
-if [ "$IMPROVED" -eq 1 ]; then
-  GAIN=$(awk "BEGIN { printf \"%.2f\", $PERCENT - $BASELINE }")
+NO_CHANGE=$(awk -v d="$DROP" 'BEGIN { print (d == 0) ? 1 : 0 }')
+IMPROVED=$(awk -v d="$DROP" 'BEGIN { print (d < 0) ? 1 : 0 }')
+if [ "$NO_CHANGE" -eq 1 ]; then
+  log_success "Coverage: ${PERCENT}% (baseline: ${BASELINE}%)"
+elif [ "$IMPROVED" -eq 1 ]; then
+  GAIN=$(awk -v p="$PERCENT" -v b="$BASELINE" 'BEGIN { printf "%.2f", p - b }')
   log_success "Coverage: ${PERCENT}% (baseline: ${BASELINE}%, +${GAIN}%)"
 else
   log_success "Coverage: ${PERCENT}% (baseline: ${BASELINE}%, -${DROP}%)"

@@ -125,11 +125,10 @@ COVERAGE_FILE=$(find "$REPO_ROOT/coverage" -name "coverage.json" -not -path "*/k
 if [ -n "$COVERAGE_FILE" ]; then
   REPORT_DIR=$(dirname "$COVERAGE_FILE")
   PERCENT=$(jq -r '.percent_covered' "$COVERAGE_FILE")
-  log_success "Coverage: ${PERCENT}%" >&2
   log_info "Report: ${REPORT_DIR}/index.html" >&2
 
-  # Output percentage to stdout for callers
-  echo "$PERCENT"
+  # Check against baseline
+  bash "$REPO_ROOT/scripts/common/check-coverage.sh" "$PERCENT"
 else
   log_error "Could not determine coverage." >&2
   exit 1
