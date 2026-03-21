@@ -16,14 +16,14 @@ teardown() {
   _common_teardown
 }
 
-@test "fails when cspell is not installed" {
+@test "fails when npx is not installed" {
   run env -i PATH="${TEST_BIN_DIR}:/usr/bin:/bin" NO_COLOR=1 HOME="$HOME" bash "$SCRIPT"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"cspell is not installed"* ]]
+  [[ "$output" == *"npx is not installed"* ]]
 }
 
 @test "passes when no files to check" {
-  create_mock cspell
+  create_mock npx
   # No staged files
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
@@ -31,7 +31,7 @@ teardown() {
 }
 
 @test "passes when cspell reports no errors" {
-  create_mock cspell 'exit 0'
+  create_mock npx 'exit 0'
   echo "hello world" >doc.md
   git add doc.md
 
@@ -41,7 +41,7 @@ teardown() {
 }
 
 @test "fails when cspell reports errors" {
-  create_mock cspell 'echo "misspelled word"; exit 1'
+  create_mock npx 'echo "misspelled word"; exit 1'
   # Build misspelled content dynamically to avoid triggering cspell on this file
   # Write misspelled content via variable to avoid cspell flagging this file
   local bad="spe"

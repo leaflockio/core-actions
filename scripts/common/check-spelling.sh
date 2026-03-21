@@ -6,11 +6,11 @@
 # written permission from Leaflock.
 
 # Checks spelling in files using cspell.
-# Requires: cspell (npm install -g cspell)
+# Requires: cspell (npm ci)
 
 . "$(dirname "$0")/config.sh"
 
-require_command "cspell" "npm install -g cspell"
+require_command "npx" "install Node.js"
 
 if [ -z "$CHECK_FILES" ]; then
   log_success "No files to spell check."
@@ -19,7 +19,7 @@ fi
 
 log_info "Checking spelling..."
 
-if ! echo "$CHECK_FILES" | xargs cspell --no-progress --no-summary 2>&1; then
+if ! echo "$CHECK_FILES" | xargs npx cspell --no-progress --no-summary 2>&1; then
   echo ""
   log_error "Spelling errors detected."
   log_info "Fix the words above or add them to .cspell.json 'words' list."

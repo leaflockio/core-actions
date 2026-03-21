@@ -6,11 +6,11 @@
 # written permission from Leaflock.
 
 # Checks formatting of files using prettier.
-# Requires: prettier (npm install -g prettier)
+# Requires: prettier (npm ci)
 
 . "$(dirname "$0")/config.sh"
 
-require_command "prettier" "npm install -g prettier"
+require_command "npx" "install Node.js"
 
 # Filter CHECK_FILES to formattable extensions
 FORMAT_FILES=""
@@ -34,7 +34,7 @@ FAIL=0
 for f in $FORMAT_FILES; do
   [ -f "$f" ] || continue
 
-  if ! prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --check "$f" >/dev/null 2>&1; then
+  if ! npx prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --check "$f" >/dev/null 2>&1; then
     log_error "Not formatted: $f"
     FAIL=1
   fi
