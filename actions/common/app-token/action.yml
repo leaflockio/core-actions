@@ -1,0 +1,37 @@
+name: Generate App Token
+description: >
+  Generates a short-lived GitHub App token and configures git identity
+  for authenticated operations like pushing to protected branches
+  and creating verified commits.
+
+inputs:
+  app-id:
+    description: GitHub App ID
+    required: true
+
+  private-key:
+    description: GitHub App private key
+    required: true
+
+outputs:
+  token:
+    description: Generated GitHub App token
+    value: ${{ steps.token.outputs.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate GitHub App token
+      id: token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}
+
+    - name: Configure git identity
+      shell: bash
+      env:
+        APP_ID: ${{ inputs.app-id }}
+      run: |
+        git config user.name "locket-ci[bot]"
+        git config user.email "${APP_ID}+locket-ci[bot]@users.noreply.github.com"

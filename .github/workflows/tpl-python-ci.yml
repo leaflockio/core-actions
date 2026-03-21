@@ -1,0 +1,96 @@
+name: Python CI
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: Python version to use
+        type: string
+        required: false
+        default: '3.12'
+
+      working-directory:
+        description: Directory containing requirements.txt or pyproject.toml
+        type: string
+        required: false
+        default: '.'
+
+      package-manager:
+        description: Package manager (pip or poetry)
+        type: string
+        required: false
+        default: pip
+
+      lint-command:
+        description: Command to run for linting
+        type: string
+        required: false
+        default: ruff check
+
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/python/setup
+        with:
+          python-version: ${{ inputs.python-version }}
+          working-directory: ${{ inputs.working-directory }}
+          package-manager: ${{ inputs.package-manager }}
+
+      - name: Lint
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          LINT_CMD: ${{ inputs.lint-command }}
+        run: eval "$LINT_CMD"
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          PKG_MANAGER: ${{ inputs.package-manager }}
+        run: |
+          if [ "$PKG_MANAGER" = "poetry" ]; then
+            pip install poetry
+            poetry install
+          else
+            pip install -r requirements.txt
+          fi
+
+      - name: Run coverage
+        working-directory: ${{ inputs.working-directory }}
+        run: bash .core-actions/scripts/python/coverage.sh

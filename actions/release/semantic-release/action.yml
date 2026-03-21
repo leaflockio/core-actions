@@ -1,0 +1,77 @@
+name: Semantic Release
+description: >
+  Runs semantic-release to version, tag, and publish a release.
+  Expects a pre-generated GitHub App token for pushing commits
+  (changelog, version bump) to protected branches.
+
+inputs:
+  token:
+    description: GitHub App token for pushing to protected branches
+    required: true
+
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '22'
+
+  working-directory:
+    description: >
+      Directory containing package.json. Defaults to repo root.
+    required: false
+    default: '.'
+
+  semantic-version:
+    description: Major version of semantic-release to install
+    required: false
+    default: '24'
+
+  extra-plugins:
+    description: >
+      Space-separated list of extra semantic-release plugins to install
+    required: false
+    default: ''
+
+outputs:
+  new_release_published:
+    description: Whether a new release was published ('true' or 'false')
+    value: ${{ steps.release.outputs.new_release_published }}
+
+  new_release_version:
+    description: Version of the release (e.g. '1.2.3' or '1.2.3-beta.1')
+    value: ${{ steps.release.outputs.new_release_version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout (full history)
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.token }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Read git identity
+      id: git-identity
+      shell: bash
+      run: |
+        echo "name=$(git config user.name)" >> "${GITHUB_OUTPUT}"
+        echo "email=$(git config user.email)" >> "${GITHUB_OUTPUT}"
+
+    - name: Run semantic-release
+      id: release
+      uses: cycjimmy/semantic-release-action@v4.2.0
+      with:
+        semantic_version: ${{ inputs.semantic-version }}
+        extra_plugins: ${{ inputs.extra-plugins }}
+        working_directory: ${{ inputs.working-directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        GIT_AUTHOR_NAME: ${{ steps.git-identity.outputs.name }}
+        GIT_AUTHOR_EMAIL: ${{ steps.git-identity.outputs.email }}
+        GIT_COMMITTER_NAME: ${{ steps.git-identity.outputs.name }}
+        GIT_COMMITTER_EMAIL: ${{ steps.git-identity.outputs.email }}
+        LEFTHOOK: 0

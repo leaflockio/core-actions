@@ -1,0 +1,92 @@
+name: Go CI
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        description: Go version to use
+        type: string
+        required: false
+        default: '1.22'
+
+      working-directory:
+        description: Directory containing go.mod
+        type: string
+        required: false
+        default: '.'
+
+      golangci-lint-version:
+        description: golangci-lint version to install
+        type: string
+        required: false
+        default: '1.62.2'
+
+      lint-command:
+        description: Command to run for linting
+        type: string
+        required: false
+        default: golangci-lint run
+
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/go/setup
+        with:
+          go-version: ${{ inputs.go-version }}
+          working-directory: ${{ inputs.working-directory }}
+
+      - name: Install golangci-lint
+        env:
+          GOLANGCI_VERSION: ${{ inputs.golangci-lint-version }}
+        run: |
+          curl -sSfL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_VERSION}/golangci-lint-${GOLANGCI_VERSION}-linux-amd64.tar.gz" -o golangci-lint.tar.gz
+          tar -xzf golangci-lint.tar.gz --strip-components=1 "golangci-lint-${GOLANGCI_VERSION}-linux-amd64/golangci-lint"
+          mv golangci-lint "$(go env GOPATH)/bin/"
+          rm golangci-lint.tar.gz
+
+      - name: Lint
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          LINT_CMD: ${{ inputs.lint-command }}
+        run: eval "$LINT_CMD"
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Run coverage
+        working-directory: ${{ inputs.working-directory }}
+        run: bash .core-actions/scripts/go/coverage.sh

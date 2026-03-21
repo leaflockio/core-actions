@@ -1,0 +1,3 @@
+Copyright {YEAR} {ORG}
+
+This project is open source. See LICENSE for terms.
