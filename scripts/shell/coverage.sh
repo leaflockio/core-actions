@@ -81,9 +81,9 @@ else
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
-# Display clean test results (TAP lines only)
-PASSED=$(grep -Ec '^ok [0-9]' "$OUTPUT_FILE" || true)
-FAILED=$(grep -Ec '^not ok [0-9]' "$OUTPUT_FILE" || true)
+# Display clean test results (main bats run only, identified by timing suffix)
+PASSED=$(grep -Ec '^ok [0-9]+.* in [0-9]+ms$' "$OUTPUT_FILE" || true)
+FAILED=$(grep -Ec '^not ok [0-9]+.* in [0-9]+ms$' "$OUTPUT_FILE" || true)
 PASSED=${PASSED:-0}
 FAILED=${FAILED:-0}
 TOTAL=$((PASSED + FAILED))
