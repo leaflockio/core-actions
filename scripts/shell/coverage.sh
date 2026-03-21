@@ -49,6 +49,9 @@ done
 log_info "Running tests under kcov (${EXPECTED_TESTS} tests)..." >&2
 START_TIME=$(date +%s)
 
+JUNIT_DIR="${COVERAGE_OUTPUT_DIR}/junit"
+mkdir -p "$JUNIT_DIR"
+
 OUTPUT_FILE=$(mktemp)
 KCOV_EXIT=0
 
@@ -74,19 +77,27 @@ DOCKERFILE
     -v "${REPO_ROOT}:/repo" \
     -w /repo \
     "$IMAGE_NAME" \
-    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --recursive /repo/tests/" \
+    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --report-formatter junit --output /repo/coverage/junit --recursive /repo/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 else
-  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
+  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs "$(nproc)" --timing --report-formatter junit --output "$JUNIT_DIR" --recursive "$REPO_ROOT/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
-# Display clean test results (main bats run only, identified by timing suffix)
-PASSED=$(grep -Ec '^ok [0-9]+.* in [0-9]+ms$' "$OUTPUT_FILE" || true)
-FAILED=$(grep -Ec '^not ok [0-9]+.* in [0-9]+ms$' "$OUTPUT_FILE" || true)
-PASSED=${PASSED:-0}
-FAILED=${FAILED:-0}
-TOTAL=$((PASSED + FAILED))
+# Parse test results from JUnit XML report (reliable regardless of parallel output)
+JUNIT_FILE="$JUNIT_DIR/report.xml"
+if [ -f "$JUNIT_FILE" ]; then
+  TOTAL=$(grep -oE 'tests="[0-9]+"' "$JUNIT_FILE" | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+  FAILED=$(grep -oE 'failures="[0-9]+"' "$JUNIT_FILE" | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+  SKIPPED=$(grep -oE 'skipped="[0-9]+"' "$JUNIT_FILE" | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
+  PASSED=$((TOTAL - FAILED - SKIPPED))
+else
+  log_error "JUnit report not found at $JUNIT_FILE" >&2
+  log_warn "kcov exit code: ${KCOV_EXIT}" >&2
+  cat "$OUTPUT_FILE" >&2
+  rm -f "$OUTPUT_FILE"
+  exit 1
+fi
 
 ELAPSED=$(($(date +%s) - START_TIME))
 

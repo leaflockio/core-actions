@@ -29,6 +29,20 @@ teardown() {
   _common_teardown
 }
 
+# Write a JUnit report.xml to the expected location
+write_junit_report() {
+  local tests="${1:-3}" failures="${2:-0}" skipped="${3:-0}"
+  local junit_dir="${COVERAGE_OUTPUT_DIR}/junit"
+  mkdir -p "$junit_dir"
+  cat >"${junit_dir}/report.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites time="0.5">
+  <testsuite name="tests" tests="${tests}" failures="${failures}" errors="0" skipped="${skipped}">
+  </testsuite>
+</testsuites>
+EOF
+}
+
 # Mock bats --count to return expected test count
 mock_bats_count() {
   local count="${1:-3}"
@@ -45,23 +59,54 @@ mock_bats_count() {
   "
 }
 
-# Helper: create a mock kcov that produces TAP output
+# Helper: create a mock kcov that produces TAP output and JUnit report
 mock_kcov_passing() {
-  create_mock kcov 'printf "1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n"'
+  create_mock kcov "
+    printf '1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n'
+    mkdir -p \"${COVERAGE_OUTPUT_DIR}/junit\"
+    cat >\"${COVERAGE_OUTPUT_DIR}/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.5\">
+  <testsuite name=\"tests\" tests=\"3\" failures=\"0\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+  "
 }
 
 mock_kcov_failing() {
-  create_mock kcov 'printf "1..3\nok 1 test one in 100ms\nnot ok 2 test two in 200ms\n# (in test file tests/foo.bats, line 10)\nok 3 test three in 150ms\n"; exit 1'
+  create_mock kcov "
+    printf '1..3\nok 1 test one in 100ms\nnot ok 2 test two in 200ms\n# (in test file tests/foo.bats, line 10)\nok 3 test three in 150ms\n'
+    mkdir -p \"${COVERAGE_OUTPUT_DIR}/junit\"
+    cat >\"${COVERAGE_OUTPUT_DIR}/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.5\">
+  <testsuite name=\"tests\" tests=\"3\" failures=\"1\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+    exit 1
+  "
 }
 
 mock_docker_all_passing() {
-  create_mock docker '
-    case "$1" in
+  create_mock docker "
+    case \"\$1\" in
       info) exit 0 ;;
       image) exit 0 ;;
-      run) printf "1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n" ;;
+      run)
+        printf '1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n'
+        mkdir -p \"${COVERAGE_OUTPUT_DIR}/junit\"
+        cat >\"${COVERAGE_OUTPUT_DIR}/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.5\">
+  <testsuite name=\"tests\" tests=\"3\" failures=\"0\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+        ;;
     esac
-  '
+  "
 }
 
 @test "fails when --docker and Docker is not running" {
@@ -110,14 +155,24 @@ mock_docker_all_passing() {
 
 @test "docker mode builds image when it does not exist" {
   mock_bats_count 1
-  create_mock docker '
-    case "$1" in
+  create_mock docker "
+    case \"\$1\" in
       info) exit 0 ;;
       image) exit 1 ;;
       build) exit 0 ;;
-      run) printf "1..1\nok 1 test one in 100ms\n" ;;
+      run)
+        printf '1..1\nok 1 test one in 100ms\n'
+        mkdir -p \"${COVERAGE_OUTPUT_DIR}/junit\"
+        cat >\"${COVERAGE_OUTPUT_DIR}/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.1\">
+  <testsuite name=\"tests\" tests=\"1\" failures=\"0\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+        ;;
     esac
-  '
+  "
   create_mock jq 'echo "88.07"'
   run bash "$SCRIPT" --docker
   [ "$status" -eq 0 ]
@@ -148,4 +203,13 @@ mock_docker_all_passing() {
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"No tests found"* ]]
+}
+
+@test "fails when JUnit report is missing" {
+  mock_bats_count 3
+  create_mock kcov 'printf "1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n"'
+  create_mock nproc 'echo "4"'
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"JUnit report not found"* ]]
 }
