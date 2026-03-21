@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [pre-main, main]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   branch-policy:
     uses: ./.github/workflows/tpl-branch-policy.yml
