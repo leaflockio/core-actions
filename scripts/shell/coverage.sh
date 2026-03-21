@@ -107,7 +107,9 @@ fi
 # Validate all tests were discovered and executed
 if [ "$TOTAL" -ne "$EXPECTED_TESTS" ]; then
   log_error "Expected ${EXPECTED_TESTS} tests but only ${TOTAL} ran." >&2
-  log_warn "This is likely a flaky test discovery issue. Retry the command." >&2
+  log_warn "kcov exit code: ${KCOV_EXIT}" >&2
+  log_warn "Full output:" >&2
+  cat "$OUTPUT_FILE" >&2
   rm -f "$OUTPUT_FILE"
   exit 1
 fi
