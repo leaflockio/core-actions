@@ -54,13 +54,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install kcov
-        env:
-          KCOV_VERSION: '42'
-        run: |
-          curl -sSfL "https://github.com/SimonKagstrom/kcov/releases/download/v${KCOV_VERSION}/kcov-amd64.tar.gz" -o kcov.tar.gz
-          sudo tar -xzf kcov.tar.gz -C /
-          rm kcov.tar.gz
-
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: bash scripts/shell/coverage.sh --docker
