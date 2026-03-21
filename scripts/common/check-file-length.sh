@@ -24,7 +24,7 @@ for f in $CHECK_FILES; do
 
   # Only check source files, skip binaries and generated files
   is_skippable_file "$f" && continue
-  case "$f" in CHANGELOG.md | LICENSE*) continue ;; esac
+  case "$f" in CHANGELOG.md | LICENSE* | *-lock.json | *.lock | go.sum | *.sum) continue ;; esac
 
   LINES=$(wc -l <"$f" | tr -d ' ')
   if [ "$LINES" -gt "$MAX_FILE_LINES" ]; then
