@@ -38,7 +38,8 @@ on:
         required: true
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
 
 concurrency:
   group: release-${{ github.ref }}

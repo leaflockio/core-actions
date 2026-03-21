@@ -17,11 +17,10 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Checkout (full history)
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ inputs.token }}
+    - name: Configure push access
+      shell: bash
+      run: |
+        git remote set-url origin "https://x-access-token:${{ inputs.token }}@github.com/${GITHUB_REPOSITORY}.git"
 
     - name: Back-merge main into pre-main
       id: merge
