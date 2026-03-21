@@ -55,7 +55,12 @@ jobs:
         run: npm ci
 
       - name: Install kcov
-        run: sudo apt-get install -y -qq kcov
+        env:
+          KCOV_VERSION: '43'
+        run: |
+          curl -sSfL "https://github.com/SimonKagstrom/kcov/releases/download/v${KCOV_VERSION}/kcov-amd64.tar.gz" -o kcov.tar.gz
+          sudo tar -xzf kcov.tar.gz -C /
+          rm kcov.tar.gz
 
       - name: Run tests with coverage
         run: npm run test:coverage
