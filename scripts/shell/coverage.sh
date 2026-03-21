@@ -77,7 +77,7 @@ DOCKERFILE
     sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --recursive /repo/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 else
-  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
+  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs "$(nproc)" --timing --recursive "$REPO_ROOT/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
