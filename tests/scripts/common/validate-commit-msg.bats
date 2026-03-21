@@ -131,6 +131,18 @@ teardown() {
   [[ "$output" == *"Invalid commit message"* ]]
 }
 
+@test "ci mode uses PR_BASE_SHA when set" {
+  echo "change" >file.txt
+  git add file.txt
+  git commit -m "feat: pr commit"
+
+  BASE_SHA=$(git rev-parse HEAD~1)
+
+  run env PR_BASE_SHA="$BASE_SHA" bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"All commit messages are valid"* ]]
+}
+
 @test "ci mode fails when no remote branch exists" {
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]

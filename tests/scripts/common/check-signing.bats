@@ -64,6 +64,18 @@ teardown() {
   [[ "$output" == *"key not in local keyring"* ]]
 }
 
+@test "uses PR_BASE_SHA when set" {
+  BASE_SHA=$(git rev-parse HEAD)
+
+  echo "change" >file.txt
+  git add file.txt
+  git commit -m "feat: pr commit"
+
+  run env PR_BASE_SHA="$BASE_SHA" bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"is not signed"* ]]
+}
+
 @test "checks commits against remote when remote exists" {
   git remote add origin "${TEST_TEMP_DIR}/repo"
   git fetch origin
