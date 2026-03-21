@@ -10,6 +10,8 @@ jobs:
 
   quality:
     uses: ./.github/workflows/tpl-common-ci.yml
+    with:
+      core-actions-ref: ${{ github.head_ref || github.ref_name }}
     secrets:
       GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
