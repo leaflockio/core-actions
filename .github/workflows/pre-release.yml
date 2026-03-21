@@ -8,5 +8,5 @@ jobs:
   release:
     uses: ./.github/workflows/tpl-release.yml
     secrets:
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+      APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}
