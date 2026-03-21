@@ -14,6 +14,7 @@
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 IMAGE_NAME="leaflock/kcov-bats"
+CONTAINER_ROOT="/repo"
 USE_DOCKER=false
 
 # Parse flags
@@ -42,7 +43,7 @@ fi
 KCOV_DOCKER_FLAGS=()
 KCOV_NATIVE_FLAGS=()
 for src in $COVERAGE_SRC; do
-  KCOV_DOCKER_FLAGS+=(--bash-parse-files-in-dir="/repo/$src/" --include-pattern="/repo/$src/")
+  KCOV_DOCKER_FLAGS+=(--bash-parse-files-in-dir="$CONTAINER_ROOT/$src/" --include-pattern="$CONTAINER_ROOT/$src/")
   KCOV_NATIVE_FLAGS+=(--bash-parse-files-in-dir="$REPO_ROOT/$src/" --include-pattern="$REPO_ROOT/$src/")
 done
 
@@ -74,13 +75,13 @@ DOCKERFILE
   fi
 
   docker run --rm \
-    -v "${REPO_ROOT}:/repo" \
-    -w /repo \
+    -v "${REPO_ROOT}:${CONTAINER_ROOT}" \
+    -w "$CONTAINER_ROOT" \
     "$IMAGE_NAME" \
-    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} /repo/coverage /usr/bin/bats --jobs \"\$(nproc)\" --timing --report-formatter junit --output /repo/coverage/junit --recursive /repo/tests/" \
+    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} ${CONTAINER_ROOT}/coverage \$(which bats) --jobs 1 --timing --report-formatter junit --output ${CONTAINER_ROOT}/coverage/junit --recursive ${CONTAINER_ROOT}/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 else
-  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs "$(nproc)" --timing --report-formatter junit --output "$JUNIT_DIR" --recursive "$REPO_ROOT/tests/" \
+  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs 1 --timing --report-formatter junit --output "$JUNIT_DIR" --recursive "$REPO_ROOT/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
