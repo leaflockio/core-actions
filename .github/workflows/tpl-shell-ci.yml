@@ -9,6 +9,9 @@ on:
         required: false
         default: '22'
 
+permissions:
+  contents: read
+
 jobs:
   shellcheck:
     name: ShellCheck

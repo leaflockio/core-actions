@@ -33,6 +33,9 @@ on:
         required: false
         default: 'main'
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -55,7 +58,9 @@ jobs:
 
       - name: Lint
         working-directory: ${{ inputs.working-directory }}
-        run: ${{ inputs.lint-command }}
+        env:
+          LINT_CMD: ${{ inputs.lint-command }}
+        run: eval "$LINT_CMD"
 
   coverage:
     name: Coverage
@@ -76,8 +81,10 @@ jobs:
 
       - name: Install dependencies
         working-directory: ${{ inputs.working-directory }}
+        env:
+          PKG_MANAGER: ${{ inputs.package-manager }}
         run: |
-          if [ "${{ inputs.package-manager }}" = "poetry" ]; then
+          if [ "$PKG_MANAGER" = "poetry" ]; then
             pip install poetry
             poetry install
           else

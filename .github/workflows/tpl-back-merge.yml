@@ -18,6 +18,9 @@ on:
         description: GitHub App private key for locket-ci
         required: true
 
+permissions:
+  contents: read
+
 concurrency:
   group: back-merge
   cancel-in-progress: false

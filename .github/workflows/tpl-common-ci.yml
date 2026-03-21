@@ -20,6 +20,9 @@ on:
         description: License key for Gitleaks secret scanner
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   gate:
     name: Quality Gate
@@ -96,7 +99,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install actionlint
-        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+        env:
+          ACTIONLINT_VERSION: 1.7.7
+        run: |
+          curl -sL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" -o actionlint.tar.gz
+          tar -xzf actionlint.tar.gz actionlint
+          rm actionlint.tar.gz
 
       - name: Lint GitHub Actions
         run: ./actionlint

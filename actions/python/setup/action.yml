@@ -57,7 +57,7 @@ runs:
         PKG_MANAGER: ${{ inputs.package-manager }}
       run: |
         if [ -n "$INSTALL_CMD" ]; then
-          $INSTALL_CMD
+          eval "$INSTALL_CMD"
         elif [ "$PKG_MANAGER" = "poetry" ]; then
           poetry install
         else

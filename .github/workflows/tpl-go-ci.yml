@@ -27,6 +27,9 @@ on:
         required: false
         default: 'main'
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -48,7 +51,9 @@ jobs:
 
       - name: Lint
         working-directory: ${{ inputs.working-directory }}
-        run: ${{ inputs.lint-command }}
+        env:
+          LINT_CMD: ${{ inputs.lint-command }}
+        run: eval "$LINT_CMD"
 
   coverage:
     name: Coverage

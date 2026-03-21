@@ -63,7 +63,7 @@ runs:
 
     - name: Run semantic-release
       id: release
-      uses: cycjimmy/semantic-release-action@v4
+      uses: cycjimmy/semantic-release-action@v4.2.0
       with:
         semantic_version: ${{ inputs.semantic-version }}
         extra_plugins: ${{ inputs.extra-plugins }}

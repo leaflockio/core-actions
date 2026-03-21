@@ -3,6 +3,8 @@ name: Branch Policy
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   branch-policy:
     name: Branch Policy

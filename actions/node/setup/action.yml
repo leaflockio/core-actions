@@ -41,4 +41,4 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       env:
         INSTALL_CMD: ${{ inputs.install-command }}
-      run: $INSTALL_CMD
+      run: eval "$INSTALL_CMD"
