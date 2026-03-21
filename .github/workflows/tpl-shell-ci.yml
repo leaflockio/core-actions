@@ -56,7 +56,7 @@ jobs:
 
       - name: Install kcov
         env:
-          KCOV_VERSION: '43'
+          KCOV_VERSION: '42'
         run: |
           curl -sSfL "https://github.com/SimonKagstrom/kcov/releases/download/v${KCOV_VERSION}/kcov-amd64.tar.gz" -o kcov.tar.gz
           sudo tar -xzf kcov.tar.gz -C /
