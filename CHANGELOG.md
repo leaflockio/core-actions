@@ -1,3 +1,9 @@
+## [1.1.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.0...v1.1.1-beta.1) (2026-03-22)
+
+### Bug Fixes
+
+* add git access step and strategy validation to back-merge action ([#16](https://github.com/leaflockio/core-actions/issues/16)) ([6279244](https://github.com/leaflockio/core-actions/commit/6279244e9c8d2031a3f74f423776113efb69fc29))
+
 ## [1.1.0](https://github.com/leaflockio/core-actions/compare/v1.0.0...v1.1.0) (2026-03-22)
 
 ### Features
