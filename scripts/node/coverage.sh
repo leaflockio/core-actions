@@ -8,11 +8,11 @@
 # Runs Node tests with coverage and checks against baseline.
 # Expects: npm run test:coverage in the consumer's package.json
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
 
 log_info "Running tests with coverage..."
 
-OUTPUT=$(npm run test:coverage 2>&1)
+OUTPUT=$(npm run "${COVERAGE_SCRIPT}" 2>&1)
 STATUS=$?
 
 if [ "$STATUS" -ne 0 ]; then
@@ -33,4 +33,4 @@ COVERAGE_DIR="${COVERAGE_DIR:-coverage}"
 
 log_info "Coverage: ${PERCENT}%"
 log_info "Report: ${COVERAGE_DIR}/index.html"
-bash "$(dirname "$0")/../common/check-coverage.sh" "$PERCENT"
+bash "$(dirname "$0")/../common/check-coverage.sh" "$PERCENT" "${COVERAGE_TAG:-}"

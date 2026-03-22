@@ -7,15 +7,17 @@
 
 # Stack-agnostic coverage regression check.
 # Compares a coverage percentage against .coverage-baseline.
-# Usage: bash check-coverage.sh <percent>
+# Usage: bash check-coverage.sh <percent> [tag]
 #   e.g. bash check-coverage.sh 88.07
+#   e.g. bash check-coverage.sh 88.07 shell
 
 . "$(dirname "$0")/config.sh"
 
 PERCENT="$1"
+TAG="${2:-${COVERAGE_TAG:-}}"
 
 if [ -z "$PERCENT" ]; then
-  log_error "Usage: check-coverage.sh <percent>"
+  log_error "Usage: check-coverage.sh <percent> [tag]"
   exit 1
 fi
 
@@ -35,7 +37,26 @@ if [ ! -f "$BASELINE_FILE" ]; then
   exit 0
 fi
 
-BASELINE=$(tr -d '[:space:]' <"$BASELINE_FILE")
+if [ -n "$TAG" ]; then
+  # Tagged mode: parse "tag: value" format
+  BASELINE=$(grep -E "^${TAG}:" "$BASELINE_FILE" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '[:space:]')
+  if [ -z "$BASELINE" ]; then
+    log_warn "Tag '${TAG}' not found in ${BASELINE_FILE}. Skipping delta check."
+    log_info "Coverage: ${PERCENT}%"
+    exit 0
+  fi
+else
+  # Legacy mode: raw number (first non-comment, non-blank line)
+  BASELINE_LINE=$(grep -v '^#' "$BASELINE_FILE" | grep -v '^$' | head -1 | tr -d '[:space:]')
+  # Detect tagged file used without a tag
+  if echo "$BASELINE_LINE" | grep -qE '^[a-zA-Z].*:'; then
+    log_warn "Tagged ${BASELINE_FILE} detected but no tag provided. Skipping delta check."
+    log_info "Coverage: ${PERCENT}%"
+    exit 0
+  fi
+  BASELINE="$BASELINE_LINE"
+fi
+
 if [ -z "$BASELINE" ]; then
   log_warn "Empty ${BASELINE_FILE}. Skipping delta check."
   log_info "Coverage: ${PERCENT}%"

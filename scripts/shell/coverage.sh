@@ -142,7 +142,7 @@ if [ -n "$COVERAGE_FILE" ]; then
   log_info "Report: ${REPORT_DIR}/index.html" >&2
 
   # Check against baseline
-  bash "$REPO_ROOT/scripts/common/check-coverage.sh" "$PERCENT"
+  bash "$REPO_ROOT/scripts/common/check-coverage.sh" "$PERCENT" "${COVERAGE_TAG:-}"
 else
   log_error "Could not determine coverage." >&2
   exit 1

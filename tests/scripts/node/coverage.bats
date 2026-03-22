@@ -57,3 +57,48 @@ teardown() {
   run bash "$SCRIPT"
   [[ "$output" == *"Running tests with coverage"* ]]
 }
+
+@test "uses custom COVERAGE_SCRIPT when set" {
+  create_mock "npm" '
+    # Verify the script name was passed
+    if echo "$@" | grep -q "test:custom:cov"; then
+      echo "All files  |   96.0 |    95.0 |   98.0 |   96.0"
+      exit 0
+    fi
+    echo "wrong script: $@" >&2
+    exit 1
+  '
+
+  export COVERAGE_SCRIPT="test:custom:cov"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Coverage: 96.0"* ]]
+}
+
+@test "passes COVERAGE_TAG to check-coverage" {
+  create_mock "npm" '
+    echo "All files  |   96.0 |    95.0 |   98.0 |   96.0"
+    exit 0
+  '
+
+  printf 'js: 96.0\nshell: 80.0\n' >.coverage-baseline
+
+  export COVERAGE_TAG="js"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"baseline: 96.0%"* ]]
+}
+
+@test "COVERAGE_TAG regression detected against tagged baseline" {
+  create_mock "npm" '
+    echo "All files  |   96.0 |    95.0 |   98.0 |   96.0"
+    exit 0
+  '
+
+  printf 'js: 96.10\nshell: 80.0\n' >.coverage-baseline
+
+  export COVERAGE_TAG="js"
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Coverage dropped"* ]]
+}

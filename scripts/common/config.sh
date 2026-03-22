@@ -27,6 +27,8 @@ LINK_CHECK_TIMEOUT="${LINK_CHECK_TIMEOUT:-5}"
 COVERAGE_MAX_DROP="${COVERAGE_MAX_DROP:-0.05}"
 COVERAGE_FLOOR="${COVERAGE_FLOOR:-95}"
 COVERAGE_SRC="${COVERAGE_SRC:-scripts}"
+COVERAGE_SCRIPT="${COVERAGE_SCRIPT:-test:coverage}"
+COVERAGE_TAG="${COVERAGE_TAG:-}"
 CHECK_MODE="${CHECK_MODE:-staged}"
 
 # ── Override from .hooks-config ─────────────────────────────────────
@@ -48,6 +50,8 @@ if [ -f ".hooks-config" ]; then
     COVERAGE_MAX_DROP) COVERAGE_MAX_DROP="$value" ;;
     COVERAGE_FLOOR) COVERAGE_FLOOR="$value" ;;
     COVERAGE_SRC) COVERAGE_SRC="$value" ;;
+    COVERAGE_SCRIPT) COVERAGE_SCRIPT="$value" ;;
+    COVERAGE_TAG) COVERAGE_TAG="$value" ;;
     CHECK_MODE) CHECK_MODE="$value" ;;
     esac
   done <<<"$(cat .hooks-config)"
