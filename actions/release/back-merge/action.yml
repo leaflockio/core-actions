@@ -14,27 +14,39 @@ inputs:
     default: 'merge'
 
 outputs:
-  back_merge_result:
-    description: Result of the back-merge ('success' or 'conflict')
-    value: ${{ steps.merge.outputs.result }}
+  result:
+    description: Result of the sync ('success' or 'failed')
+    value: ${{ steps.sync.outputs.result }}
 
 runs:
   using: composite
   steps:
-    - name: Sync pre-main with main
-      id: merge
+    - name: Configure git access
       shell: bash
       run: |
-        if [ "${{ inputs.strategy }}" = "force-sync" ]; then
-          SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/force-sync.sh"
-        else
-          SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"
-        fi
+        git remote set-url origin "https://x-access-token:${{ inputs.token }}@github.com/${GITHUB_REPOSITORY}.git"
+
+    - name: Sync pre-main with main
+      id: sync
+      shell: bash
+      run: |
+        case "${{ inputs.strategy }}" in
+          merge)
+            SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"
+            ;;
+          force-sync)
+            SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/force-sync.sh"
+            ;;
+          *)
+            echo "::error::Invalid strategy '${{ inputs.strategy }}'. Must be 'merge' or 'force-sync'."
+            exit 1
+            ;;
+        esac
 
         if bash "$SCRIPT"; then
           echo "result=success" >> "${GITHUB_OUTPUT}"
         else
-          echo "result=conflict" >> "${GITHUB_OUTPUT}"
+          echo "result=failed" >> "${GITHUB_OUTPUT}"
           exit 1
         fi
       env:
