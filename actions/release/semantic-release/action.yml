@@ -53,6 +53,11 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
 
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ inputs.working-directory }}
+
     - name: Read git identity
       id: git-identity
       shell: bash
