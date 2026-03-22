@@ -1,0 +1,6 @@
+{
+  "version": "0.2",
+  "import": ["configs/common/.cspell.json"],
+  "words": ["pypirc", "winpath", "rojects"],
+  "ignorePaths": ["configs/common/LICENSE-apache-2.0"]
+}

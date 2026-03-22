@@ -1,0 +1,32 @@
+{
+  "name": "@leaflockio/core-actions",
+  "version": "1.0.0-beta.1",
+  "private": true,
+  "description": "Reusable GitHub Actions, composite actions, and shared scripts for Leaflock repositories",
+  "scripts": {
+    "format": "prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --write .",
+    "format:check": "prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --check .",
+    "format:sh": "shfmt -w .",
+    "format:sh:check": "shfmt -d .",
+    "spell": "cspell \"**/*\"",
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
+    "lint:sh": "shellcheck -x --source-path=SCRIPTDIR scripts/**/*.sh",
+    "test": "bats --jobs 16 --timing --recursive tests/",
+    "test:js": "vitest run",
+    "test:js:coverage": "vitest run --coverage",
+    "test:js:coverage:check": "COVERAGE_TAG=js COVERAGE_SCRIPT=test:js:coverage COVERAGE_DIR=coverage/js bash scripts/node/coverage.sh",
+    "test:sh:coverage": "COVERAGE_TAG=shell bash scripts/shell/coverage.sh",
+    "test:sh:coverage:local": "COVERAGE_TAG=shell bash scripts/shell/coverage.sh --docker"
+  },
+  "devDependencies": {
+    "@octokit/rest": "^22.0.1",
+    "@vitest/coverage-v8": "^4.1.0",
+    "bats": "^1.13.0",
+    "cspell": "^9.7.0",
+    "markdownlint-cli2": "^0.21.0",
+    "prettier": "^3.8.1",
+    "shellcheck": "^4.1.0",
+    "vitest": "^4.1.0"
+  }
+}

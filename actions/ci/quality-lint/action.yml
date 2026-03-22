@@ -1,0 +1,37 @@
+name: Quality Lint
+description: >
+  Runs lint checks that require npm tools (prettier, cspell).
+  The consumer repo must have run npm ci before calling this action.
+  Checks formatting, spelling, and license headers.
+
+inputs:
+  scripts-dir:
+    description: Path to the core-actions scripts/common/ directory
+    required: true
+  pr-base-sha:
+    description: Base commit SHA of the pull request (for file-scoped checks)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Formatting
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-format.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Spelling
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-spelling.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: License headers
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/license-header.sh" check
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}

@@ -1,0 +1,45 @@
+name: Gitleaks Secret Scanner
+description: >
+  Scans the repository for leaked secrets using Gitleaks.
+  The caller must pass the license key via inputs.
+
+inputs:
+  license:
+    description: Gitleaks license key
+    required: false
+    default: ''
+
+  require-license:
+    description: >
+      Whether to fail if no license is provided. Defaults to true.
+      Set to false to run without a license when one is unavailable.
+    required: false
+    default: 'true'
+
+  config-path:
+    description: >
+      Path to a Gitleaks configuration file. Omit to use default rules.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Validate license
+      shell: bash
+      env:
+        REQUIRE_LICENSE: ${{ inputs.require-license }}
+        LICENSE: ${{ inputs.license }}
+      run: |
+        if [ "$REQUIRE_LICENSE" = "true" ] && [ -z "$LICENSE" ]; then
+          echo "::error::Gitleaks license is required but was not provided."
+          echo "::error::Pass the license key via inputs.license."
+          exit 1
+        fi
+
+    - name: Scan for secrets
+      uses: gitleaks/gitleaks-action@v2.3.7
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        GITLEAKS_LICENSE: ${{ inputs.license }}
+        GITLEAKS_CONFIG: ${{ inputs.config-path }}

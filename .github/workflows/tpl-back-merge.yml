@@ -1,0 +1,53 @@
+name: Back-merge
+
+on:
+  workflow_call:
+    inputs:
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+    secrets:
+      APP_ID:
+        description: GitHub App ID for locket-ci
+        required: true
+
+      APP_PRIVATE_KEY:
+        description: GitHub App private key for locket-ci
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: back-merge
+  cancel-in-progress: false
+
+jobs:
+  back-merge:
+    name: Back-merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - uses: ./.core-actions/actions/common/app-token
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: ./.core-actions/actions/release/back-merge
+        with:
+          token: ${{ steps.app-token.outputs.token }}

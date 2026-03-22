@@ -1,0 +1,34 @@
+name: Setup Go
+description: >
+  Checks out the repository and sets up Go with module caching. Verifies go.sum
+  integrity after setup. Used as a building block in all Go CI workflows.
+
+inputs:
+  go-version:
+    description: Go version to use
+    required: false
+    default: '1.22'
+
+  working-directory:
+    description: >
+      Directory containing go.mod. Defaults to repo root.
+      Set this for monorepos where the Go module lives in a subdirectory.
+    required: false
+    default: '.'
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache-dependency-path: ${{ inputs.working-directory }}/go.sum
+
+    - name: Verify modules
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: go mod verify

@@ -1,0 +1,17 @@
+name: Pre-release
+
+on:
+  push:
+    branches: [pre-main]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    uses: ./.github/workflows/tpl-release.yml
+    with:
+      core-actions-ref: pre-main
+    secrets:
+      APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}

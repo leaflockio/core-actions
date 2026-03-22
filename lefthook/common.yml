@@ -1,0 +1,88 @@
+# Hooks that apply to every repo regardless of tech stack.
+# Reference this alongside a stack-specific config in your repo's lefthook.yml:
+#
+#   remotes:
+#     - git_url: https://github.com/leaflockio/core-actions
+#       ref: v1
+#       configs:
+#         - lefthook/common.yml
+#         - lefthook/node.yml
+
+pre-commit:
+  jobs:
+    - name: common-checks
+      group:
+        piped: true
+        jobs:
+          - name: check-partial-stage
+            run: bash scripts/common/check-partial-stage.sh
+            interactive: true
+          - name: quality-gates
+            group:
+              parallel: true
+              jobs:
+                - name: check-branch
+                  run: bash scripts/common/check-branch.sh
+                - name: check-large-files
+                  run: bash scripts/common/check-large-files.sh
+                - name: check-file-length
+                  run: bash scripts/common/check-file-length.sh
+                - name: check-commit-size
+                  run: bash scripts/common/check-commit-size.sh
+                - name: check-secrets
+                  run: bash scripts/common/check-secrets.sh
+                - name: check-sensitive-files
+                  run: bash scripts/common/check-sensitive-files.sh
+                - name: check-paths
+                  run: bash scripts/common/check-paths.sh
+                - name: check-todo
+                  run: bash scripts/common/check-todo.sh
+                - name: check-naming
+                  run: bash scripts/common/check-naming.sh
+                - name: check-format
+                  run: bash scripts/common/check-format.sh
+                - name: check-markdown-lint
+                  glob: '**/*.md'
+                  run: markdownlint-cli2 {staged_files}
+                - name: check-spelling
+                  run: bash scripts/common/check-spelling.sh
+                - name: check-markdown-links
+                  run: bash scripts/common/check-markdown-links.sh
+                - name: check-license-header
+                  run: bash scripts/common/license-header.sh check --staged
+
+commit-msg:
+  commands:
+    validate-commit-msg:
+      run: bash scripts/common/validate-commit-msg.sh {1}
+
+post-checkout:
+  commands:
+    check-branch-name:
+      run: bash scripts/common/check-branch-name.sh {0} {1} {2}
+
+post-commit:
+  commands:
+    check-signing:
+      run: bash scripts/common/check-signing.sh
+
+pre-rebase:
+  commands:
+    check-rebase:
+      run: bash scripts/common/check-rebase.sh {1} {2}
+
+pre-push:
+  jobs:
+    - name: common-push-checks
+      group:
+        piped: true
+        jobs:
+          - name: check-uncommitted
+            run: bash scripts/common/check-uncommitted.sh
+            interactive: true
+          - name: push-gates
+            group:
+              parallel: true
+              jobs:
+                - name: check-signing
+                  run: bash scripts/common/check-signing.sh

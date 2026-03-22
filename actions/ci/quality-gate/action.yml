@@ -1,0 +1,78 @@
+name: Quality Gate
+description: >
+  Runs fast quality checks that require only git and bash.
+  Checks branch naming, commit messages, signing, large files,
+  file length, sensitive files, hardcoded paths, todo markers, and naming.
+
+inputs:
+  scripts-dir:
+    description: Path to the core-actions scripts/common/ directory
+    required: true
+  pr-base-sha:
+    description: Base commit SHA of the pull request (for file-scoped checks)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Branch naming
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-branch-name.sh"
+      env:
+        CHECK_MODE: all
+
+    - name: Commit messages
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/validate-commit-msg.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Commit signing
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-signing.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Large files
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-large-files.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: File length
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-file-length.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Sensitive files
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-sensitive-files.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Hardcoded paths
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-paths.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: Ticket-linked markers
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-todo.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+
+    - name: File naming
+      shell: bash
+      run: bash "${{ inputs.scripts-dir }}/check-naming.sh"
+      env:
+        CHECK_MODE: pr
+        PR_BASE_SHA: ${{ inputs.pr-base-sha }}

@@ -1,0 +1,20 @@
+# Python specific hooks.
+# Always use alongside common.yml.
+
+pre-commit:
+  jobs:
+    - name: python-checks
+      group:
+        parallel: true
+        jobs:
+          - name: check-naming
+            run: bash scripts/python/check-naming.sh
+          - name: check-format
+            run: bash scripts/python/check-format.sh
+          - name: check-lint
+            run: bash scripts/python/check-lint.sh
+
+pre-push:
+  jobs:
+    - name: python-coverage
+      run: bash scripts/python/coverage.sh

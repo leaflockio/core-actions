@@ -1,0 +1,33 @@
+# Example: consumer repos pull hooks from this repo via remotes:
+#
+#   remotes:
+#     - git_url: https://github.com/leaflockio/core-actions
+#       ref: v1
+#       configs:
+#         - lefthook/common.yml
+#         - lefthook/node.yml
+
+extends:
+  - lefthook/common.yml
+  - lefthook/shell.yml
+  - lefthook/node.yml
+
+# Override pre-push coverage jobs from shell.yml and node.yml.
+# This repo has two coverage domains (shell + JS), each needing a different
+# COVERAGE_TAG and COVERAGE_SCRIPT. The .hooks-config only supports a single
+# global value per key, so per-stack config is not yet supported.
+# As a workaround, we override the jobs here with per-job env. Jobs with the
+# same name (shell-coverage, node-coverage) replace the ones from the extended
+# configs — they do not run twice.
+pre-push:
+  jobs:
+    - name: shell-coverage
+      env:
+        COVERAGE_TAG: shell
+      run: bash scripts/shell/coverage.sh --docker
+    - name: node-coverage
+      env:
+        COVERAGE_TAG: js
+        COVERAGE_SCRIPT: test:js:coverage
+        COVERAGE_DIR: coverage/js
+      run: bash scripts/node/coverage.sh
