@@ -13,7 +13,7 @@ scripts/
   node/          # node-specific hooks (naming, lint-staged, coverage)
   go/            # go-specific hooks (naming, format, lint, coverage)
   python/        # python-specific hooks (naming, format, lint, coverage)
-  release/       # release scripts (back-merge)
+  release/       # release scripts (back-merge, force-sync)
 ```
 
 ---

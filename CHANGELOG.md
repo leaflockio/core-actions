@@ -1,3 +1,9 @@
+## [1.1.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.0.0...v1.1.0-beta.1) (2026-03-22)
+
+### Features
+
+* add verified back-merge and force-sync strategies via GitHub API ([#14](https://github.com/leaflockio/core-actions/issues/14)) ([7478761](https://github.com/leaflockio/core-actions/commit/747876181419f3c4eacb359a5f4058eb1664b625))
+
 ## 1.0.0 (2026-03-22)
 
 ### Features
