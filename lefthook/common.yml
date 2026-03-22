@@ -9,44 +9,47 @@
 #         - lefthook/node.yml
 
 pre-commit:
-  piped: true
   jobs:
-    - name: check-partial-stage
-      run: bash scripts/common/check-partial-stage.sh
-      interactive: true
-    - name: quality-gates
+    - name: common-checks
       group:
-        parallel: true
+        piped: true
         jobs:
-          - name: check-branch
-            run: bash scripts/common/check-branch.sh
-          - name: check-large-files
-            run: bash scripts/common/check-large-files.sh
-          - name: check-file-length
-            run: bash scripts/common/check-file-length.sh
-          - name: check-commit-size
-            run: bash scripts/common/check-commit-size.sh
-          - name: check-secrets
-            run: bash scripts/common/check-secrets.sh
-          - name: check-sensitive-files
-            run: bash scripts/common/check-sensitive-files.sh
-          - name: check-paths
-            run: bash scripts/common/check-paths.sh
-          - name: check-todo
-            run: bash scripts/common/check-todo.sh
-          - name: check-naming
-            run: bash scripts/common/check-naming.sh
-          - name: check-format
-            run: bash scripts/common/check-format.sh
-          - name: check-markdown-lint
-            glob: '**/*.md'
-            run: markdownlint-cli2 {staged_files}
-          - name: check-spelling
-            run: bash scripts/common/check-spelling.sh
-          - name: check-markdown-links
-            run: bash scripts/common/check-markdown-links.sh
-          - name: check-license-header
-            run: bash scripts/common/license-header.sh check --staged
+          - name: check-partial-stage
+            run: bash scripts/common/check-partial-stage.sh
+            interactive: true
+          - name: quality-gates
+            group:
+              parallel: true
+              jobs:
+                - name: check-branch
+                  run: bash scripts/common/check-branch.sh
+                - name: check-large-files
+                  run: bash scripts/common/check-large-files.sh
+                - name: check-file-length
+                  run: bash scripts/common/check-file-length.sh
+                - name: check-commit-size
+                  run: bash scripts/common/check-commit-size.sh
+                - name: check-secrets
+                  run: bash scripts/common/check-secrets.sh
+                - name: check-sensitive-files
+                  run: bash scripts/common/check-sensitive-files.sh
+                - name: check-paths
+                  run: bash scripts/common/check-paths.sh
+                - name: check-todo
+                  run: bash scripts/common/check-todo.sh
+                - name: check-naming
+                  run: bash scripts/common/check-naming.sh
+                - name: check-format
+                  run: bash scripts/common/check-format.sh
+                - name: check-markdown-lint
+                  glob: '**/*.md'
+                  run: markdownlint-cli2 {staged_files}
+                - name: check-spelling
+                  run: bash scripts/common/check-spelling.sh
+                - name: check-markdown-links
+                  run: bash scripts/common/check-markdown-links.sh
+                - name: check-license-header
+                  run: bash scripts/common/license-header.sh check --staged
 
 commit-msg:
   commands:
@@ -69,14 +72,17 @@ pre-rebase:
       run: bash scripts/common/check-rebase.sh {1} {2}
 
 pre-push:
-  piped: true
   jobs:
-    - name: check-uncommitted
-      run: bash scripts/common/check-uncommitted.sh
-      interactive: true
-    - name: push-gates
+    - name: common-push-checks
       group:
-        parallel: true
+        piped: true
         jobs:
-          - name: check-signing
-            run: bash scripts/common/check-signing.sh
+          - name: check-uncommitted
+            run: bash scripts/common/check-uncommitted.sh
+            interactive: true
+          - name: push-gates
+            group:
+              parallel: true
+              jobs:
+                - name: check-signing
+                  run: bash scripts/common/check-signing.sh

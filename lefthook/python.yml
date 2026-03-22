@@ -2,7 +2,6 @@
 # Always use alongside common.yml.
 
 pre-commit:
-  piped: true
   jobs:
     - name: python-checks
       group:
