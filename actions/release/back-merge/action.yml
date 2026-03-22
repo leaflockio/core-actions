@@ -1,6 +1,6 @@
 name: Back-merge
 description: >
-  Merges main into pre-main after a production release or hotfix merge
+  Syncs pre-main with main after a production release or hotfix merge
   to keep pre-main up to date with version bumps, changelog changes,
   and any hotfix patches.
 
@@ -8,6 +8,10 @@ inputs:
   token:
     description: GitHub App token for pushing to protected branches
     required: true
+  strategy:
+    description: 'Sync strategy: merge or force-sync'
+    required: false
+    default: 'merge'
 
 outputs:
   back_merge_result:
@@ -17,16 +21,17 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Configure push access
-      shell: bash
-      run: |
-        git remote set-url origin "https://x-access-token:${{ inputs.token }}@github.com/${GITHUB_REPOSITORY}.git"
-
-    - name: Back-merge main into pre-main
+    - name: Sync pre-main with main
       id: merge
       shell: bash
       run: |
-        if bash "${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"; then
+        if [ "${{ inputs.strategy }}" = "force-sync" ]; then
+          SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/force-sync.sh"
+        else
+          SCRIPT="${GITHUB_ACTION_PATH}/../../../scripts/release/back-merge.sh"
+        fi
+
+        if bash "$SCRIPT"; then
           echo "result=success" >> "${GITHUB_OUTPUT}"
         else
           echo "result=conflict" >> "${GITHUB_OUTPUT}"
