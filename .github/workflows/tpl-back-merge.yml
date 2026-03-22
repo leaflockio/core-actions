@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: 'main'
+      strategy:
+        description: 'Sync strategy: merge or force-sync'
+        type: string
+        required: false
+        default: 'merge'
 
     secrets:
       APP_ID:
@@ -51,3 +56,4 @@ jobs:
       - uses: ./.core-actions/actions/release/back-merge
         with:
           token: ${{ steps.app-token.outputs.token }}
+          strategy: ${{ inputs.strategy }}

@@ -11,6 +11,7 @@ jobs:
   release:
     uses: ./.github/workflows/tpl-release.yml
     with:
+      release: true
       core-actions-ref: pre-main
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}

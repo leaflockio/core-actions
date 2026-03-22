@@ -3,6 +3,12 @@ name: Release
 on:
   workflow_call:
     inputs:
+      release:
+        description: Whether to run semantic-release (version bump, tag, publish)
+        type: boolean
+        required: false
+        default: true
+
       node-version:
         description: Node.js version (semantic-release runs on Node)
         type: string
@@ -28,6 +34,15 @@ on:
         required: false
         default: 'main'
 
+    outputs:
+      new_release_published:
+        description: Whether a new release was published ('true' or 'false')
+        value: ${{ jobs.release.outputs.new_release_published }}
+
+      new_release_version:
+        description: Version of the release (e.g. '1.2.3' or '1.2.3-beta.1')
+        value: ${{ jobs.release.outputs.new_release_version }}
+
     secrets:
       APP_ID:
         description: GitHub App ID for locket-ci
@@ -49,6 +64,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      new_release_published: ${{ steps.release.outputs.new_release_published }}
+      new_release_version: ${{ steps.release.outputs.new_release_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,6 +86,8 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: ./.core-actions/actions/release/semantic-release
+        if: inputs.release
+        id: release
         with:
           token: ${{ steps.app-token.outputs.token }}
           node-version: ${{ inputs.node-version }}

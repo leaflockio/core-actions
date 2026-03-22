@@ -1,8 +1,11 @@
 # core-actions
 
 ![CI](https://github.com/leaflockio/core-actions/actions/workflows/ci.yml/badge.svg)
-![Version](https://img.shields.io/github/v/release/leaflockio/core-actions)
-![License](https://img.shields.io/github/license/leaflockio/core-actions)
+![Release](https://github.com/leaflockio/core-actions/actions/workflows/release.yml/badge.svg)
+![Pre-release](https://github.com/leaflockio/core-actions/actions/workflows/pre-release.yml/badge.svg)
+![Version](https://img.shields.io/badge/version-v1.0.0-blue)
+![License](https://img.shields.io/badge/License-Apache_2.0-blue)
+![Shell](https://img.shields.io/badge/Shell-Bash-green)
 
 Reusable GitHub Actions workflows, composite actions, lefthook configs, and shared hook scripts for Leaflock repositories. Provides standardized CI, release, back-merge pipelines, and git hooks so every repo follows the same flow without duplicating logic.
 
@@ -122,6 +125,8 @@ on:
 jobs:
   release:
     uses: leaflockio/core-actions/.github/workflows/tpl-release.yml@v1
+    with:
+      release: true
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}
@@ -136,12 +141,17 @@ on:
 jobs:
   release:
     uses: leaflockio/core-actions/.github/workflows/tpl-release.yml@v1
+    with:
+      release: true
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}
   back-merge:
     needs: release
+    if: needs.release.outputs.new_release_published == 'true'
     uses: leaflockio/core-actions/.github/workflows/tpl-back-merge.yml@v1
+    with:
+      strategy: merge
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}

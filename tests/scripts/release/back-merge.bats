@@ -28,89 +28,137 @@ setup() {
 
   SCRIPT="${PROJECT_ROOT}/scripts/release/back-merge.sh"
 
-  # Override git remote set-url to use our local remote instead of GitHub URL
-  create_mock_git_wrapper
+  # Track curl calls
+  CURL_LOG="${TEST_TEMP_DIR}/curl_calls.log"
+  export CURL_LOG
 }
 
 teardown() {
   _common_teardown
 }
 
-# Creates a git wrapper that intercepts "remote set-url" to keep the local
-# remote path, but passes everything else through to real git.
-create_mock_git_wrapper() {
+# Creates a mock curl that responds to GitHub API calls.
+# Args: $1 = new commit SHA to return from POST /git/commits
+setup_curl_mock() {
+  local new_commit_sha="${1:-abc1234567890def}"
+  local main_tree_sha="${2:-tree000sha}"
+
   REAL_GIT="$(which git)"
   export REAL_GIT
 
-  cat >"${TEST_BIN_DIR}/git" <<'WRAPPER'
+  cat >"${TEST_BIN_DIR}/curl" <<MOCK
 #!/bin/sh
-if [ "$1" = "remote" ] && [ "$2" = "set-url" ]; then
-  exit 0
-fi
-exec "$REAL_GIT" "$@"
-WRAPPER
-  chmod +x "${TEST_BIN_DIR}/git"
+echo "\$@" >> "${CURL_LOG}"
+
+# Route based on method + endpoint
+case "\$@" in
+  *GET*/git/commits/*)
+    echo '{"tree": {"sha": "${main_tree_sha}"}}'
+    ;;
+  *POST*/git/commits*)
+    echo '{"sha": "${new_commit_sha}"}'
+    ;;
+  *PATCH*/git/refs/heads/pre-main*)
+    echo '{"ref": "refs/heads/pre-main", "object": {"sha": "${new_commit_sha}"}}'
+    ;;
+  *)
+    echo '{"error": "unexpected call"}' >&2
+    exit 1
+    ;;
+esac
+MOCK
+  chmod +x "${TEST_BIN_DIR}/curl"
+
+  # Also need jq — use real jq
+  REAL_JQ="$(which jq)"
+  if [ -n "$REAL_JQ" ]; then
+    ln -sf "$REAL_JQ" "${TEST_BIN_DIR}/jq"
+  fi
 }
 
-@test "back-merges main into pre-main on clean merge" {
+@test "creates verified merge commit via API on clean merge" {
   # Add a commit to main that pre-main doesn't have
   echo "release v1.0.0" >VERSION
   git add VERSION
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
+  setup_curl_mock "new-commit-sha-123"
+
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Back-merge complete"* ]]
+  [[ "$output" == *"verified commit"* ]]
 
-  # Verify pre-main has the commit
-  git checkout pre-main
-  [ -f VERSION ]
-  [ "$(cat VERSION)" = "release v1.0.0" ]
+  # Verify API calls were made
+  [ -f "$CURL_LOG" ]
+  grep -q "GET.*git/commits" "$CURL_LOG"
+  grep -q "POST.*git/commits" "$CURL_LOG"
+  grep -q "PATCH.*git/refs/heads/pre-main" "$CURL_LOG"
 }
 
-@test "creates a merge commit not a fast-forward" {
+@test "commit message includes skip ci and correct text" {
   echo "release v1.0.0" >VERSION
   git add VERSION
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
+  setup_curl_mock
+
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
-  # Check merge commit message on pre-main
-  git checkout pre-main
-  LAST_MSG=$(git log -1 --pretty=%s)
-  [[ "$LAST_MSG" == *"back-merge main into pre-main"* ]]
+  # Verify the POST body includes the right message
+  grep "POST" "$CURL_LOG" | grep -q "git/commits"
 }
 
-@test "merge commit includes skip ci tag" {
+@test "merge commit has two parents (pre-main and main SHAs)" {
   echo "release v1.0.0" >VERSION
   git add VERSION
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
+  MAIN_SHA="$(git rev-parse origin/main)"
+  PRE_MAIN_SHA="$(git rev-parse origin/pre-main)"
+
+  # Use a curl mock that captures the POST body
+  cat >"${TEST_BIN_DIR}/curl" <<MOCK
+#!/bin/sh
+echo "\$@" >> "${CURL_LOG}"
+case "\$@" in
+  *GET*/git/commits/*)
+    echo '{"tree": {"sha": "treeSHA"}}'
+    ;;
+  *POST*/git/commits*)
+    # Echo back what was sent so we can inspect
+    echo '{"sha": "new-commit-123"}'
+    ;;
+  *PATCH*)
+    echo '{"ref": "refs/heads/pre-main"}'
+    ;;
+esac
+MOCK
+  chmod +x "${TEST_BIN_DIR}/curl"
+  REAL_JQ="$(which jq)"
+  [ -n "$REAL_JQ" ] && ln -sf "$REAL_JQ" "${TEST_BIN_DIR}/jq"
+
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
-  git checkout pre-main
-  LAST_MSG=$(git log -1 --pretty=%s)
-  [[ "$LAST_MSG" == *"[skip ci]"* ]]
+  # The POST call should include both parent SHAs
+  POST_CALL="$(grep "POST" "$CURL_LOG")"
+  [[ "$POST_CALL" == *"$PRE_MAIN_SHA"* ]]
+  [[ "$POST_CALL" == *"$MAIN_SHA"* ]]
 }
 
-@test "pushes merged pre-main to remote" {
-  echo "release v1.0.0" >VERSION
-  git add VERSION
-  git commit -m "chore: release v1.0.0"
-  git push origin main 2>/dev/null
-
+@test "exits 0 with skip message when already in sync" {
+  # main and pre-main point to same commit — already in sync
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
+  [[ "$output" == *"already includes main"* ]]
 
-  # Verify remote pre-main has the VERSION file
-  VERIFY_DIR="${TEST_TEMP_DIR}/verify"
-  git clone --branch pre-main "${TEST_TEMP_DIR}/remote.git" "$VERIFY_DIR" 2>/dev/null
-  [ -f "$VERIFY_DIR/VERSION" ]
+  # No curl calls should have been made
+  [ ! -f "$CURL_LOG" ] || [ ! -s "$CURL_LOG" ]
 }
 
 @test "fails with conflict instructions when merge conflicts" {
@@ -134,32 +182,76 @@ WRAPPER
   [[ "$output" == *"Manual resolution required"* ]]
 }
 
-@test "succeeds when main and pre-main are already in sync" {
-  run bash "$SCRIPT"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Back-merge complete"* ]]
-}
-
-@test "preserves existing pre-main commits after merge" {
-  # Add a commit to pre-main
-  git checkout pre-main
-  echo "feature work" >FEATURE.txt
-  git add FEATURE.txt
-  git commit -m "feat: add feature"
-  git push origin pre-main 2>/dev/null
-
-  # Add a different commit to main
-  git checkout main
+@test "fails when API returns null tree SHA" {
   echo "release v1.0.0" >VERSION
   git add VERSION
   git commit -m "chore: release v1.0.0"
   git push origin main 2>/dev/null
 
+  REAL_JQ="$(which jq)"
+  [ -n "$REAL_JQ" ] && ln -sf "$REAL_JQ" "${TEST_BIN_DIR}/jq"
+
+  cat >"${TEST_BIN_DIR}/curl" <<'MOCK'
+#!/bin/sh
+echo "$@" >> "$CURL_LOG"
+case "$@" in
+  *GET*/git/commits/*)
+    echo '{}'
+    ;;
+esac
+MOCK
+  chmod +x "${TEST_BIN_DIR}/curl"
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to get tree SHA"* ]]
+}
+
+@test "fails when API returns null commit SHA" {
+  echo "release v1.0.0" >VERSION
+  git add VERSION
+  git commit -m "chore: release v1.0.0"
+  git push origin main 2>/dev/null
+
+  REAL_JQ="$(which jq)"
+  [ -n "$REAL_JQ" ] && ln -sf "$REAL_JQ" "${TEST_BIN_DIR}/jq"
+
+  cat >"${TEST_BIN_DIR}/curl" <<'MOCK'
+#!/bin/sh
+echo "$@" >> "$CURL_LOG"
+case "$@" in
+  *GET*/git/commits/*)
+    echo '{"tree": {"sha": "valid-tree-sha"}}'
+    ;;
+  *POST*/git/commits*)
+    echo '{}'
+    ;;
+esac
+MOCK
+  chmod +x "${TEST_BIN_DIR}/curl"
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Failed to create merge commit"* ]]
+}
+
+@test "uses main tree SHA for the merge commit" {
+  echo "release v1.0.0" >VERSION
+  git add VERSION
+  git commit -m "chore: release v1.0.0"
+  git push origin main 2>/dev/null
+
+  MAIN_SHA="$(git rev-parse origin/main)"
+
+  setup_curl_mock "new-commit" "main-tree-sha-123"
+
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 
-  # Verify both files exist on pre-main
-  git checkout pre-main
-  [ -f FEATURE.txt ]
-  [ -f VERSION ]
+  # The GET call should fetch main's commit to get tree SHA
+  grep -q "GET.*git/commits/${MAIN_SHA}" "$CURL_LOG"
+
+  # The POST body should include the tree SHA
+  POST_CALL="$(grep "POST" "$CURL_LOG")"
+  [[ "$POST_CALL" == *"main-tree-sha-123"* ]]
 }

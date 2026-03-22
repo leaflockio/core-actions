@@ -10,13 +10,18 @@ permissions:
 jobs:
   release:
     uses: ./.github/workflows/tpl-release.yml
+    with:
+      release: true
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}
 
   back-merge:
     needs: release
+    if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/tpl-back-merge.yml
+    with:
+      strategy: merge
     secrets:
       APP_ID: ${{ secrets.LOCKET_CI_APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.LOCKET_CI_PRIVATE_KEY }}
