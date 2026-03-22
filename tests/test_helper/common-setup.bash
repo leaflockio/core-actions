@@ -13,6 +13,9 @@ _common_setup() {
   # Disable color codes for predictable assertions
   export NO_COLOR=1
 
+  # Prevent lefthook from running in test git repos
+  export LEFTHOOK=0
+
   # Prepend temp bin dir to PATH for mock commands
   TEST_BIN_DIR="${TEST_TEMP_DIR}/bin"
   mkdir -p "$TEST_BIN_DIR"

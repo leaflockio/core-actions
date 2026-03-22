@@ -8,21 +8,7 @@ setup() {
 
   # Point coverage output to temp dir so tests don't touch real coverage/
   export COVERAGE_OUTPUT_DIR="${TEST_TEMP_DIR}/coverage"
-
-  # Create coverage JSON in temp dir (not the real project coverage/)
-  COVERAGE_DIR="${TEST_TEMP_DIR}/coverage/bats.test"
-  mkdir -p "$COVERAGE_DIR"
-  cat >"${COVERAGE_DIR}/coverage.json" <<'JSON'
-{
-  "percent_covered": "88.07",
-  "covered_lines": 406,
-  "total_lines": 461,
-  "command": "bats"
-}
-JSON
-
-  # Mock find to return our temp coverage JSON
-  create_mock find "echo \"${COVERAGE_DIR}/coverage.json\""
+  mkdir -p "$COVERAGE_OUTPUT_DIR"
 }
 
 teardown() {
@@ -71,6 +57,10 @@ mock_kcov_passing() {
   </testsuite>
 </testsuites>
 JUNIT
+    mkdir -p \"${COVERAGE_OUTPUT_DIR}/bats.result\"
+    cat >\"${COVERAGE_OUTPUT_DIR}/bats.result/coverage.json\" <<'COV'
+{\"percent_covered\":\"88.07\",\"covered_lines\":406,\"total_lines\":461,\"command\":\"bats\"}
+COV
   "
 }
 
@@ -104,6 +94,10 @@ mock_docker_all_passing() {
   </testsuite>
 </testsuites>
 JUNIT
+        mkdir -p \"${COVERAGE_OUTPUT_DIR}/bats.result\"
+        cat >\"${COVERAGE_OUTPUT_DIR}/bats.result/coverage.json\" <<'COV'
+{\"percent_covered\":\"88.07\",\"covered_lines\":406,\"total_lines\":461,\"command\":\"bats\"}
+COV
         ;;
     esac
   "
@@ -170,6 +164,10 @@ JUNIT
   </testsuite>
 </testsuites>
 JUNIT
+        mkdir -p \"${COVERAGE_OUTPUT_DIR}/bats.result\"
+        cat >\"${COVERAGE_OUTPUT_DIR}/bats.result/coverage.json\" <<'COV'
+{\"percent_covered\":\"88.07\",\"covered_lines\":406,\"total_lines\":461,\"command\":\"bats\"}
+COV
         ;;
     esac
   "
@@ -181,9 +179,19 @@ JUNIT
 
 @test "fails when no coverage JSON found" {
   mock_bats_count 3
-  mock_kcov_passing
+  # Use a kcov mock that creates JUnit but no coverage JSON
+  create_mock kcov "
+    printf '1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n'
+    mkdir -p \"${COVERAGE_OUTPUT_DIR}/junit\"
+    cat >\"${COVERAGE_OUTPUT_DIR}/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.5\">
+  <testsuite name=\"tests\" tests=\"3\" failures=\"0\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+  "
   create_mock nproc 'echo "4"'
-  create_mock find ''
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Could not determine coverage"* ]]
@@ -203,6 +211,47 @@ JUNIT
   run bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"No tests found"* ]]
+}
+
+@test "passes COVERAGE_TAG to check-coverage" {
+  mock_bats_count 3
+  mock_kcov_passing
+  create_mock jq 'echo "88.07"'
+  create_mock nproc 'echo "4"'
+
+  export COVERAGE_TAG="shell"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"88.07"* ]]
+}
+
+@test "uses custom COVERAGE_OUTPUT_REL" {
+  export COVERAGE_OUTPUT_REL="coverage/custom"
+  export COVERAGE_OUTPUT_DIR="${TEST_TEMP_DIR}/coverage/custom"
+  mkdir -p "$COVERAGE_OUTPUT_DIR"
+
+  mock_bats_count 3
+  create_mock kcov "
+    printf '1..3\nok 1 test one in 100ms\nok 2 test two in 200ms\nok 3 test three in 150ms\n'
+    mkdir -p \"${TEST_TEMP_DIR}/coverage/custom/junit\"
+    cat >\"${TEST_TEMP_DIR}/coverage/custom/junit/report.xml\" <<'JUNIT'
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<testsuites time=\"0.5\">
+  <testsuite name=\"tests\" tests=\"3\" failures=\"0\" errors=\"0\" skipped=\"0\">
+  </testsuite>
+</testsuites>
+JUNIT
+    mkdir -p \"${TEST_TEMP_DIR}/coverage/custom/bats.result\"
+    cat >\"${TEST_TEMP_DIR}/coverage/custom/bats.result/coverage.json\" <<'COV'
+{\"percent_covered\":\"85.00\",\"covered_lines\":85,\"total_lines\":100,\"command\":\"bats\"}
+COV
+  "
+  create_mock jq 'echo "85.00"'
+  create_mock nproc 'echo "4"'
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"85.00"* ]]
 }
 
 @test "fails when JUnit report is missing" {

@@ -26,7 +26,8 @@ done
 
 . "$REPO_ROOT/scripts/common/config.sh"
 
-COVERAGE_OUTPUT_DIR="${COVERAGE_OUTPUT_DIR:-$REPO_ROOT/coverage}"
+COVERAGE_OUTPUT_REL="${COVERAGE_OUTPUT_REL:-coverage/bats}"
+COVERAGE_OUTPUT_DIR="${COVERAGE_OUTPUT_DIR:-$REPO_ROOT/$COVERAGE_OUTPUT_REL}"
 
 # Clean stale coverage data so reports always reflect the current run
 rm -rf "$COVERAGE_OUTPUT_DIR"
@@ -70,7 +71,7 @@ if [ "$USE_DOCKER" = true ]; then
     log_info "Building coverage image (one-time setup)..." >&2
     docker build -t "$IMAGE_NAME" - <<'DOCKERFILE'
 FROM kcov/kcov
-RUN apt-get update -qq && apt-get install -y -qq bats git parallel >/dev/null 2>&1
+RUN apt-get update -qq && apt-get install -y -qq bats git jq parallel >/dev/null 2>&1
 DOCKERFILE
   fi
 
@@ -78,10 +79,10 @@ DOCKERFILE
     -v "${REPO_ROOT}:${CONTAINER_ROOT}" \
     -w "$CONTAINER_ROOT" \
     "$IMAGE_NAME" \
-    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} ${CONTAINER_ROOT}/coverage \$(which bats) --jobs 1 --timing --report-formatter junit --output ${CONTAINER_ROOT}/coverage/junit --recursive ${CONTAINER_ROOT}/tests/" \
+    sh -c "kcov --bash-dont-parse-binary-dir ${KCOV_DOCKER_FLAGS[*]} ${CONTAINER_ROOT}/${COVERAGE_OUTPUT_REL} \$(which bats) --jobs 1 --timing --report-formatter junit --output ${CONTAINER_ROOT}/${COVERAGE_OUTPUT_REL}/junit --recursive ${CONTAINER_ROOT}/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 else
-  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$REPO_ROOT/coverage" npx bats --jobs 1 --timing --report-formatter junit --output "$JUNIT_DIR" --recursive "$REPO_ROOT/tests/" \
+  kcov --bash-dont-parse-binary-dir "${KCOV_NATIVE_FLAGS[@]}" "$COVERAGE_OUTPUT_DIR" npx bats --jobs 1 --timing --report-formatter junit --output "$JUNIT_DIR" --recursive "$REPO_ROOT/tests/" \
     >"$OUTPUT_FILE" 2>&1 || KCOV_EXIT=$?
 fi
 
@@ -135,7 +136,7 @@ if [ "$KCOV_EXIT" -ne 0 ] || [ "$FAILED" -gt 0 ]; then
 fi
 
 # Extract total coverage percentage from kcov JSON summary
-COVERAGE_FILE=$(find "$REPO_ROOT/coverage" -name "coverage.json" -not -path "*/kcov-merged/*" | head -1)
+COVERAGE_FILE=$(find "$COVERAGE_OUTPUT_DIR" -name "coverage.json" -not -path "*/kcov-merged/*" | head -1)
 if [ -n "$COVERAGE_FILE" ]; then
   REPORT_DIR=$(dirname "$COVERAGE_FILE")
   PERCENT=$(jq -r '.percent_covered' "$COVERAGE_FILE")

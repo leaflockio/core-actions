@@ -21,15 +21,21 @@ if [ "$STATUS" -ne 0 ]; then
   exit 1
 fi
 
-PERCENT=$(echo "$OUTPUT" | grep -i 'all files' | grep -oE '[0-9]+(\.[0-9]+)?' | head -1)
+SUMMARY_FILE="${COVERAGE_DIR}/coverage-summary.json"
 
-if [ -z "$PERCENT" ]; then
-  log_error "Could not extract coverage percentage from test output."
-  log_info "Ensure 'npm run test:coverage' outputs a summary with 'All files' and a percentage."
+if [ ! -f "$SUMMARY_FILE" ]; then
+  log_error "Coverage summary not found at ${SUMMARY_FILE}."
+  log_info "Ensure '${COVERAGE_SCRIPT}' generates a json-summary report."
   exit 1
 fi
 
-COVERAGE_DIR="${COVERAGE_DIR:-coverage}"
+# Compute overall coverage: sum all covered / sum all total across all four metrics
+PERCENT=$(jq -r '.total | (.lines.covered + .statements.covered + .functions.covered + .branches.covered) / (.lines.total + .statements.total + .functions.total + .branches.total) * 100 | . * 100 | floor / 100' "$SUMMARY_FILE")
+
+if [ -z "$PERCENT" ] || [ "$PERCENT" = "null" ]; then
+  log_error "Could not extract coverage from ${SUMMARY_FILE}."
+  exit 1
+fi
 
 log_info "Coverage: ${PERCENT}%"
 log_info "Report: ${COVERAGE_DIR}/index.html"

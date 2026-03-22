@@ -144,3 +144,41 @@ EOF
   [ "$status" -ne 0 ]
   echo "$output" | grep -q "PR_BASE_SHA"
 }
+
+# ── Coverage and remaining config keys ────────────────────────────
+
+@test "config reads all coverage keys from .hooks-config" {
+  cat >.hooks-config <<'EOF'
+COVERAGE_MAX_DROP=1.0
+COVERAGE_FLOOR=80
+COVERAGE_SRC=src lib
+COVERAGE_SCRIPT=test:custom:cov
+COVERAGE_TAG=js
+COVERAGE_DIR=coverage/js
+EOF
+
+  [ "$(get_config_var COVERAGE_MAX_DROP)" = "1.0" ]
+  [ "$(get_config_var COVERAGE_FLOOR)" = "80" ]
+  [ "$(get_config_var COVERAGE_SRC)" = "src lib" ]
+  [ "$(get_config_var COVERAGE_SCRIPT)" = "test:custom:cov" ]
+  [ "$(get_config_var COVERAGE_TAG)" = "js" ]
+  [ "$(get_config_var COVERAGE_DIR)" = "coverage/js" ]
+}
+
+@test "config reads remaining keys from .hooks-config" {
+  cat >.hooks-config <<'EOF'
+PARTIAL_STAGE=prompt
+UNCOMMITTED_PUSH=prompt
+MAX_COMMIT_LINES=200
+MAX_COMMIT_MSG_LENGTH=50
+LINK_CHECK_TIMEOUT=10
+CHECK_MODE=all
+EOF
+
+  [ "$(get_config_var PARTIAL_STAGE)" = "prompt" ]
+  [ "$(get_config_var UNCOMMITTED_PUSH)" = "prompt" ]
+  [ "$(get_config_var MAX_COMMIT_LINES)" = "200" ]
+  [ "$(get_config_var MAX_COMMIT_MSG_LENGTH)" = "50" ]
+  [ "$(get_config_var LINK_CHECK_TIMEOUT)" = "10" ]
+  [ "$(get_config_var CHECK_MODE)" = "all" ]
+}

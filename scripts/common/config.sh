@@ -29,6 +29,7 @@ COVERAGE_FLOOR="${COVERAGE_FLOOR:-95}"
 COVERAGE_SRC="${COVERAGE_SRC:-scripts}"
 COVERAGE_SCRIPT="${COVERAGE_SCRIPT:-test:coverage}"
 COVERAGE_TAG="${COVERAGE_TAG:-}"
+COVERAGE_DIR="${COVERAGE_DIR:-coverage}"
 CHECK_MODE="${CHECK_MODE:-staged}"
 
 # ── Override from .hooks-config ─────────────────────────────────────
@@ -52,6 +53,7 @@ if [ -f ".hooks-config" ]; then
     COVERAGE_SRC) COVERAGE_SRC="$value" ;;
     COVERAGE_SCRIPT) COVERAGE_SCRIPT="$value" ;;
     COVERAGE_TAG) COVERAGE_TAG="$value" ;;
+    COVERAGE_DIR) COVERAGE_DIR="$value" ;;
     CHECK_MODE) CHECK_MODE="$value" ;;
     esac
   done <<<"$(cat .hooks-config)"
