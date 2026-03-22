@@ -56,6 +56,12 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    "@semantic-release/github"
+    [
+      "@semantic-release/github",
+      {
+        "successComment": "<%= issue.pull_request ? '🏷️ Released in [v' + nextRelease.version + '](' + (releases.filter(r => r.url).map(r => r.url)[0] || '') + ')' : false %>",
+        "failComment": false
+      }
+    ]
   ]
 }
