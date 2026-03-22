@@ -20,7 +20,7 @@ on:
           Space-separated list of extra semantic-release plugins to install
         type: string
         required: false
-        default: '@semantic-release/changelog @semantic-release/git conventional-changelog-conventionalcommits'
+        default: '@semantic-release/changelog @semantic-release/git @octokit/rest conventional-changelog-conventionalcommits'
 
       core-actions-ref:
         description: Git ref for core-actions checkout (tag, branch, or SHA)
@@ -38,8 +38,7 @@ on:
         required: true
 
 permissions:
-  contents: write
-  issues: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}

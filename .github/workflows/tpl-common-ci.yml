@@ -110,6 +110,25 @@ jobs:
       - name: Lint GitHub Actions
         run: ./actionlint
 
+  pr-title:
+    name: PR Title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+
+      - name: Validate PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: bash .core-actions/scripts/common/check-pr-title.sh
+
   gitleaks:
     name: Secret Scan
     runs-on: ubuntu-latest

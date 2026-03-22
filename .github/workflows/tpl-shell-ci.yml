@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: '22'
+      coverage-tag:
+        description: Coverage baseline tag (leave empty for legacy single-baseline mode)
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -66,6 +71,8 @@ jobs:
         run: docker load -i ${{ runner.temp }}/kcov-image.tar
 
       - name: Run tests with coverage
+        env:
+          COVERAGE_TAG: ${{ inputs.coverage-tag }}
         run: bash scripts/shell/coverage.sh --docker
 
       - name: Save kcov image to cache
