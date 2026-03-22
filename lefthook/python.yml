@@ -17,5 +17,5 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: coverage
+    - name: python-coverage
       run: bash scripts/python/coverage.sh

@@ -19,5 +19,5 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: coverage
+    - name: shell-coverage
       run: bash scripts/shell/coverage.sh --docker

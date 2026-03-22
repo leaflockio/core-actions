@@ -17,5 +17,5 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: coverage
+    - name: go-coverage
       run: bash scripts/go/coverage.sh
