@@ -46,7 +46,7 @@ teardown() {
 }
 ```
 
-- **`_common_setup`** — creates `TEST_TEMP_DIR`, sets `NO_COLOR=1`, prepends `TEST_BIN_DIR` to `PATH`
+- **`_common_setup`** — creates `TEST_TEMP_DIR`, sets `NO_COLOR=1`, sets `LEFTHOOK=0` (prevents hooks in test repos), prepends `TEST_BIN_DIR` to `PATH`
 - **`_common_teardown`** — removes `TEST_TEMP_DIR`
 - **`init_test_repo`** — initializes a git repo inside `TEST_TEMP_DIR` with signing disabled
 

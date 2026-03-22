@@ -10,7 +10,7 @@ This repo provides lefthook hook configurations that consumer repos pull via rem
 | ------------ | ------------- | ------------------------------------------------------------------------------ |
 | `common.yml` | All repos     | Branch checks, naming, secrets, formatting, spelling, license headers, signing |
 | `shell.yml`  | Shell         | kebab-case naming, shfmt, shellcheck, kcov coverage                            |
-| `node.yml`   | Node/TS/React | PascalCase/camelCase naming, lint-staged, test coverage                        |
+| `node.yml`   | Node/TS/React | PascalCase/camelCase naming, test coverage                                     |
 | `go.yml`     | Go            | snake_case naming, gofmt, golangci-lint, test coverage                         |
 | `python.yml` | Python        | snake_case naming, ruff format, ruff check, pytest coverage                    |
 
@@ -44,11 +44,37 @@ To pull the latest hooks from core-actions, bump the `ref` in your `lefthook.yml
 
 ## How Configs Are Structured
 
-All configs follow the same pattern:
+### common.yml
+
+Common checks are wrapped in a piped group so `check-partial-stage` blocks quality gates, but stack checks from extended configs run concurrently at the hook level (no broken pipe):
 
 ```yaml
 pre-commit:
-  piped: true
+  jobs:
+    - name: common-checks
+      group:
+        piped: true
+        jobs:
+          - name: check-partial-stage
+            run: bash scripts/common/check-partial-stage.sh
+            interactive: true
+          - name: quality-gates
+            group:
+              parallel: true
+              jobs:
+                - name: check-branch
+                  run: bash scripts/common/check-branch.sh
+                # ... more checks
+```
+
+Pre-push uses the same pattern (`common-push-checks` piped group).
+
+### Stack configs
+
+Stack configs add their checks as top-level jobs. Without `piped: true` at the hook level, they run concurrently with `common-checks`:
+
+```yaml
+pre-commit:
   jobs:
     - name: <stack>-checks
       group:
@@ -63,7 +89,7 @@ pre-push:
       run: bash scripts/<stack>/coverage.sh
 ```
 
-- **`piped: true`** — jobs run sequentially, later jobs only run if earlier ones pass
+- **`group: piped: true`** (common.yml) — sequential within the group, stops on failure
 - **`group: parallel: true`** — jobs within the group run in parallel
 - Pre-commit runs fast checks (naming, format, lint)
 - Pre-push runs slow checks (coverage)

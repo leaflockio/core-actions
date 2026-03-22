@@ -22,6 +22,7 @@ Reusable GitHub Actions workflows, composite actions, lefthook configs, and shar
 - [ShellCheck](https://www.shellcheck.net) (shell linting)
 - [shfmt](https://github.com/mvdan/sh) (shell formatting)
 - [bats-core](https://github.com/bats-core/bats-core) (shell testing)
+- [Vitest](https://vitest.dev) (JS testing)
 - [kcov](https://github.com/SimonKagstrom/kcov) (shell coverage)
 
 ---
@@ -65,8 +66,12 @@ npm run spell               # check spelling
 npm run lint:sh             # lint shell scripts
 npm run lint:md             # lint markdown
 npm run lint:md:fix         # fix markdown lint issues
-npm run test                # run bats tests
-npm run test:coverage:local # run tests with coverage (Docker)
+npm run test                       # run bats tests
+npm run test:js                    # run JS tests (vitest)
+npm run test:js:coverage           # run JS tests with coverage
+npm run test:js:coverage:check     # run JS tests + baseline check
+npm run test:sh:coverage           # run shell tests with coverage (CI)
+npm run test:sh:coverage:local     # run shell tests with coverage (Docker)
 ```
 
 ---

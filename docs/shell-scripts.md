@@ -34,7 +34,7 @@ Scripts source shared utilities using `dirname`:
 ```
 
 - **`config.sh`** — loads utils.sh, reads `.hooks-config` overrides, populates `CHECK_FILES` based on `CHECK_MODE` (staged/pr/all)
-- **`utils.sh`** — logging (`log_info`, `log_error`, `log_success`, `log_warn`), `require_command`, `is_skippable_file`, `get_file_content`
+- **`utils.sh`** — logging (`log_info`, `log_error`, `log_success`, `log_warn`), `require_command`, `is_rebasing`, `is_protected_branch`, `is_skippable_file`, `get_file_content`, `get_remote_branch`
 
 Scripts that need the file list (naming, format, lint checks) source `config.sh`. Coverage scripts also source `config.sh` for `COVERAGE_TAG`, `COVERAGE_SCRIPT`, and other coverage config values.
 
