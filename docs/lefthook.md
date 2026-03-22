@@ -59,7 +59,7 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: coverage
+    - name: <stack>-coverage
       run: bash scripts/<stack>/coverage.sh
 ```
 
