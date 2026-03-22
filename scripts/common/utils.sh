@@ -49,6 +49,12 @@ prompt_yn() {
   esac
 }
 
+# Returns 0 if a rebase is in progress.
+is_rebasing() {
+  _git_dir=$(git rev-parse --git-dir 2>/dev/null) || return 1
+  [ -d "$_git_dir/rebase-merge" ] || [ -d "$_git_dir/rebase-apply" ]
+}
+
 # Exit 1 if a command is not found.
 # Usage: require_command "prettier" "npm install -g prettier"
 require_command() {

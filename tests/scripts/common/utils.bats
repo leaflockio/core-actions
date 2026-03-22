@@ -211,6 +211,40 @@ teardown() {
   [ "$status" -eq 1 ]
 }
 
+# --- is_rebasing ---
+
+@test "is_rebasing returns 1 when not rebasing" {
+  init_test_repo
+  echo "init" >README.md
+  git add README.md
+  git commit -q -m "init"
+
+  run is_rebasing
+  [ "$status" -eq 1 ]
+}
+
+@test "is_rebasing returns 0 when rebase-merge exists" {
+  init_test_repo
+  echo "init" >README.md
+  git add README.md
+  git commit -q -m "init"
+
+  mkdir -p "$(git rev-parse --git-dir)/rebase-merge"
+  run is_rebasing
+  [ "$status" -eq 0 ]
+}
+
+@test "is_rebasing returns 0 when rebase-apply exists" {
+  init_test_repo
+  echo "init" >README.md
+  git add README.md
+  git commit -q -m "init"
+
+  mkdir -p "$(git rev-parse --git-dir)/rebase-apply"
+  run is_rebasing
+  [ "$status" -eq 0 ]
+}
+
 # --- get_file_content ---
 
 @test "get_file_content returns full file in all mode" {

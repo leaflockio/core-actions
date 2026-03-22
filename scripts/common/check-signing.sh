@@ -11,6 +11,9 @@
 
 . "$(dirname "$0")/config.sh"
 
+# Skip during rebase — commits are replayed, not new
+is_rebasing && exit 0
+
 check_commit() {
   COMMIT="$1"
   SIG=$(git log --show-signature -1 "$COMMIT" 2>/dev/null)

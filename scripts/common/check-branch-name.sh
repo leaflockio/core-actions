@@ -16,6 +16,9 @@
 
 . "$(dirname "$0")/config.sh"
 
+# Skip during rebase — detached HEAD is expected
+is_rebasing && exit 0
+
 NAMING_PATTERN='^(feature|fix|chore|docs|refactor|hotfix)/[0-9]+-[a-z0-9-]+$'
 
 # Hook mode — warn only
