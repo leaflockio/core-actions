@@ -34,7 +34,7 @@ FAIL=0
 for f in $FORMAT_FILES; do
   [ -f "$f" ] || continue
 
-  if ! npx prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --check "$f" >/dev/null 2>&1; then
+  if ! npx prettier --check "$f" >/dev/null 2>&1; then
     log_error "Not formatted: $f"
     FAIL=1
   fi
