@@ -8,13 +8,13 @@ pre-commit:
         parallel: true
         jobs:
           - name: check-naming
-            run: bash scripts/go/check-naming.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/go/check-naming.sh
           - name: check-format
-            run: bash scripts/go/check-format.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/go/check-format.sh
           - name: check-lint
-            run: bash scripts/go/check-lint.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/go/check-lint.sh
 
 pre-push:
   jobs:
     - name: go-coverage
-      run: bash scripts/go/coverage.sh
+      run: bash ${HOOKS_SCRIPTS:-scripts}/go/coverage.sh

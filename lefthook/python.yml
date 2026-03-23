@@ -8,13 +8,13 @@ pre-commit:
         parallel: true
         jobs:
           - name: check-naming
-            run: bash scripts/python/check-naming.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/python/check-naming.sh
           - name: check-format
-            run: bash scripts/python/check-format.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/python/check-format.sh
           - name: check-lint
-            run: bash scripts/python/check-lint.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/python/check-lint.sh
 
 pre-push:
   jobs:
     - name: python-coverage
-      run: bash scripts/python/coverage.sh
+      run: bash ${HOOKS_SCRIPTS:-scripts}/python/coverage.sh
