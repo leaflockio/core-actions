@@ -8,7 +8,7 @@ pre-commit:
         parallel: true
         jobs:
           - name: check-naming
-            run: bash scripts/shell/check-naming.sh
+            run: bash ${HOOKS_SCRIPTS:-scripts}/shell/check-naming.sh
           - name: check-format
             glob: '**/*.sh'
             run: shfmt -d {staged_files}
@@ -19,4 +19,4 @@ pre-commit:
 pre-push:
   jobs:
     - name: shell-coverage
-      run: bash scripts/shell/coverage.sh --docker
+      run: bash ${HOOKS_SCRIPTS:-scripts}/shell/coverage.sh --docker
