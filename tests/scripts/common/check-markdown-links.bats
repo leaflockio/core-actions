@@ -81,3 +81,19 @@ EOF
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
 }
+
+@test "skips links inside fenced code blocks" {
+  cat >docs.md <<'EOF'
+# Template
+
+```markdown
+![Badge](https://example.com/{repo}/badge.svg)
+See [docs](nonexistent/) for details.
+```
+EOF
+  git add docs.md
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Markdown link check passed"* ]]
+}

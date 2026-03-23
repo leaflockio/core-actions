@@ -31,9 +31,14 @@ for file in $MD_FILES; do
 
   FILE_DIR=$(dirname "$file")
 
+  # Strip fenced code blocks before extracting links.
+  # Handles both ``` and ```` (or more) fence markers.
+  STRIPPED_FILE=$(mktemp)
+  sed "/^[[:space:]]*\`\{3,\}/,/^[[:space:]]*\`\{3,\}/d" "$file" >"$STRIPPED_FILE"
+
   # Extract markdown links: [text](url-or-path)
   MATCHES_FILE=$(mktemp)
-  grep -noE '\[([^]]*)\]\(([^)]+)\)' "$file" 2>/dev/null >"$MATCHES_FILE" || true
+  grep -noE '\[([^]]*)\]\(([^)]+)\)' "$STRIPPED_FILE" 2>/dev/null >"$MATCHES_FILE" || true
 
   while IFS= read -r match; do
     LINE_NUM=$(echo "$match" | cut -d: -f1)
@@ -61,7 +66,7 @@ for file in $MD_FILES; do
       FAIL=1
     fi
   done <<<"$(cat "$MATCHES_FILE")"
-  rm -f "$MATCHES_FILE"
+  rm -f "$MATCHES_FILE" "$STRIPPED_FILE"
 done
 
 if [ "$FAIL" -ne 0 ]; then
