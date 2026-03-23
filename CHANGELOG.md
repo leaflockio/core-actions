@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/leaflockio/core-actions/compare/v1.1.1...v1.1.2) (2026-03-23)
+
+### Bug Fixes
+
+* parameterize hook script paths for remotes ([#19](https://github.com/leaflockio/core-actions/issues/19)) ([f6be4f6](https://github.com/leaflockio/core-actions/commit/f6be4f6e1e56b6007c0d19993060330c54b9efc2))
+
 ## [1.1.2-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.1...v1.1.2-beta.1) (2026-03-23)
 
 ### Bug Fixes
