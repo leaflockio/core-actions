@@ -4,8 +4,8 @@
   "private": true,
   "description": "Reusable GitHub Actions, composite actions, and shared scripts for Leaflock repositories",
   "scripts": {
-    "format": "prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --write .",
-    "format:check": "prettier --config configs/common/.prettierrc --ignore-path configs/common/.prettierignore --check .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "format:sh": "shfmt -w .",
     "format:sh:check": "shfmt -d .",
     "spell": "cspell \"**/*\"",
