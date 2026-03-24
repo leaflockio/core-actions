@@ -33,6 +33,15 @@ on:
         required: false
         default: 'main'
 
+    secrets:
+      APP_ID:
+        description: GitHub App ID — required when calling from a repo that cannot access core-actions with the default token
+        required: false
+
+      APP_PRIVATE_KEY:
+        description: GitHub App private key (pairs with APP_ID)
+        required: false
+
 permissions:
   contents: read
 
@@ -41,14 +50,25 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate cross-repo token
+        if: env.HAS_APP_CREDS == 'true'
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: ./.core-actions/actions/python/setup
         with:
@@ -66,14 +86,25 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate cross-repo token
+        if: env.HAS_APP_CREDS == 'true'
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: actions/setup-python@v5
         with:
