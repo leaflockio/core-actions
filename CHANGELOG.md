@@ -3,6 +3,11 @@
 ### Bug Fixes
 
 * cross-repo auth, workflow cleanup, and prettier config ([#25](https://github.com/leaflockio/core-actions/issues/25)) ([af6157a](https://github.com/leaflockio/core-actions/commit/af6157a994dc4adb1173eb4de423708105e5dd82))
+## [1.1.3](https://github.com/leaflockio/core-actions/compare/v1.1.2...v1.1.3) (2026-03-23)
+
+### Bug Fixes
+
+* remove hardcoded config paths and skip code blocks in link check ([#22](https://github.com/leaflockio/core-actions/issues/22)) ([fe98a67](https://github.com/leaflockio/core-actions/commit/fe98a678cfda365c3c61d5c7a5b71b1db7996b8b))
 
 ## [1.1.3-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.2...v1.1.3-beta.1) (2026-03-23)
 
