@@ -1,3 +1,9 @@
+## [1.1.4-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.3...v1.1.4-beta.1) (2026-03-24)
+
+### Bug Fixes
+
+* cross-repo auth, workflow cleanup, and prettier config ([#25](https://github.com/leaflockio/core-actions/issues/25)) ([af6157a](https://github.com/leaflockio/core-actions/commit/af6157a994dc4adb1173eb4de423708105e5dd82))
+
 ## [1.1.3-beta.2](https://github.com/leaflockio/core-actions/compare/v1.1.3-beta.1...v1.1.3-beta.2) (2026-03-24)
 
 ### Bug Fixes
