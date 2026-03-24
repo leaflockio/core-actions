@@ -1,3 +1,9 @@
+## [1.1.5](https://github.com/leaflockio/core-actions/compare/v1.1.4...v1.1.5) (2026-03-24)
+
+### Bug Fixes
+
+* scope app token to org for cross-repo access ([#27](https://github.com/leaflockio/core-actions/issues/27)) ([#28](https://github.com/leaflockio/core-actions/issues/28)) ([b1282af](https://github.com/leaflockio/core-actions/commit/b1282afba514c6751d3898cc2adc2fb28e422fb2))
+
 ## [1.1.5-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.4...v1.1.5-beta.1) (2026-03-24)
 
 ### Bug Fixes
