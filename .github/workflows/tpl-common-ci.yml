@@ -16,6 +16,14 @@ on:
         default: 'main'
 
     secrets:
+      APP_ID:
+        description: GitHub App ID — required when calling from a repo that cannot access core-actions with the default token
+        required: false
+
+      APP_PRIVATE_KEY:
+        description: GitHub App private key (pairs with APP_ID)
+        required: false
+
       GITLEAKS_LICENSE:
         description: License key for Gitleaks secret scanner
         required: false
@@ -34,11 +42,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate cross-repo token
+        if: secrets.APP_ID != ''
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: ./.core-actions/actions/ci/quality-gate
         with:
@@ -54,11 +71,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate cross-repo token
+        if: secrets.APP_ID != ''
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: actions/setup-node@v4
         with:
@@ -81,11 +107,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate cross-repo token
+        if: secrets.APP_ID != ''
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: ./.core-actions/actions/ci/quality-links
         with:
@@ -118,11 +153,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Generate cross-repo token
+        if: secrets.APP_ID != ''
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - name: Validate PR title
         env:
@@ -138,11 +182,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate cross-repo token
+        if: secrets.APP_ID != ''
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
           path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: ./.core-actions/actions/common/gitleaks
         with:
