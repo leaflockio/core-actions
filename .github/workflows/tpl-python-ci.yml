@@ -62,6 +62,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: leaflockio
 
       - uses: actions/checkout@v4
         with:
@@ -98,6 +99,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: leaflockio
 
       - uses: actions/checkout@v4
         with:
