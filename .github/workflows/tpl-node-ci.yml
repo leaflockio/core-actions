@@ -44,11 +44,13 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Generate cross-repo token
-        if: secrets.APP_ID != ''
+        if: env.HAS_APP_CREDS == 'true'
         id: cross-repo-token
         uses: actions/create-github-app-token@v1
         with:
@@ -77,11 +79,13 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Generate cross-repo token
-        if: secrets.APP_ID != ''
+        if: env.HAS_APP_CREDS == 'true'
         id: cross-repo-token
         uses: actions/create-github-app-token@v1
         with:
