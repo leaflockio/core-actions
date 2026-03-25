@@ -79,3 +79,17 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.git-identity.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.git-identity.outputs.email }}
         LEFTHOOK: 0
+
+    - name: Release summary
+      shell: bash
+      env:
+        PUBLISHED: ${{ steps.release.outputs.new_release_published }}
+        VERSION: ${{ steps.release.outputs.new_release_version }}
+      run: |
+        if [ "$PUBLISHED" = "true" ]; then
+          echo "## Release Published" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Version:** ${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "## No Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "No version bump triggered by the commits in this push." >> "$GITHUB_STEP_SUMMARY"
+        fi
