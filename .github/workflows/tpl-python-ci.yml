@@ -27,6 +27,12 @@ on:
         required: false
         default: ruff check
 
+      build-command:
+        description: Command to run for building (e.g. python -m build)
+        type: string
+        required: false
+        default: python -m build
+
       core-actions-ref:
         description: Git ref for core-actions checkout (tag, branch, or SHA)
         type: string
@@ -127,3 +133,40 @@ jobs:
       - name: Run coverage
         working-directory: ${{ inputs.working-directory }}
         run: bash .core-actions/scripts/python/coverage.sh
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate cross-repo token
+        if: env.HAS_APP_CREDS == 'true'
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: leaflockio
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
+
+      - uses: ./.core-actions/actions/python/setup
+        with:
+          python-version: ${{ inputs.python-version }}
+          working-directory: ${{ inputs.working-directory }}
+          package-manager: ${{ inputs.package-manager }}
+
+      - name: Build
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          BUILD_CMD: ${{ inputs.build-command }}
+        run: eval "$BUILD_CMD"

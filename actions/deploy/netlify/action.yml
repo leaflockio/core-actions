@@ -4,6 +4,11 @@ description: >
   with standardized inputs.
 
 inputs:
+  enabled:
+    description: Whether to run the deploy (set to false to skip)
+    required: false
+    default: 'true'
+
   auth-token:
     description: Netlify auth token
     required: true
@@ -30,7 +35,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Skip notice
+      if: inputs.enabled != 'true'
+      shell: bash
+      run: echo "::notice::Deploy skipped (enabled=false)"
+
     - name: Deploy to Netlify
+      if: inputs.enabled == 'true'
       uses: nwtgck/actions-netlify@v3.0.0
       with:
         publish-dir: ${{ inputs.publish-dir }}
@@ -40,7 +51,7 @@ runs:
         NETLIFY_SITE_ID: ${{ inputs.site-id }}
 
     - name: Deployment summary
-      if: inputs.environment != ''
+      if: inputs.enabled == 'true' && inputs.environment != ''
       shell: bash
       env:
         ENVIRONMENT: ${{ inputs.environment }}
