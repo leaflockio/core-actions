@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/leaflockio/core-actions/compare/v1.1.5...v1.2.0) (2026-03-25)
+
+### Features
+
+* 30 32 ci build release summary deploy toggle ([#33](https://github.com/leaflockio/core-actions/issues/33)) ([539b5f9](https://github.com/leaflockio/core-actions/commit/539b5f9d336fbd17aa95e4d1ce88212d5edba328))
+
 ## [1.2.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.1.5...v1.2.0-beta.1) (2026-03-25)
 
 ### Features
