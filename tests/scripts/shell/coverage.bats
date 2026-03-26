@@ -111,6 +111,20 @@ COV
   [[ "$output" == *"Docker is not running"* ]]
 }
 
+@test "fails when --docker and Docker is unresponsive (timeout)" {
+  mock_bats_count 1
+  create_mock docker '
+    if [ "$1" = "info" ]; then
+      sleep 30
+    fi
+  '
+  # Override seq to return only 2 iterations so the test completes quickly
+  create_mock seq 'printf "1\n2\n"'
+  run bash "$SCRIPT" --docker
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"not responding"* ]]
+}
+
 @test "native mode runs kcov and outputs coverage percent" {
   mock_bats_count 3
   mock_kcov_passing

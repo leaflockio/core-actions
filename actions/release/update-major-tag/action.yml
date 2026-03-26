@@ -54,7 +54,7 @@ runs:
         echo "Major tag:   ${MAJOR_TAG}"
 
         # Check if major tag already exists on remote
-        if git ls-remote --tags origin "refs/tags/${MAJOR_TAG}" | grep -q "${MAJOR_TAG}"; then
+        if git ls-remote --tags origin "refs/tags/${MAJOR_TAG}" | grep -q "refs/tags/${MAJOR_TAG}$"; then
           echo "Moving existing ${MAJOR_TAG} → ${RELEASE_TAG}"
           git tag -f "$MAJOR_TAG" "$RELEASE_TAG"
           git push -f origin "refs/tags/${MAJOR_TAG}"

@@ -26,6 +26,26 @@ done
 
 . "$REPO_ROOT/scripts/common/config.sh"
 
+# Verify Docker daemon early when --docker is requested
+if [ "$USE_DOCKER" = true ]; then
+  DOCKER_OK=false
+  docker info >/dev/null 2>&1 &
+  DOCKER_PID=$!
+  for _i in $(seq 1 10); do
+    if ! kill -0 "$DOCKER_PID" 2>/dev/null; then
+      wait "$DOCKER_PID" 2>/dev/null && DOCKER_OK=true
+      break
+    fi
+    sleep 1
+  done
+  if [ "$DOCKER_OK" = false ]; then
+    kill -9 "$DOCKER_PID" 2>/dev/null
+    log_error "Docker is not running or not responding." >&2
+    log_warn "Please start Docker Desktop (or the Docker daemon) and try again." >&2
+    exit 1
+  fi
+fi
+
 COVERAGE_OUTPUT_REL="${COVERAGE_OUTPUT_REL:-coverage/bats}"
 COVERAGE_OUTPUT_DIR="${COVERAGE_OUTPUT_DIR:-$REPO_ROOT/$COVERAGE_OUTPUT_REL}"
 
@@ -58,14 +78,6 @@ OUTPUT_FILE=$(mktemp)
 KCOV_EXIT=0
 
 if [ "$USE_DOCKER" = true ]; then
-  # Verify Docker daemon is running
-  if ! docker info >/dev/null 2>&1; then
-    log_error "Docker is not running." >&2
-    log_warn "Please start Docker Desktop (or the Docker daemon) and try again." >&2
-    rm -f "$OUTPUT_FILE"
-    exit 1
-  fi
-
   # Build the image once if it doesn't exist
   if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
     log_info "Building coverage image (one-time setup)..." >&2
