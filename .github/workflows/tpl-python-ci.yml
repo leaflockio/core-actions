@@ -80,10 +80,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/python/setup
+      - uses: ./.git/modules/core-actions/actions/python/setup
         with:
           python-version: ${{ inputs.python-version }}
           working-directory: ${{ inputs.working-directory }}
@@ -117,7 +117,7 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: actions/setup-python@v5
@@ -138,7 +138,7 @@ jobs:
 
       - name: Run coverage
         working-directory: ${{ inputs.working-directory }}
-        run: bash .core-actions/scripts/python/coverage.sh
+        run: bash .git/modules/core-actions/scripts/python/coverage.sh
 
   build:
     name: Build
@@ -162,10 +162,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/python/setup
+      - uses: ./.git/modules/core-actions/actions/python/setup
         with:
           python-version: ${{ inputs.python-version }}
           working-directory: ${{ inputs.working-directory }}

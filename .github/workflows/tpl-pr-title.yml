@@ -51,10 +51,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - name: Validate PR title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: bash .core-actions/scripts/common/check-pr-title.sh
+        run: bash .git/modules/core-actions/scripts/common/check-pr-title.sh
