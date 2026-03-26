@@ -1,0 +1,60 @@
+name: PR Title
+
+on:
+  workflow_call:
+    inputs:
+      core-actions-ref:
+        description: Git ref for core-actions checkout (tag, branch, or SHA)
+        type: string
+        required: false
+        default: 'main'
+
+      owner:
+        description: GitHub owner for app token scope (defaults to repository owner)
+        type: string
+        required: false
+        default: ''
+
+    secrets:
+      APP_ID:
+        description: GitHub App ID — required when calling from a repo that cannot access core-actions with the default token
+        required: false
+
+      APP_PRIVATE_KEY:
+        description: GitHub App private key (pairs with APP_ID)
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  pr-title:
+    name: PR Title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate cross-repo token
+        if: env.HAS_APP_CREDS == 'true'
+        id: cross-repo-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ inputs.owner || github.repository_owner }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: leaflockio/core-actions
+          ref: ${{ inputs.core-actions-ref }}
+          path: .core-actions
+          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
+
+      - name: Validate PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: bash .core-actions/scripts/common/check-pr-title.sh
