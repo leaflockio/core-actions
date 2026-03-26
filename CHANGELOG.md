@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/leaflockio/core-actions/compare/v1.3.1...v1.3.2) (2026-03-26)
+
+### Bug Fixes
+
+* relocate checkout path and extract PR title workflow ([#45](https://github.com/leaflockio/core-actions/issues/45), [#46](https://github.com/leaflockio/core-actions/issues/46)) ([#47](https://github.com/leaflockio/core-actions/issues/47)) ([5cdbba4](https://github.com/leaflockio/core-actions/commit/5cdbba429115f024bba9370ced7fde4610c3b7c6))
+
 ## [1.3.2-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.1...v1.3.2-beta.1) (2026-03-26)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "@leaflockio/core-actions",
-  "version": "1.3.2-beta.1",
+  "version": "1.3.2",
   "private": true,
   "description": "Reusable GitHub Actions, composite actions, and shared scripts for Leaflock repositories",
   "scripts": {
