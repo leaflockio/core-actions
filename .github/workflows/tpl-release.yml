@@ -34,6 +34,12 @@ on:
         required: false
         default: 'main'
 
+      owner:
+        description: GitHub owner for app token scope (defaults to repository owner)
+        type: string
+        required: false
+        default: ''
+
     outputs:
       new_release_published:
         description: Whether a new release was published ('true' or 'false')
@@ -79,7 +85,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: leaflockio
+          owner: ${{ inputs.owner || github.repository_owner }}
 
       - uses: actions/checkout@v4
         with:

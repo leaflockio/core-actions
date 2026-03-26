@@ -33,6 +33,12 @@ on:
         required: false
         default: 'main'
 
+      owner:
+        description: GitHub owner for app token scope (defaults to repository owner)
+        type: string
+        required: false
+        default: ''
+
     secrets:
       APP_ID:
         description: GitHub App ID — required when calling from a repo that cannot access core-actions with the default token
@@ -62,7 +68,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: leaflockio
+          owner: ${{ inputs.owner || github.repository_owner }}
 
       - uses: actions/checkout@v4
         with:
@@ -98,7 +104,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: leaflockio
+          owner: ${{ inputs.owner || github.repository_owner }}
 
       - uses: actions/checkout@v4
         with:
@@ -135,7 +141,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: leaflockio
+          owner: ${{ inputs.owner || github.repository_owner }}
 
       - uses: actions/checkout@v4
         with:
