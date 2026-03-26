@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/leaflockio/core-actions/compare/v1.2.0...v1.3.0) (2026-03-26)
+
+### Features
+
+* decouple org references, add major tag, and release summaries ([1911603](https://github.com/leaflockio/core-actions/commit/19116032f6087027f8f67d486c3d38c18e9c3399))
+
 ## [1.3.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.2.0...v1.3.0-beta.1) (2026-03-26)
 
 ### Features
