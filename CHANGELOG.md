@@ -1,3 +1,9 @@
+## [1.3.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.0...v1.3.1-beta.1) (2026-03-26)
+
+### Bug Fixes
+
+* resolve checkout cleanup and tag detection issues ([a7bb7b6](https://github.com/leaflockio/core-actions/commit/a7bb7b6f048f31d14823ba18ee1e2a12b4d3b852))
+
 ## [1.3.0](https://github.com/leaflockio/core-actions/compare/v1.2.0...v1.3.0) (2026-03-26)
 
 ### Features
