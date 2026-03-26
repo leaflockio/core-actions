@@ -80,10 +80,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/go/setup
+      - uses: ./.git/modules/core-actions/actions/go/setup
         with:
           go-version: ${{ inputs.go-version }}
           working-directory: ${{ inputs.working-directory }}
@@ -125,7 +125,7 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: actions/setup-go@v5
@@ -134,7 +134,7 @@ jobs:
 
       - name: Run coverage
         working-directory: ${{ inputs.working-directory }}
-        run: bash .core-actions/scripts/go/coverage.sh
+        run: bash .git/modules/core-actions/scripts/go/coverage.sh
 
   build:
     name: Build
@@ -158,10 +158,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/go/setup
+      - uses: ./.git/modules/core-actions/actions/go/setup
         with:
           go-version: ${{ inputs.go-version }}
           working-directory: ${{ inputs.working-directory }}

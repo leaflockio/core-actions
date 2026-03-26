@@ -1,0 +1,16 @@
+name: PR Title
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    branches: [pre-main, main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  pr-title:
+    uses: ./.github/workflows/tpl-pr-title.yml
+    with:
+      core-actions-ref: ${{ github.head_ref || github.ref_name }}
