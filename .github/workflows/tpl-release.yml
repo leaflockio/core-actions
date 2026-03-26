@@ -107,7 +107,7 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Configure git identity
@@ -117,7 +117,7 @@ jobs:
           git config user.name "locket-ci[bot]"
           git config user.email "${APP_ID}+locket-ci[bot]@users.noreply.github.com"
 
-      - uses: ./.core-actions/actions/release/semantic-release
+      - uses: ./.git/modules/core-actions/actions/release/semantic-release
         if: inputs.release
         id: release
         with:
@@ -126,7 +126,7 @@ jobs:
           working-directory: ${{ inputs.working-directory }}
           extra-plugins: ${{ inputs.extra-plugins }}
 
-      - uses: ./.core-actions/actions/release/update-major-tag
+      - uses: ./.git/modules/core-actions/actions/release/update-major-tag
         if: inputs.release && steps.release.outputs.new_release_published == 'true'
         id: major-tag
         with:

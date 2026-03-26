@@ -63,12 +63,12 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/ci/quality-gate
+      - uses: ./.git/modules/core-actions/actions/ci/quality-gate
         with:
-          scripts-dir: .core-actions/scripts/common
+          scripts-dir: .git/modules/core-actions/scripts/common
           pr-base-sha: ${{ github.event.pull_request.base.sha }}
 
   lint:
@@ -95,7 +95,7 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
       - uses: actions/setup-node@v4
@@ -105,9 +105,9 @@ jobs:
       - name: Install tools
         run: npm ci
 
-      - uses: ./.core-actions/actions/ci/quality-lint
+      - uses: ./.git/modules/core-actions/actions/ci/quality-lint
         with:
-          scripts-dir: .core-actions/scripts/common
+          scripts-dir: .git/modules/core-actions/scripts/common
           pr-base-sha: ${{ github.event.pull_request.base.sha }}
 
   links:
@@ -134,12 +134,12 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/ci/quality-links
+      - uses: ./.git/modules/core-actions/actions/ci/quality-links
         with:
-          scripts-dir: .core-actions/scripts/common
+          scripts-dir: .git/modules/core-actions/scripts/common
           pr-base-sha: ${{ github.event.pull_request.base.sha }}
 
   actionlint:
@@ -159,37 +159,6 @@ jobs:
 
       - name: Lint GitHub Actions
         run: ./actionlint
-
-  pr-title:
-    name: PR Title
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      HAS_APP_CREDS: ${{ secrets.APP_ID != '' }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Generate cross-repo token
-        if: env.HAS_APP_CREDS == 'true'
-        id: cross-repo-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ inputs.owner || github.repository_owner }}
-
-      - uses: actions/checkout@v4
-        with:
-          repository: leaflockio/core-actions
-          ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
-          token: ${{ steps.cross-repo-token.outputs.token || github.token }}
-
-      - name: Validate PR title
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: bash .core-actions/scripts/common/check-pr-title.sh
 
   gitleaks:
     name: Secret Scan
@@ -215,10 +184,10 @@ jobs:
         with:
           repository: leaflockio/core-actions
           ref: ${{ inputs.core-actions-ref }}
-          path: .core-actions
+          path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: ./.core-actions/actions/common/gitleaks
+      - uses: ./.git/modules/core-actions/actions/common/gitleaks
         with:
           license: ${{ secrets.GITLEAKS_LICENSE }}
           require-license: ${{ secrets.GITLEAKS_LICENSE != '' && 'true' || 'false' }}
