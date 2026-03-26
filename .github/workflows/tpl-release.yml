@@ -28,6 +28,12 @@ on:
         required: false
         default: '@semantic-release/changelog @semantic-release/git @octokit/rest conventional-changelog-conventionalcommits'
 
+      update-major-tag:
+        description: Whether to move the major version tag after release (e.g. v1 → v1.2.0)
+        type: boolean
+        required: false
+        default: true
+
       core-actions-ref:
         description: Git ref for core-actions checkout (tag, branch, or SHA)
         type: string
@@ -48,6 +54,14 @@ on:
       new_release_version:
         description: Version of the release (e.g. '1.2.3' or '1.2.3-beta.1')
         value: ${{ jobs.release.outputs.new_release_version }}
+
+      major_tag:
+        description: The major tag that was updated or created (e.g. 'v1')
+        value: ${{ jobs.release.outputs.major_tag }}
+
+      major_tag_action:
+        description: What happened to the major tag — 'created', 'updated', or 'skipped'
+        value: ${{ jobs.release.outputs.major_tag_action }}
 
     secrets:
       APP_ID:
@@ -73,6 +87,8 @@ jobs:
     outputs:
       new_release_published: ${{ steps.release.outputs.new_release_published }}
       new_release_version: ${{ steps.release.outputs.new_release_version }}
+      major_tag: ${{ steps.major-tag.outputs.major-tag }}
+      major_tag_action: ${{ steps.major-tag.outputs.action }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -109,3 +125,11 @@ jobs:
           node-version: ${{ inputs.node-version }}
           working-directory: ${{ inputs.working-directory }}
           extra-plugins: ${{ inputs.extra-plugins }}
+
+      - uses: ./.core-actions/actions/release/update-major-tag
+        if: inputs.release && steps.release.outputs.new_release_published == 'true'
+        id: major-tag
+        with:
+          version: ${{ steps.release.outputs.new_release_version }}
+          enabled: ${{ inputs.update-major-tag }}
+          token: ${{ steps.app-token.outputs.token }}
