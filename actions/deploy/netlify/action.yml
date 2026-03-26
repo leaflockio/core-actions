@@ -38,7 +38,17 @@ runs:
     - name: Skip notice
       if: inputs.enabled != 'true'
       shell: bash
-      run: echo "::notice::Deploy skipped (enabled=false)"
+      env:
+        ENVIRONMENT: ${{ inputs.environment }}
+      run: |
+        echo "::notice::Deploy skipped (enabled=false)"
+        if [ -n "$ENVIRONMENT" ]; then
+          echo "## Deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Environment** | ${ENVIRONMENT} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Result** | Skipped (disabled) |" >> "$GITHUB_STEP_SUMMARY"
+        fi
 
     - name: Deploy to Netlify
       if: inputs.enabled == 'true'
@@ -55,5 +65,12 @@ runs:
       shell: bash
       env:
         ENVIRONMENT: ${{ inputs.environment }}
+        PRODUCTION: ${{ inputs.production }}
       run: |
-        echo "## ${ENVIRONMENT} Deployment Complete" >> "$GITHUB_STEP_SUMMARY"
+        echo "## Deploy" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+        echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Environment** | ${ENVIRONMENT} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Provider** | Netlify |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Production** | ${PRODUCTION} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Result** | Deployed |" >> "$GITHUB_STEP_SUMMARY"

@@ -86,10 +86,12 @@ runs:
         PUBLISHED: ${{ steps.release.outputs.new_release_published }}
         VERSION: ${{ steps.release.outputs.new_release_version }}
       run: |
+        echo "## Release" >> "$GITHUB_STEP_SUMMARY"
         if [ "$PUBLISHED" = "true" ]; then
-          echo "## Release Published" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Version:** ${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Published** | Yes |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Version** | \`v${VERSION}\` |" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "## No Release" >> "$GITHUB_STEP_SUMMARY"
           echo "No version bump triggered by the commits in this push." >> "$GITHUB_STEP_SUMMARY"
         fi
