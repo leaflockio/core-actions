@@ -76,14 +76,18 @@ runs:
         VERSION: ${{ inputs.version }}
       run: |
         echo "## Major Tag" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+        echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
         case "$ACTION" in
           created)
-            echo "**Created** \`${MAJOR_TAG}\` → \`v${VERSION#v}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Action** | Created |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Tag** | \`${MAJOR_TAG}\` → \`v${VERSION#v}\` |" >> "$GITHUB_STEP_SUMMARY"
             ;;
           updated)
-            echo "**Updated** \`${MAJOR_TAG}\` → \`v${VERSION#v}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Action** | Updated |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Tag** | \`${MAJOR_TAG}\` → \`v${VERSION#v}\` |" >> "$GITHUB_STEP_SUMMARY"
             ;;
           skipped)
-            echo "Major tag update was **skipped** (disabled)." >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Action** | Skipped (disabled) |" >> "$GITHUB_STEP_SUMMARY"
             ;;
         esac

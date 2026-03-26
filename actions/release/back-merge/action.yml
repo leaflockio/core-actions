@@ -53,3 +53,20 @@ runs:
         GITHUB_TOKEN: ${{ inputs.token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         LEFTHOOK: 0
+
+    - name: Back-merge summary
+      if: always()
+      shell: bash
+      env:
+        RESULT: ${{ steps.sync.outputs.result }}
+        STRATEGY: ${{ inputs.strategy }}
+      run: |
+        echo "## Back-merge" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+        echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Strategy** | ${STRATEGY} |" >> "$GITHUB_STEP_SUMMARY"
+        if [ "$RESULT" = "success" ]; then
+          echo "| **Result** | Synced pre-main with main |" >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "| **Result** | Failed |" >> "$GITHUB_STEP_SUMMARY"
+        fi
