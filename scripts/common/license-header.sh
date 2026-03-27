@@ -9,7 +9,7 @@
 #
 # Usage:
 #   license-header.sh get                    # Print the header for this repo
-#   license-header.sh check <file|--staged>  # Validate header exists and matches repo type
+#   license-header.sh check <file|--staged|--all>  # Validate header exists and matches repo type
 #   license-header.sh add <file|--all>       # Insert correct header at top of file(s)
 #   license-header.sh update <file|--all>    # Update year in existing header(s)
 #   license-header.sh migrate <open-source|private>  # Convert all files and LICENSE file
@@ -191,7 +191,9 @@ cmd_get() {
 resolve_files() {
   _cmd="$1"
   shift
-  if [ "$1" = "--staged" ] || [ "$1" = "--all" ]; then
+  if [ "$1" = "--all" ]; then
+    get_all_source_files
+  elif [ "$1" = "--staged" ]; then
     echo "$CHECK_FILES"
   elif [ -z "$1" ]; then
     log_error "Usage: license-header.sh $_cmd <file(s)|--staged|--all>"
@@ -346,6 +348,7 @@ cmd_migrate() {
     TMPFILE=$(mktemp)
     IN_HEADER=0
     HEADER_DONE=0
+    HTML_COMMENT_CLOSED=0
 
     while IFS= read -r line; do
       if [ "$HEADER_DONE" -eq 1 ]; then
@@ -369,12 +372,35 @@ cmd_migrate() {
         ;;
       esac
 
+      # For HTML, opening <!-- marks the start of the header block
+      if [ "$STYLE" = "html" ] && [ "$IN_HEADER" -eq 0 ]; then
+        case "$line" in
+        '<!--')
+          IN_HEADER=1
+          continue
+          ;;
+        esac
+      fi
+
       if [ "$IN_HEADER" -eq 1 ]; then
         IS_COMMENT=0
         case "$STYLE" in
         hash) case "$line" in '#'* | '') IS_COMMENT=1 ;; esac ;;
         slash) case "$line" in '//'* | '') IS_COMMENT=1 ;; esac ;;
-        html) case "$line" in '<!--'* | '-->'* | '') IS_COMMENT=1 ;; esac ;;
+        html)
+          case "$line" in
+          '-->'*)
+            IS_COMMENT=1
+            HTML_COMMENT_CLOSED=1
+            ;;
+          '') IS_COMMENT=1 ;;
+          *)
+            if [ "$HTML_COMMENT_CLOSED" -eq 0 ]; then
+              IS_COMMENT=1
+            fi
+            ;;
+          esac
+          ;;
         esac
 
         if [ "$IS_COMMENT" -eq 1 ]; then
