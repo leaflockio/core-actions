@@ -1,3 +1,9 @@
+## [1.3.3-beta.2](https://github.com/leaflockio/core-actions/compare/v1.3.3-beta.1...v1.3.3-beta.2) (2026-03-27)
+
+### Bug Fixes
+
+* add css comment style and fix /* stripping in migrate ([#53](https://github.com/leaflockio/core-actions/issues/53)) ([f3e3aaf](https://github.com/leaflockio/core-actions/commit/f3e3aaf59bdeaf26f780731f1d1e18b807c6d8c5))
+
 ## [1.3.3-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.2...v1.3.3-beta.1) (2026-03-27)
 
 ### Bug Fixes
