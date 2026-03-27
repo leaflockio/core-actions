@@ -1,3 +1,9 @@
+## [1.3.3-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.2...v1.3.3-beta.1) (2026-03-27)
+
+### Bug Fixes
+
+* **license-header:** fix --all flag and HTML header stripping in migrate ([#52](https://github.com/leaflockio/core-actions/issues/52)) ([9c215da](https://github.com/leaflockio/core-actions/commit/9c215da8c8fd19d51217d36e7d5fe920d8d37fd8))
+
 ## [1.3.2](https://github.com/leaflockio/core-actions/compare/v1.3.1...v1.3.2) (2026-03-26)
 
 ### Bug Fixes
