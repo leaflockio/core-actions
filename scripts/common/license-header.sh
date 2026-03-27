@@ -348,6 +348,7 @@ cmd_migrate() {
     TMPFILE=$(mktemp)
     IN_HEADER=0
     HEADER_DONE=0
+    HTML_COMMENT_CLOSED=0
 
     while IFS= read -r line; do
       if [ "$HEADER_DONE" -eq 1 ]; then
@@ -371,12 +372,35 @@ cmd_migrate() {
         ;;
       esac
 
+      # For HTML, opening <!-- marks the start of the header block
+      if [ "$STYLE" = "html" ] && [ "$IN_HEADER" -eq 0 ]; then
+        case "$line" in
+        '<!--')
+          IN_HEADER=1
+          continue
+          ;;
+        esac
+      fi
+
       if [ "$IN_HEADER" -eq 1 ]; then
         IS_COMMENT=0
         case "$STYLE" in
         hash) case "$line" in '#'* | '') IS_COMMENT=1 ;; esac ;;
         slash) case "$line" in '//'* | '') IS_COMMENT=1 ;; esac ;;
-        html) case "$line" in '<!--'* | '-->'* | '') IS_COMMENT=1 ;; esac ;;
+        html)
+          case "$line" in
+          '-->'*)
+            IS_COMMENT=1
+            HTML_COMMENT_CLOSED=1
+            ;;
+          '') IS_COMMENT=1 ;;
+          *)
+            if [ "$HTML_COMMENT_CLOSED" -eq 0 ]; then
+              IS_COMMENT=1
+            fi
+            ;;
+          esac
+          ;;
         esac
 
         if [ "$IS_COMMENT" -eq 1 ]; then
