@@ -59,7 +59,8 @@ detect_license_type() {
 get_comment_style() {
   case "$1" in
   *.sh | *.py) echo "hash" ;;
-  *.js | *.jsx | *.ts | *.tsx | *.go | *.css | *.scss) echo "slash" ;;
+  *.js | *.jsx | *.ts | *.tsx | *.go | *.scss) echo "slash" ;;
+  *.css) echo "css" ;;
   *.html) echo "html" ;;
   *) echo "" ;;
   esac
@@ -117,6 +118,17 @@ wrap_header() {
         echo "// $line"
       fi
     done
+    ;;
+  css)
+    echo "/*"
+    while IFS= read -r line; do
+      if [ -z "$line" ]; then
+        echo " *"
+      else
+        echo " * $line"
+      fi
+    done
+    echo " */"
     ;;
   html)
     echo "<!--"
@@ -372,10 +384,10 @@ cmd_migrate() {
         ;;
       esac
 
-      # For HTML, opening <!-- marks the start of the header block
-      if [ "$STYLE" = "html" ] && [ "$IN_HEADER" -eq 0 ]; then
-        case "$line" in
-        '<!--')
+      # For HTML/CSS, opening tag marks the start of the header block
+      if [ "$IN_HEADER" -eq 0 ]; then
+        case "$STYLE:$line" in
+        'html:<!--' | 'css:/*')
           IN_HEADER=1
           continue
           ;;
@@ -387,6 +399,7 @@ cmd_migrate() {
         case "$STYLE" in
         hash) case "$line" in '#'* | '') IS_COMMENT=1 ;; esac ;;
         slash) case "$line" in '//'* | '') IS_COMMENT=1 ;; esac ;;
+        css) case "$line" in '/*' | ' *'*) IS_COMMENT=1 ;; esac ;;
         html)
           case "$line" in
           '-->'*)
