@@ -1,3 +1,11 @@
+## [1.3.3](https://github.com/leaflockio/core-actions/compare/v1.3.2...v1.3.3) (2026-03-28)
+
+### Bug Fixes
+
+* add css comment style and fix /* stripping in migrate ([#53](https://github.com/leaflockio/core-actions/issues/53)) ([f3e3aaf](https://github.com/leaflockio/core-actions/commit/f3e3aaf59bdeaf26f780731f1d1e18b807c6d8c5))
+* **check-naming:** allow PascalCase css/scss with component sibling ([#55](https://github.com/leaflockio/core-actions/issues/55)) ([876e5b5](https://github.com/leaflockio/core-actions/commit/876e5b535f976ef01cf6f7ca3d5b8d287da7fd11))
+* **license-header:** fix --all flag and HTML header stripping in migrate ([#52](https://github.com/leaflockio/core-actions/issues/52)) ([9c215da](https://github.com/leaflockio/core-actions/commit/9c215da8c8fd19d51217d36e7d5fe920d8d37fd8))
+
 ## [1.3.3-beta.3](https://github.com/leaflockio/core-actions/compare/v1.3.3-beta.2...v1.3.3-beta.3) (2026-03-28)
 
 ### Bug Fixes
