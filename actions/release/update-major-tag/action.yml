@@ -14,6 +14,14 @@ inputs:
     required: false
     default: 'true'
 
+  release-pattern:
+    description: >
+      Regex pattern to identify a stable production release version.
+      Only versions matching this pattern will trigger a major tag update.
+      Defaults to strict semver (X.Y.Z) with no pre-release suffix.
+    required: false
+    default: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
   token:
     description: GitHub App token for pushing tags
     required: true
@@ -36,12 +44,23 @@ runs:
       env:
         VERSION: ${{ inputs.version }}
         ENABLED: ${{ inputs.enabled }}
+        RELEASE_PATTERN: ${{ inputs.release-pattern }}
         GITHUB_TOKEN: ${{ inputs.token }}
       run: |
         if [ "$ENABLED" != "true" ]; then
           echo "Major tag update disabled — skipping."
           echo "action=skipped" >> "$GITHUB_OUTPUT"
           echo "major_tag=" >> "$GITHUB_OUTPUT"
+          echo "SKIP_REASON=disabled" >> "$GITHUB_ENV"
+          exit 0
+        fi
+
+        # Only update major tag for stable production releases
+        if ! echo "$VERSION" | grep -qE "$RELEASE_PATTERN"; then
+          echo "Version '${VERSION}' not identified as a stable release — skipping major tag update."
+          echo "action=skipped" >> "$GITHUB_OUTPUT"
+          echo "major_tag=" >> "$GITHUB_OUTPUT"
+          echo "SKIP_REASON=not-stable" >> "$GITHUB_ENV"
           exit 0
         fi
 
@@ -88,6 +107,10 @@ runs:
             echo "| **Tag** | \`${MAJOR_TAG}\` → \`v${VERSION#v}\` |" >> "$GITHUB_STEP_SUMMARY"
             ;;
           skipped)
-            echo "| **Action** | Skipped (disabled) |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$SKIP_REASON" = "not-stable" ]; then
+              echo "| **Action** | Skipped (not identified as stable release) |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| **Action** | Skipped (disabled) |" >> "$GITHUB_STEP_SUMMARY"
+            fi
             ;;
         esac

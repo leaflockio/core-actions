@@ -34,6 +34,15 @@ on:
         required: false
         default: true
 
+      release-pattern:
+        description: >
+          Regex pattern to identify a stable production release version.
+          Only versions matching this pattern will trigger a major tag update.
+          Defaults to strict semver (X.Y.Z) with no pre-release suffix.
+        type: string
+        required: false
+        default: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
       core-actions-ref:
         description: Git ref for core-actions checkout (tag, branch, or SHA)
         type: string
@@ -132,4 +141,5 @@ jobs:
         with:
           version: ${{ steps.release.outputs.new_release_version }}
           enabled: ${{ inputs.update-major-tag }}
+          release-pattern: ${{ inputs.release-pattern }}
           token: ${{ steps.app-token.outputs.token }}
