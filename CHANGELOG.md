@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/leaflockio/core-actions/compare/v1.3.3...v1.3.4) (2026-03-28)
+
+### Bug Fixes
+
+* **update-major-tag:** skip update when version is not a stable release ([30c79b0](https://github.com/leaflockio/core-actions/commit/30c79b0b25b023a6184f6f38fb7a997afb36f6e8))
+* **update-major-tag:** skip update when version is not a stable release ([#58](https://github.com/leaflockio/core-actions/issues/58)) ([87e19ff](https://github.com/leaflockio/core-actions/commit/87e19fff5db79320daf99cab4d5c8f8372e4a9c4))
+
 ## [1.3.4-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.3...v1.3.4-beta.1) (2026-03-28)
 
 ### Bug Fixes
