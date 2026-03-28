@@ -155,6 +155,87 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
+# --- PascalCase CSS/SCSS with sibling component ---
+
+@test "passes when PascalCase .css has sibling .jsx" {
+  mkdir -p src
+  echo "" >src/App.jsx
+  echo "" >src/App.css
+  git add src/App.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "passes when PascalCase .css has sibling .tsx" {
+  mkdir -p src
+  echo "" >src/Button.tsx
+  echo "" >src/Button.css
+  git add src/Button.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "passes when PascalCase .css has sibling .js" {
+  mkdir -p src
+  echo "" >src/App.js
+  echo "" >src/App.css
+  git add src/App.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "passes when PascalCase .css has sibling .ts" {
+  mkdir -p src
+  echo "" >src/App.ts
+  echo "" >src/App.css
+  git add src/App.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "passes when PascalCase .scss has sibling .jsx" {
+  mkdir -p src
+  echo "" >src/App.jsx
+  echo "" >src/App.scss
+  git add src/App.scss
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "fails when PascalCase .css has no sibling component" {
+  mkdir -p src
+  echo "" >src/App.css
+  git add src/App.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid filename"* ]]
+}
+
+@test "fails when PascalCase .scss has no sibling component" {
+  mkdir -p src
+  echo "" >src/App.scss
+  git add src/App.scss
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Invalid filename"* ]]
+}
+
+@test "passes with kebab-case .css without sibling" {
+  mkdir -p src
+  echo "" >src/app.css
+  git add src/app.css
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
 # --- Invalid filenames ---
 
 @test "fails on PascalCase non-language file" {

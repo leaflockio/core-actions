@@ -75,6 +75,20 @@ while IFS= read -r FILE; do
   *.sh) continue ;;
   esac
 
+  # Allow PascalCase .css/.scss when a sibling component file exists in the same directory
+  case "$BASE" in
+  *.css | *.scss)
+    NAME="${BASE%.*}"
+    if echo "$NAME" | grep -qE '^[A-Z][a-zA-Z0-9]*$'; then
+      SIBLING_FOUND=0
+      for EXT in js jsx ts tsx; do
+        [ -f "$DIR/$NAME.$EXT" ] && SIBLING_FOUND=1 && break
+      done
+      [ "$SIBLING_FOUND" -eq 1 ] && continue
+    fi
+    ;;
+  esac
+
   # Allow no-extension uppercase files (LICENSE, CODEOWNERS)
   echo "$BASE" | grep -qE '^[A-Z][A-Z0-9_]*$' && continue
 
