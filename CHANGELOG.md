@@ -1,3 +1,9 @@
+## [1.3.5](https://github.com/leaflockio/core-actions/compare/v1.3.4...v1.3.5) (2026-03-28)
+
+### Bug Fixes
+
+* **validate-commit-msg:** strip PR number suffix before length check ([#61](https://github.com/leaflockio/core-actions/issues/61)) ([aa37e5e](https://github.com/leaflockio/core-actions/commit/aa37e5ec97fc4afdeb8ba41842b9449f1af5661a))
+
 ## [1.3.5-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.4...v1.3.5-beta.1) (2026-03-28)
 
 ### Bug Fixes
