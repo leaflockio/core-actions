@@ -103,6 +103,13 @@ is_skippable_file() {
   return 1
 }
 
+# Strips the GitHub-appended PR number suffix from a commit/title string.
+# GitHub appends " (#N)" during squash merge — this should not count toward length limits.
+# Usage: strip_pr_suffix "fix(scope): some message (#42)"
+strip_pr_suffix() {
+  echo "${1% (#[0-9]*)}"
+}
+
 # Returns file content: full file in "all" mode, only added diff lines otherwise.
 # Usage: get_file_content "file.js" "$CHECK_MODE"
 get_file_content() {

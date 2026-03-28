@@ -55,6 +55,25 @@ teardown() {
   [[ "$output" == *"characters (max 72)"* ]]
 }
 
+@test "accepts title with PR number suffix within limit after stripping" {
+  # 71 chars + " (#58)" = 77 chars raw — mirrors the real CI failure case
+  run env PR_TITLE="fix(update-major-tag): skip update when version is not a stable release (#58)" bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "accepts title at exactly 72 chars with PR number suffix" {
+  # "fix(scope): " (12) + 60 a's = 72 chars, plus " (#1)" suffix
+  run env PR_TITLE="fix(scope): aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (#1)" bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
+@test "rejects title exceeding 72 chars even after stripping PR number suffix" {
+  # 73 chars + " (#1)" — stripping still leaves 73 chars which exceeds limit
+  run env PR_TITLE="feat: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (#1)" bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"characters (max 72)"* ]]
+}
+
 @test "rejects description starting with uppercase" {
   run env PR_TITLE="feat: Add login page" bash "$SCRIPT"
   [ "$status" -eq 1 ]
