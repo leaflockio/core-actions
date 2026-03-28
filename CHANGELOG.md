@@ -1,3 +1,9 @@
+## [1.3.3-beta.3](https://github.com/leaflockio/core-actions/compare/v1.3.3-beta.2...v1.3.3-beta.3) (2026-03-28)
+
+### Bug Fixes
+
+* **check-naming:** allow PascalCase css/scss with component sibling ([#55](https://github.com/leaflockio/core-actions/issues/55)) ([876e5b5](https://github.com/leaflockio/core-actions/commit/876e5b535f976ef01cf6f7ca3d5b8d287da7fd11))
+
 ## [1.3.3-beta.2](https://github.com/leaflockio/core-actions/compare/v1.3.3-beta.1...v1.3.3-beta.2) (2026-03-27)
 
 ### Bug Fixes
