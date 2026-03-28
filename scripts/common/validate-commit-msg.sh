@@ -35,7 +35,8 @@ validate_message() {
     return 1
   fi
 
-  LENGTH=$(echo "$FIRST_LINE" | wc -c | tr -d ' ')
+  NORMALIZED=$(strip_pr_suffix "$FIRST_LINE")
+  LENGTH=$(echo "$NORMALIZED" | wc -c | tr -d ' ')
   LENGTH=$((LENGTH - 1))
   if [ "$LENGTH" -gt "$MAX_LENGTH" ]; then
     log_error "Commit message first line is $LENGTH characters (max $MAX_LENGTH).${CONTEXT:+ ($CONTEXT)}"

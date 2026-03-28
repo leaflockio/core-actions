@@ -62,6 +62,28 @@ teardown() {
   [[ "$output" == *"characters (max 72)"* ]]
 }
 
+@test "accepts squash commit with PR number suffix within limit after stripping" {
+  # 71 chars + " (#58)" = 77 chars raw — mirrors the real CI failure case
+  echo "fix(update-major-tag): skip update when version is not a stable release (#58)" >"$MSG_FILE"
+  run bash "$SCRIPT" "$MSG_FILE"
+  [ "$status" -eq 0 ]
+}
+
+@test "accepts message at exactly 72 chars with PR number suffix" {
+  # "fix(scope): " (12) + 60 a's = 72 chars, plus " (#1)" suffix
+  echo "fix(scope): aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (#1)" >"$MSG_FILE"
+  run bash "$SCRIPT" "$MSG_FILE"
+  [ "$status" -eq 0 ]
+}
+
+@test "rejects message exceeding 72 chars even after stripping PR number suffix" {
+  # 73 chars + " (#1)" — stripping still leaves 73 chars which exceeds limit
+  echo "feat: this is a long commit message that is seventy three characters long (#1)" >"$MSG_FILE"
+  run bash "$SCRIPT" "$MSG_FILE"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"characters (max 72)"* ]]
+}
+
 @test "rejects description starting with uppercase" {
   echo "feat: Add login page" >"$MSG_FILE"
   run bash "$SCRIPT" "$MSG_FILE"
