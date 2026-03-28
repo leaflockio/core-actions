@@ -245,6 +245,32 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
+# --- strip_pr_suffix ---
+
+@test "strip_pr_suffix removes single-digit PR number suffix" {
+  run strip_pr_suffix "fix(scope): some message (#1)"
+  [ "$status" -eq 0 ]
+  [ "$output" = "fix(scope): some message" ]
+}
+
+@test "strip_pr_suffix removes multi-digit PR number suffix" {
+  run strip_pr_suffix "fix(scope): some message (#9999)"
+  [ "$status" -eq 0 ]
+  [ "$output" = "fix(scope): some message" ]
+}
+
+@test "strip_pr_suffix is a no-op when no suffix present" {
+  run strip_pr_suffix "fix(scope): some message"
+  [ "$status" -eq 0 ]
+  [ "$output" = "fix(scope): some message" ]
+}
+
+@test "strip_pr_suffix does not strip PR reference in the middle of message" {
+  run strip_pr_suffix "fix(scope): some (#42) message"
+  [ "$status" -eq 0 ]
+  [ "$output" = "fix(scope): some (#42) message" ]
+}
+
 # --- get_file_content ---
 
 @test "get_file_content returns full file in all mode" {

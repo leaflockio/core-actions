@@ -38,7 +38,8 @@ if ! echo "$PR_TITLE" | grep -qE "$PATTERN"; then
   exit 1
 fi
 
-LENGTH=$(echo "$PR_TITLE" | wc -c | tr -d ' ')
+NORMALIZED=$(strip_pr_suffix "$PR_TITLE")
+LENGTH=$(echo "$NORMALIZED" | wc -c | tr -d ' ')
 LENGTH=$((LENGTH - 1))
 if [ "$LENGTH" -gt "$MAX_LENGTH" ]; then
   log_error "PR title is $LENGTH characters (max $MAX_LENGTH)."
