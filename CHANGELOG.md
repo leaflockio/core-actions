@@ -1,3 +1,9 @@
+## [1.3.6-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.5...v1.3.6-beta.1) (2026-03-29)
+
+### Bug Fixes
+
+* **tpl-release:** install core-actions deps for verified-commit plugin ([#68](https://github.com/leaflockio/core-actions/issues/68)) ([263b283](https://github.com/leaflockio/core-actions/commit/263b283c8a5acbcef66726576da5c621d4859bf8))
+
 ## [1.3.5](https://github.com/leaflockio/core-actions/compare/v1.3.4...v1.3.5) (2026-03-28)
 
 ### Bug Fixes
