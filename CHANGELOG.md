@@ -1,3 +1,9 @@
+## [1.3.7-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.6...v1.3.7-beta.1) (2026-04-05)
+
+### Bug Fixes
+
+* **coverage:** per-metric node checks with JSON config and baseline ([#75](https://github.com/leaflockio/core-actions/issues/75)) ([db92303](https://github.com/leaflockio/core-actions/commit/db923037c5f68c39c75f7a9d7980e087d10d2ce0))
+
 ## [1.3.6](https://github.com/leaflockio/core-actions/compare/v1.3.5...v1.3.6) (2026-03-29)
 
 ### Bug Fixes
