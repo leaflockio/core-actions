@@ -182,6 +182,28 @@ EOF
   [[ "$output" == *"+1.00% from"* ]]
 }
 
+@test "uses custom summaryFile from COVERAGE_CONFIG_NODE when set" {
+  create_mock "npm" 'exit 0'
+  mkdir -p custom-reports
+  cat >custom-reports/summary.json <<EOF
+{"total":{"lines":{"pct":90},"statements":{"pct":90},"functions":{"pct":90},"branches":{"pct":90}}}
+EOF
+
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":80,"statements":80,"functions":80,"branches":80},"delta":0.05,"summaryFile":"custom-reports/summary.json"}'
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"lines: 90%"* ]]
+}
+
+@test "fails when custom summaryFile does not exist" {
+  create_mock "npm" 'exit 0'
+
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":80,"statements":80,"functions":80,"branches":80},"delta":0.05,"summaryFile":"no-such-dir/summary.json"}'
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Coverage summary not found"* ]]
+}
+
 @test "warns and skips delta when baseline is a plain number" {
   create_mock "npm" 'exit 0'
   create_summary 96 96 96 96

@@ -21,11 +21,13 @@ if [ "$STATUS" -ne 0 ]; then
   exit 1
 fi
 
-SUMMARY_FILE="${COVERAGE_DIR}/coverage-summary.json"
+_SUMMARY_FILE=$(echo "${COVERAGE_CONFIG_NODE:-}" | jq -r '.summaryFile // empty' 2>/dev/null)
+SUMMARY_FILE="${_SUMMARY_FILE:-${COVERAGE_DIR}/coverage-summary.json}"
 
 if [ ! -f "$SUMMARY_FILE" ]; then
   log_error "Coverage summary not found at ${SUMMARY_FILE}."
-  log_info "Ensure '${COVERAGE_SCRIPT}' generates a json-summary report."
+  log_info "Ensure '${COVERAGE_SCRIPT}' generates a json-summary report (Istanbul format)."
+  log_info "Override path via summaryFile in COVERAGE_CONFIG_NODE if needed."
   exit 1
 fi
 
