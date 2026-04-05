@@ -21,22 +21,23 @@ if [ "$STATUS" -ne 0 ]; then
   exit 1
 fi
 
-SUMMARY_FILE="${COVERAGE_DIR}/coverage-summary.json"
+_SUMMARY_FILE=$(echo "${COVERAGE_CONFIG_NODE:-}" | jq -r '.summaryFile // empty' 2>/dev/null)
+SUMMARY_FILE="${_SUMMARY_FILE:-${COVERAGE_DIR}/coverage-summary.json}"
 
 if [ ! -f "$SUMMARY_FILE" ]; then
   log_error "Coverage summary not found at ${SUMMARY_FILE}."
-  log_info "Ensure '${COVERAGE_SCRIPT}' generates a json-summary report."
+  log_info "Ensure '${COVERAGE_SCRIPT}' generates a json-summary report (Istanbul format)."
+  log_info "Override path via summaryFile in COVERAGE_CONFIG_NODE if needed."
   exit 1
 fi
 
-# Compute overall coverage: sum all covered / sum all total across all four metrics
-PERCENT=$(jq -r '.total | (.lines.covered + .statements.covered + .functions.covered + .branches.covered) / (.lines.total + .statements.total + .functions.total + .branches.total) * 100 | . * 100 | floor / 100' "$SUMMARY_FILE")
+# Extract all four metrics as a single JSON object
+METRICS=$(jq -c '{lines:.total.lines.pct,statements:.total.statements.pct,functions:.total.functions.pct,branches:.total.branches.pct}' "$SUMMARY_FILE")
 
-if [ -z "$PERCENT" ] || [ "$PERCENT" = "null" ]; then
-  log_error "Could not extract coverage from ${SUMMARY_FILE}."
+if [ -z "$METRICS" ] || ! echo "$METRICS" | jq -e '[.lines,.statements,.functions,.branches] | all(. != null)' >/dev/null 2>&1; then
+  log_error "Could not extract coverage metrics from ${SUMMARY_FILE}."
   exit 1
 fi
 
-log_info "Coverage: ${PERCENT}%"
 log_info "Report: ${COVERAGE_DIR}/index.html"
-bash "$(dirname "$0")/../common/check-coverage.sh" "$PERCENT" "${COVERAGE_TAG:-}"
+bash "$(dirname "$0")/../common/check-coverage.sh" "$METRICS" "${COVERAGE_TAG:-}"

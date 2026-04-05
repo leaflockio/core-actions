@@ -182,3 +182,34 @@ EOF
   [ "$(get_config_var LINK_CHECK_TIMEOUT)" = "10" ]
   [ "$(get_config_var CHECK_MODE)" = "all" ]
 }
+
+# ── COVERAGE_CONFIG_* keys ────────────────────────────────────────
+
+@test "config defaults COVERAGE_CONFIG_* to empty string" {
+  [ "$(get_config_var COVERAGE_CONFIG_NODE)" = "" ]
+  [ "$(get_config_var COVERAGE_CONFIG_SHELL)" = "" ]
+  [ "$(get_config_var COVERAGE_CONFIG_GO)" = "" ]
+  [ "$(get_config_var COVERAGE_CONFIG_PYTHON)" = "" ]
+}
+
+@test "config reads COVERAGE_CONFIG_NODE with JSON value from .hooks-config" {
+  cat >.hooks-config <<'EOF'
+COVERAGE_CONFIG_NODE={"floor":{"lines":80,"statements":80,"functions":75,"branches":70},"delta":2}
+EOF
+
+  result="$(get_config_var COVERAGE_CONFIG_NODE)"
+  [ "$result" = '{"floor":{"lines":80,"statements":80,"functions":75,"branches":70},"delta":2}' ]
+}
+
+@test "config reads all COVERAGE_CONFIG_* keys from .hooks-config" {
+  cat >.hooks-config <<'EOF'
+COVERAGE_CONFIG_NODE={"floor":{"lines":80,"statements":80,"functions":75,"branches":70},"delta":2}
+COVERAGE_CONFIG_SHELL={"floor":60,"delta":5}
+COVERAGE_CONFIG_GO={"floor":75,"delta":2}
+COVERAGE_CONFIG_PYTHON={"floor":75,"delta":2}
+EOF
+
+  [ "$(get_config_var COVERAGE_CONFIG_SHELL)" = '{"floor":60,"delta":5}' ]
+  [ "$(get_config_var COVERAGE_CONFIG_GO)" = '{"floor":75,"delta":2}' ]
+  [ "$(get_config_var COVERAGE_CONFIG_PYTHON)" = '{"floor":75,"delta":2}' ]
+}

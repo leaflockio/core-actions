@@ -12,5 +12,11 @@ pre-commit:
 
 pre-push:
   jobs:
-    - name: node-coverage
-      run: bash ${HOOKS_SCRIPTS:-scripts}/node/coverage.sh
+    - name: node-push-checks
+      group:
+        parallel: true
+        jobs:
+          - name: eslint
+            run: npm run lint
+          - name: node-coverage
+            run: bash ${HOOKS_SCRIPTS:-scripts}/node/coverage.sh

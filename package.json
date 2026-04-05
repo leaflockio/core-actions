@@ -1,7 +1,8 @@
 {
   "name": "@leaflockio/core-actions",
-  "version": "1.3.6",
+  "version": "1.4.0-beta.2",
   "private": true,
+  "type": "module",
   "description": "Reusable GitHub Actions, composite actions, and shared scripts for Leaflock repositories",
   "scripts": {
     "format": "prettier --write .",
@@ -9,6 +10,8 @@
     "format:sh": "shfmt -w .",
     "format:sh:check": "shfmt -d .",
     "spell": "cspell \"**/*\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
     "lint:sh": "shellcheck -x --source-path=SCRIPTDIR scripts/**/*.sh",
@@ -20,10 +23,17 @@
     "test:sh:coverage:local": "COVERAGE_TAG=shell bash scripts/shell/coverage.sh --docker"
   },
   "devDependencies": {
+    "@eslint/compat": "^2.0.4",
+    "@eslint/js": "^10.0.1",
     "@octokit/rest": "^22.0.1",
     "@vitest/coverage-v8": "^4.1.0",
     "bats": "^1.13.0",
     "cspell": "^9.7.0",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-perfectionist": "^5.8.0",
+    "eslint-plugin-security": "^4.0.0",
+    "globals": "^17.4.0",
     "markdownlint-cli2": "^0.21.0",
     "prettier": "^3.8.1",
     "shellcheck": "^4.1.0",
