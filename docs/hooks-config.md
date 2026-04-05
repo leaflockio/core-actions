@@ -71,10 +71,11 @@ Node coverage is checked per-metric (lines, statements, functions, branches). Th
 COVERAGE_CONFIG_NODE={"floor":{"lines":80,"statements":80,"functions":75,"branches":70},"delta":2}
 ```
 
-| Field   | Type        | Description                                                               |
-| ------- | ----------- | ------------------------------------------------------------------------- |
-| `floor` | JSON object | Per-metric minimum percentage. Fails if any metric drops below its floor. |
-| `delta` | number      | Maximum allowed drop from baseline for any single metric.                 |
+| Field         | Type        | Description                                                                                  |
+| ------------- | ----------- | -------------------------------------------------------------------------------------------- |
+| `floor`       | JSON object | Per-metric minimum percentage. Fails if any metric drops below its floor.                    |
+| `delta`       | number      | Maximum allowed drop from baseline for any single metric.                                    |
+| `summaryFile` | string      | Path to the Istanbul JSON summary file. Defaults to `${COVERAGE_DIR}/coverage-summary.json`. |
 
 If `COVERAGE_CONFIG_NODE` is not set, the legacy `COVERAGE_FLOOR` and `COVERAGE_MAX_DROP` values are used and the same floor applies to all four metrics.
 
