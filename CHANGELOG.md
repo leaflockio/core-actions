@@ -1,3 +1,9 @@
+## [1.4.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.7-beta.1...v1.4.0-beta.1) (2026-04-05)
+
+### Features
+
+* **coverage:** add summaryFile field to COVERAGE_CONFIG_NODE ([#76](https://github.com/leaflockio/core-actions/issues/76)) ([0167bed](https://github.com/leaflockio/core-actions/commit/0167bedd2efd614151b410b3e36f36cdfd54389f))
+
 ## [1.3.7-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.6...v1.3.7-beta.1) (2026-04-05)
 
 ### Bug Fixes
