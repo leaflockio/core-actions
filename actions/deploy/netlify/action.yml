@@ -1,7 +1,7 @@
 name: Deploy to Netlify
 description: >
-  Deploys a built site to Netlify. Wraps nwtgck/actions-netlify
-  with standardized inputs.
+  Deploys a site to Netlify. Supports static file upload (default) and
+  full Netlify build pipeline for SSR frameworks (Next.js, SvelteKit, Nuxt).
 
 inputs:
   enabled:
@@ -18,7 +18,7 @@ inputs:
     required: true
 
   publish-dir:
-    description: Directory containing the built site
+    description: Directory containing the built site (ignored when use-netlify-build is true)
     required: false
     default: './dist'
 
@@ -31,6 +31,14 @@ inputs:
     description: Environment name for the deployment summary (e.g. QA, Production)
     required: false
     default: ''
+
+  use-netlify-build:
+    description: >
+      When true, runs the Netlify build pipeline via netlify-cli (required for SSR
+      frameworks that rely on @netlify/plugin-nextjs or similar build plugins).
+      When false (default), uploads publish-dir directly via nwtgck/actions-netlify.
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -50,8 +58,8 @@ runs:
           echo "| **Result** | Skipped (disabled) |" >> "$GITHUB_STEP_SUMMARY"
         fi
 
-    - name: Deploy to Netlify
-      if: inputs.enabled == 'true'
+    - name: Deploy to Netlify (static)
+      if: inputs.enabled == 'true' && inputs.use-netlify-build != 'true'
       uses: nwtgck/actions-netlify@v3.0.0
       with:
         publish-dir: ${{ inputs.publish-dir }}
@@ -60,17 +68,38 @@ runs:
         NETLIFY_AUTH_TOKEN: ${{ inputs.auth-token }}
         NETLIFY_SITE_ID: ${{ inputs.site-id }}
 
+    - name: Deploy to Netlify (build pipeline)
+      if: inputs.enabled == 'true' && inputs.use-netlify-build == 'true'
+      shell: bash
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ inputs.auth-token }}
+        NETLIFY_SITE_ID: ${{ inputs.site-id }}
+        PRODUCTION: ${{ inputs.production }}
+      run: |
+        if [ "$PRODUCTION" = "true" ]; then
+          npx netlify-cli deploy --build --prod
+        else
+          npx netlify-cli deploy --build
+        fi
+
     - name: Deployment summary
       if: inputs.enabled == 'true' && inputs.environment != ''
       shell: bash
       env:
         ENVIRONMENT: ${{ inputs.environment }}
         PRODUCTION: ${{ inputs.production }}
+        USE_NETLIFY_BUILD: ${{ inputs.use-netlify-build }}
       run: |
+        if [ "$USE_NETLIFY_BUILD" = "true" ]; then
+          MODE="Build pipeline"
+        else
+          MODE="Static"
+        fi
         echo "## Deploy" >> "$GITHUB_STEP_SUMMARY"
         echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
         echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
         echo "| **Environment** | ${ENVIRONMENT} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| **Provider** | Netlify |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| **Mode** | ${MODE} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| **Production** | ${PRODUCTION} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| **Result** | Deployed |" >> "$GITHUB_STEP_SUMMARY"

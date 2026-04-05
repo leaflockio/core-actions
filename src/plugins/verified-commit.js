@@ -15,14 +15,10 @@
 //     "message": "chore(release): ${nextRelease.version} [skip ci]"
 //   }]
 
-const { execFileSync } = require('child_process');
-const { readFileSync } = require('fs');
-const { resolve } = require('path');
-
-async function getOctokit(token) {
-  const { Octokit } = await import('@octokit/rest');
-  return new Octokit({ auth: token });
-}
+import { Octokit } from '@octokit/rest';
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import { resolve } from 'path';
 
 function parseRepo(repositoryUrl) {
   const match = repositoryUrl.match(/(?:github\.com)[/:]([^/]+)\/([^/.]+?)(?:\.git)?$/);
@@ -34,7 +30,7 @@ async function prepare(pluginConfig, context) {
   const { branch, cwd, env, lastRelease, logger, nextRelease, options } = context;
   const token = env.GH_TOKEN || env.GITHUB_TOKEN;
   const { owner, repo } = parseRepo(options.repositoryUrl);
-  const octokit = await getOctokit(token);
+  const octokit = new Octokit({ auth: token });
   const branchName = branch.name;
   const assets = pluginConfig.assets;
 
@@ -73,7 +69,7 @@ async function prepare(pluginConfig, context) {
     }
     let content;
     try {
-      content = readFileSync(fullPath, 'utf-8');
+      content = fs.readFileSync(fullPath, 'utf-8');
     } catch {
       logger.log(`Skipping ${filePath} (not found or not modified)`);
       continue;
@@ -137,8 +133,8 @@ async function prepare(pluginConfig, context) {
   }
 
   // Update git HEAD locally so semantic-release tags the correct commit
-  execFileSync('git', ['fetch', 'origin', branchName], { cwd });
-  execFileSync('git', ['reset', '--hard', `origin/${branchName}`], { cwd });
+  childProcess.execFileSync('git', ['fetch', 'origin', branchName], { cwd });
+  childProcess.execFileSync('git', ['reset', '--hard', `origin/${branchName}`], { cwd });
 
   logger.log(`Pushed verified commit to ${branchName}`);
 }
@@ -164,4 +160,4 @@ async function verify(pluginConfig, context) {
   }
 }
 
-module.exports = { parseRepo, prepare, renderMessage, verifyConditions: verify };
+export { parseRepo, prepare, renderMessage, verify as verifyConditions };

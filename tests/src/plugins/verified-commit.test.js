@@ -24,15 +24,28 @@ vi.mock('@octokit/rest', () => ({
   },
 }));
 
-import childProcess from 'child_process';
-// Use vi.spyOn for CJS modules since the plugin uses require()
-import fs from 'fs';
+vi.mock('child_process', async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, execFileSync: vi.fn() };
+});
 
-const mockReadFileSync = vi.spyOn(fs, 'readFileSync');
-const mockExecFileSync = vi.spyOn(childProcess, 'execFileSync').mockImplementation(() => {});
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, readFileSync: vi.fn() };
+});
 
-const { parseRepo, prepare, renderMessage, verifyConditions } =
-  await import('../../../src/plugins/verified-commit.js');
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+
+import {
+  parseRepo,
+  prepare,
+  renderMessage,
+  verifyConditions,
+} from '../../../src/plugins/verified-commit.js';
+
+const mockReadFileSync = fs.readFileSync;
+const mockExecFileSync = childProcess.execFileSync;
 
 // ---------------------------------------------------------------------------
 // Unit tests — parseRepo
