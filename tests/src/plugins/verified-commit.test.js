@@ -4,15 +4,15 @@
 // software, via any medium, is strictly prohibited without prior
 // written permission from Leaflock.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock @octokit/rest before importing the module under test
 const mockGit = {
-  getRef: vi.fn(),
-  getCommit: vi.fn(),
   createBlob: vi.fn(),
-  createTree: vi.fn(),
   createCommit: vi.fn(),
+  createTree: vi.fn(),
+  getCommit: vi.fn(),
+  getRef: vi.fn(),
   updateRef: vi.fn(),
 };
 
@@ -24,14 +24,14 @@ vi.mock('@octokit/rest', () => ({
   },
 }));
 
+import childProcess from 'child_process';
 // Use vi.spyOn for CJS modules since the plugin uses require()
 import fs from 'fs';
-import childProcess from 'child_process';
 
 const mockReadFileSync = vi.spyOn(fs, 'readFileSync');
 const mockExecFileSync = vi.spyOn(childProcess, 'execFileSync').mockImplementation(() => {});
 
-const { parseRepo, renderMessage, verifyConditions, prepare } =
+const { parseRepo, prepare, renderMessage, verifyConditions } =
   await import('../../../src/plugins/verified-commit.js');
 
 // ---------------------------------------------------------------------------
@@ -128,13 +128,13 @@ describe('prepare', () => {
   const newCommitSha = 'eee555';
 
   const baseContext = {
-    env: { GH_TOKEN: 'test-token' },
-    cwd: '/workspace',
-    options: { repositoryUrl: 'https://github.com/leaflockio/core-actions' },
-    logger: { log: vi.fn() },
-    nextRelease: { version: '2.0.0', notes: 'release notes' },
-    lastRelease: { version: '1.0.0' },
     branch: { name: 'main' },
+    cwd: '/workspace',
+    env: { GH_TOKEN: 'test-token' },
+    lastRelease: { version: '1.0.0' },
+    logger: { log: vi.fn() },
+    nextRelease: { notes: 'release notes', version: '2.0.0' },
+    options: { repositoryUrl: 'https://github.com/leaflockio/core-actions' },
   };
 
   beforeEach(() => {
@@ -157,38 +157,44 @@ describe('prepare', () => {
 
     expect(mockGit.getRef).toHaveBeenCalledWith({
       owner: 'leaflockio',
-      repo: 'core-actions',
       ref: 'heads/main',
+      repo: 'core-actions',
     });
     expect(mockGit.getCommit).toHaveBeenCalledWith({
+      commit_sha: baseSha,
       owner: 'leaflockio',
       repo: 'core-actions',
-      commit_sha: baseSha,
     });
     expect(mockGit.createBlob).toHaveBeenCalledTimes(2);
     expect(mockGit.createTree).toHaveBeenCalledWith({
+      base_tree: treeSha,
       owner: 'leaflockio',
       repo: 'core-actions',
-      base_tree: treeSha,
       tree: [
-        { path: 'package.json', mode: '100644', type: 'blob', sha: blobSha },
-        { path: 'CHANGELOG.md', mode: '100644', type: 'blob', sha: blobSha },
+        { mode: '100644', path: 'package.json', sha: blobSha, type: 'blob' },
+        { mode: '100644', path: 'CHANGELOG.md', sha: blobSha, type: 'blob' },
       ],
     });
     expect(mockGit.createCommit).toHaveBeenCalledWith({
-      owner: 'leaflockio',
-      repo: 'core-actions',
       message: expect.stringContaining('2.0.0'),
-      tree: newTreeSha,
+      owner: 'leaflockio',
       parents: [baseSha],
+      repo: 'core-actions',
+      tree: newTreeSha,
     });
     expect(mockGit.updateRef).toHaveBeenCalledWith({
-      owner: 'leaflockio',
-      repo: 'core-actions',
-      ref: 'heads/main',
-      sha: newCommitSha,
       force: false,
+      owner: 'leaflockio',
+      ref: 'heads/main',
+      repo: 'core-actions',
+      sha: newCommitSha,
     });
+  });
+
+  it('throws when asset path resolves outside working directory', async () => {
+    await expect(prepare({ assets: ['../outside.txt'] }, baseContext)).rejects.toThrow(
+      'resolves outside the working directory',
+    );
   });
 
   it('skips files that do not exist on disk', async () => {
