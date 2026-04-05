@@ -10,3 +10,7 @@ CHECK_MODE=staged
 COVERAGE_MAX_DROP=0.05
 COVERAGE_FLOOR=78
 COVERAGE_SRC=scripts
+# Per-runner coverage config: floor (per-metric JSON for node, plain number for others) + delta.
+# JSON values must use compact format (no spaces) and must not contain '=' characters.
+# See docs/hooks-config.md for migration guidance from plain number baseline to JSON format.
+COVERAGE_CONFIG_NODE={"floor":{"lines":100,"statements":100,"functions":100,"branches":100},"delta":0.05}

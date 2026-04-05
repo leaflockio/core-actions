@@ -161,3 +161,148 @@ teardown() {
   [[ "$output" == *"Tagged .coverage-baseline detected but no tag provided"* ]]
   [[ "$output" == *"Skipping delta check"* ]]
 }
+
+# ── JSON mode (node — per-metric) ────────────────────────────────
+
+JSON_METRICS='{"lines":85,"statements":82,"functions":78,"branches":72}'
+JSON_FLOOR_LOW='{"lines":70,"statements":70,"functions":70,"branches":70}'
+
+@test "json: passes all metrics above single number floor with no baseline" {
+  # No COVERAGE_CONFIG_NODE — falls back to COVERAGE_FLOOR as plain number
+  printf 'COVERAGE_FLOOR=70\nCOVERAGE_MAX_DROP=0.05\n' >.hooks-config
+  git add .hooks-config
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"lines: 85%"* ]]
+  [[ "$output" == *"statements: 82%"* ]]
+  [[ "$output" == *"functions: 78%"* ]]
+  [[ "$output" == *"branches: 72%"* ]]
+}
+
+@test "json: fails when one metric below single number floor" {
+  # No COVERAGE_CONFIG_NODE — falls back to COVERAGE_FLOOR as plain number
+  printf 'COVERAGE_FLOOR=80\nCOVERAGE_MAX_DROP=0.05\n' >.hooks-config
+  git add .hooks-config
+
+  run bash "$SCRIPT" '{"lines":85,"statements":82,"functions":78,"branches":72}'
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"branches: 72% is below floor (80%)"* ]]
+}
+
+@test "json: passes all metrics above JSON floor object via COVERAGE_CONFIG_NODE" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+}
+
+@test "json: fails when one metric below JSON floor object threshold" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":80,"branches":70},"delta":0.05}'
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"functions: 78% is below floor (80%)"* ]]
+}
+
+@test "json: skips delta when no baseline file" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No .coverage-baseline found"* ]]
+  [[ "$output" == *"no baseline"* ]]
+}
+
+@test "json: passes when all metrics match baseline" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  echo '{"lines":85,"statements":82,"functions":78,"branches":72}' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"lines: 85%"* ]]
+  [[ "$output" == *"baseline: 85%"* ]]
+}
+
+@test "json: passes when drop within delta" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  echo '{"lines":85.04,"statements":82,"functions":78,"branches":72}' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"-0.04% from"* ]]
+}
+
+@test "json: fails when one metric drops beyond delta" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  echo '{"lines":85.10,"statements":82,"functions":78,"branches":72}' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"lines: dropped 0.10%"* ]]
+}
+
+@test "json: shows improvement when metric increases from baseline" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  echo '{"lines":83,"statements":82,"functions":78,"branches":72}' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"+2.00% from"* ]]
+}
+
+@test "json: warns and skips delta when baseline is plain number" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  echo "85" >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"plain number"* ]]
+  [[ "$output" == *"migrate"* ]]
+}
+
+@test "json: tagged baseline passes when all metrics match" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  printf 'js: {"lines":85,"statements":82,"functions":78,"branches":72}\n' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS" js
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"baseline: 85%"* ]]
+}
+
+@test "json: tagged baseline fails when one metric regresses" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  printf 'js: {"lines":85.10,"statements":82,"functions":78,"branches":72}\n' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS" js
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"lines: dropped"* ]]
+}
+
+@test "json: tagged baseline warns when tag not found" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  printf 'shell: {"lines":85,"statements":82,"functions":78,"branches":72}\n' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS" js
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Tag 'js' not found"* ]]
+  [[ "$output" == *"Skipping delta check"* ]]
+}
+
+@test "json: warns when tagged baseline file used without tag" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  printf 'js: {"lines":85,"statements":82,"functions":78,"branches":72}\n' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Tagged .coverage-baseline detected but no tag provided"* ]]
+  [[ "$output" == *"Skipping delta check"* ]]
+}
+
+@test "json: warns when baseline metric key missing from JSON" {
+  export COVERAGE_CONFIG_NODE='{"floor":{"lines":70,"statements":70,"functions":70,"branches":70},"delta":0.05}'
+  # baseline missing branches key
+  echo '{"lines":85,"statements":82,"functions":78}' >.coverage-baseline
+
+  run bash "$SCRIPT" "$JSON_METRICS"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"branches: not found in baseline"* ]]
+}
