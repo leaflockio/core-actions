@@ -1,3 +1,10 @@
+## [1.4.0-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.0-beta.1...v1.4.0-beta.2) (2026-04-05)
+
+### Features
+
+* **deploy:** add use-netlify-build input to netlify action ([#78](https://github.com/leaflockio/core-actions/issues/78)) ([a204b4a](https://github.com/leaflockio/core-actions/commit/a204b4ac3ef895cb3131d052eb1dff74dc2b8882))
+* **hooks:** add eslint to node pre-push alongside coverage ([#77](https://github.com/leaflockio/core-actions/issues/77)) ([970c9e2](https://github.com/leaflockio/core-actions/commit/970c9e2301dcc1ea3c27419a9b03f65c1a987723))
+
 ## [1.4.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.3.7-beta.1...v1.4.0-beta.1) (2026-04-05)
 
 ### Features
