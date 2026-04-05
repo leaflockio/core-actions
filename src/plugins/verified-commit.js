@@ -15,9 +15,14 @@
 //     "message": "chore(release): ${nextRelease.version} [skip ci]"
 //   }]
 
-const { readFileSync } = require('fs');
-const { join } = require('path');
 const { execFileSync } = require('child_process');
+const { readFileSync } = require('fs');
+const { resolve } = require('path');
+
+async function getOctokit(token) {
+  const { Octokit } = await import('@octokit/rest');
+  return new Octokit({ auth: token });
+}
 
 function parseRepo(repositoryUrl) {
   const match = repositoryUrl.match(/(?:github\.com)[/:]([^/]+)\/([^/.]+?)(?:\.git)?$/);
@@ -25,9 +30,117 @@ function parseRepo(repositoryUrl) {
   return { owner: match[1], repo: match[2] };
 }
 
-async function getOctokit(token) {
-  const { Octokit } = await import('@octokit/rest');
-  return new Octokit({ auth: token });
+async function prepare(pluginConfig, context) {
+  const { branch, cwd, env, lastRelease, logger, nextRelease, options } = context;
+  const token = env.GH_TOKEN || env.GITHUB_TOKEN;
+  const { owner, repo } = parseRepo(options.repositoryUrl);
+  const octokit = await getOctokit(token);
+  const branchName = branch.name;
+  const assets = pluginConfig.assets;
+
+  const msg =
+    pluginConfig.message ||
+    'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}';
+  const message = renderMessage(msg, {
+    branch,
+    lastRelease,
+    nextRelease,
+  });
+
+  // 1. Get current branch ref
+  const { data: ref } = await octokit.git.getRef({
+    owner,
+    ref: `heads/${branchName}`,
+    repo,
+  });
+  const currentCommitSha = ref.object.sha;
+
+  // 2. Get the base tree
+  const { data: commit } = await octokit.git.getCommit({
+    commit_sha: currentCommitSha,
+    owner,
+    repo,
+  });
+  const baseTreeSha = commit.tree.sha;
+
+  // 3. Create blobs for each file
+  const treeEntries = [];
+  const resolvedCwd = resolve(cwd);
+  for (const filePath of assets) {
+    const fullPath = resolve(cwd, filePath);
+    if (!fullPath.startsWith(resolvedCwd + '/') && fullPath !== resolvedCwd) {
+      throw new Error(`Asset path '${filePath}' resolves outside the working directory.`);
+    }
+    let content;
+    try {
+      content = readFileSync(fullPath, 'utf-8');
+    } catch {
+      logger.log(`Skipping ${filePath} (not found or not modified)`);
+      continue;
+    }
+
+    const { data: blob } = await octokit.git.createBlob({
+      content,
+      encoding: 'utf-8',
+      owner,
+      repo,
+    });
+
+    treeEntries.push({
+      mode: '100644',
+      path: filePath,
+      sha: blob.sha,
+      type: 'blob',
+    });
+  }
+
+  if (treeEntries.length === 0) {
+    logger.log('No files to commit.');
+    return;
+  }
+
+  // 4. Create tree
+  const { data: tree } = await octokit.git.createTree({
+    base_tree: baseTreeSha,
+    owner,
+    repo,
+    tree: treeEntries,
+  });
+
+  // 5. Create commit
+  const { data: newCommit } = await octokit.git.createCommit({
+    message,
+    owner,
+    parents: [currentCommitSha],
+    repo,
+    tree: tree.sha,
+  });
+
+  logger.log(
+    `Created verified commit ${newCommit.sha.substring(0, 7)} (verified: ${newCommit.verification?.verified})`,
+  );
+
+  // 6. Update branch ref
+  try {
+    await octokit.git.updateRef({
+      force: false,
+      owner,
+      ref: `heads/${branchName}`,
+      repo,
+      sha: newCommit.sha,
+    });
+  } catch (err) {
+    throw new Error(
+      `Failed to update ref heads/${branchName} to ${newCommit.sha.substring(0, 7)}: ${err.message}`,
+      { cause: err },
+    );
+  }
+
+  // Update git HEAD locally so semantic-release tags the correct commit
+  execFileSync('git', ['fetch', 'origin', branchName], { cwd });
+  execFileSync('git', ['reset', '--hard', `origin/${branchName}`], { cwd });
+
+  logger.log(`Pushed verified commit to ${branchName}`);
 }
 
 function renderMessage(msg, context) {
@@ -51,112 +164,4 @@ async function verify(pluginConfig, context) {
   }
 }
 
-async function prepare(pluginConfig, context) {
-  const { env, cwd, options, logger, nextRelease, lastRelease, branch } = context;
-  const token = env.GH_TOKEN || env.GITHUB_TOKEN;
-  const { owner, repo } = parseRepo(options.repositoryUrl);
-  const octokit = await getOctokit(token);
-  const branchName = branch.name;
-  const assets = pluginConfig.assets;
-
-  const msg =
-    pluginConfig.message ||
-    'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}';
-  const message = renderMessage(msg, {
-    branch,
-    lastRelease,
-    nextRelease,
-  });
-
-  // 1. Get current branch ref
-  const { data: ref } = await octokit.git.getRef({
-    owner,
-    repo,
-    ref: `heads/${branchName}`,
-  });
-  const currentCommitSha = ref.object.sha;
-
-  // 2. Get the base tree
-  const { data: commit } = await octokit.git.getCommit({
-    owner,
-    repo,
-    commit_sha: currentCommitSha,
-  });
-  const baseTreeSha = commit.tree.sha;
-
-  // 3. Create blobs for each file
-  const treeEntries = [];
-  for (const filePath of assets) {
-    const fullPath = join(cwd, filePath);
-    let content;
-    try {
-      content = readFileSync(fullPath, 'utf-8');
-    } catch {
-      logger.log(`Skipping ${filePath} (not found or not modified)`);
-      continue;
-    }
-
-    const { data: blob } = await octokit.git.createBlob({
-      owner,
-      repo,
-      content,
-      encoding: 'utf-8',
-    });
-
-    treeEntries.push({
-      path: filePath,
-      mode: '100644',
-      type: 'blob',
-      sha: blob.sha,
-    });
-  }
-
-  if (treeEntries.length === 0) {
-    logger.log('No files to commit.');
-    return;
-  }
-
-  // 4. Create tree
-  const { data: tree } = await octokit.git.createTree({
-    owner,
-    repo,
-    base_tree: baseTreeSha,
-    tree: treeEntries,
-  });
-
-  // 5. Create commit
-  const { data: newCommit } = await octokit.git.createCommit({
-    owner,
-    repo,
-    message,
-    tree: tree.sha,
-    parents: [currentCommitSha],
-  });
-
-  logger.log(
-    `Created verified commit ${newCommit.sha.substring(0, 7)} (verified: ${newCommit.verification?.verified})`,
-  );
-
-  // 6. Update branch ref
-  try {
-    await octokit.git.updateRef({
-      owner,
-      repo,
-      ref: `heads/${branchName}`,
-      sha: newCommit.sha,
-      force: false,
-    });
-  } catch (err) {
-    throw new Error(
-      `Failed to update ref heads/${branchName} to ${newCommit.sha.substring(0, 7)}: ${err.message}`,
-    );
-  }
-
-  // Update git HEAD locally so semantic-release tags the correct commit
-  execFileSync('git', ['fetch', 'origin', branchName], { cwd });
-  execFileSync('git', ['reset', '--hard', `origin/${branchName}`], { cwd });
-
-  logger.log(`Pushed verified commit to ${branchName}`);
-}
-
-module.exports = { verifyConditions: verify, prepare, parseRepo, renderMessage };
+module.exports = { parseRepo, prepare, renderMessage, verifyConditions: verify };
