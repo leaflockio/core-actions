@@ -1,3 +1,9 @@
+## [1.4.1-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.1...v1.4.1-beta.2) (2026-04-14)
+
+### Bug Fixes
+
+* **check-paths:** add CHECK_PATHS_SKIP_FILES config to skip Docker paths ([#90](https://github.com/leaflockio/core-actions/issues/90)) ([73a7a1e](https://github.com/leaflockio/core-actions/commit/73a7a1e7f712446eb9dc8aaf93e0bd435cb91504))
+
 ## [1.4.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.0...v1.4.1-beta.1) (2026-04-14)
 
 ### Bug Fixes
