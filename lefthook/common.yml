@@ -42,7 +42,7 @@ pre-commit:
                 - name: check-format
                   run: bash ${HOOKS_SCRIPTS:-scripts}/common/check-format.sh
                 - name: check-markdown-lint
-                  glob: '**/*.md'
+                  glob: '*.md,**/*.md'
                   run: markdownlint-cli2 {staged_files}
                 - name: check-spelling
                   run: bash ${HOOKS_SCRIPTS:-scripts}/common/check-spelling.sh
