@@ -35,6 +35,7 @@ COVERAGE_CONFIG_SHELL="${COVERAGE_CONFIG_SHELL:-}"
 COVERAGE_CONFIG_GO="${COVERAGE_CONFIG_GO:-}"
 COVERAGE_CONFIG_PYTHON="${COVERAGE_CONFIG_PYTHON:-}"
 CHECK_MODE="${CHECK_MODE:-staged}"
+CHECK_PATHS_SKIP_FILES="${CHECK_PATHS_SKIP_FILES:-[]}"
 
 # ── Override from .hooks-config ─────────────────────────────────────
 
@@ -63,6 +64,7 @@ if [ -f ".hooks-config" ]; then
     COVERAGE_CONFIG_GO) COVERAGE_CONFIG_GO="$value" ;;
     COVERAGE_CONFIG_PYTHON) COVERAGE_CONFIG_PYTHON="$value" ;;
     CHECK_MODE) CHECK_MODE="$value" ;;
+    CHECK_PATHS_SKIP_FILES) CHECK_PATHS_SKIP_FILES="$value" ;;
     esac
   done <<<"$(cat .hooks-config)"
 fi
