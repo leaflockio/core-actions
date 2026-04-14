@@ -37,6 +37,18 @@ COVERAGE_CONFIG_NODE={"floor":{"lines":80,"statements":80,"functions":75,"branch
 
 ---
 
+## Path Check Settings
+
+| Key                      | Default | Description                                                                                                                                   |
+| ------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHECK_PATHS_SKIP_FILES` | `[]`    | JSON array of filename patterns to exclude from the hardcoded-path check. Supports shell glob patterns (e.g. `Dockerfile.*`, `*.dockerfile`). |
+
+```bash
+CHECK_PATHS_SKIP_FILES=["Dockerfile","Dockerfile.*","*.dockerfile","docker-compose.yml","docker-compose.*.yml"]
+```
+
+---
+
 ## Coverage Settings (Legacy)
 
 These apply to shell, go, and python runners. Node uses `COVERAGE_CONFIG_NODE` instead.
@@ -140,6 +152,7 @@ MAX_COMMIT_MSG_LENGTH=72
 PROTECTED_BRANCHES=main master pre-main
 LINK_CHECK_TIMEOUT=5
 CHECK_MODE=staged
+CHECK_PATHS_SKIP_FILES=["Dockerfile","Dockerfile.*","*.dockerfile","docker-compose.yml","docker-compose.*.yml"]
 # Legacy floor used by shell runner
 COVERAGE_FLOOR=70
 COVERAGE_MAX_DROP=0.05

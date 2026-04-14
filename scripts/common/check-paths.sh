@@ -27,6 +27,19 @@ for f in $CHECK_FILES; do
   # Skip binary-ish files
   is_skippable_file "$f" && continue
 
+  # Skip files excluded via CHECK_PATHS_SKIP_FILES config
+  if [ -n "$CHECK_PATHS_SKIP_FILES" ] && command -v jq >/dev/null 2>&1; then
+    _skip=0
+    while IFS= read -r _pattern; do
+      _re=$(printf '%s' "$_pattern" | sed 's/\./[.]/g; s/\*/.*/g; s/?/./g')
+      if echo "$f" | grep -qE "^${_re}$"; then
+        _skip=1
+        break
+      fi
+    done <<<"$(echo "$CHECK_PATHS_SKIP_FILES" | jq -r '.[]' 2>/dev/null)"
+    [ "$_skip" -eq 1 ] && continue
+  fi
+
   CONTENT=$(get_file_content "$f" "$CHECK_MODE")
 
   [ -z "$CONTENT" ] && continue
