@@ -1,3 +1,9 @@
+## [1.4.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.0...v1.4.1-beta.1) (2026-04-14)
+
+### Bug Fixes
+
+* **hooks:** include root-level .md files in check-markdown-lint glob ([#87](https://github.com/leaflockio/core-actions/issues/87)) ([807f4b3](https://github.com/leaflockio/core-actions/commit/807f4b3e00f78538fddea44351d01ca2310fa391))
+
 ## [1.4.0](https://github.com/leaflockio/core-actions/compare/v1.3.6...v1.4.0) (2026-04-05)
 
 ### Features
