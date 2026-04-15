@@ -1,3 +1,9 @@
+## [1.4.2-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.1...v1.4.2-beta.1) (2026-04-15)
+
+### Bug Fixes
+
+* **release:** make extra-plugins additive over base plugin set ([#104](https://github.com/leaflockio/core-actions/issues/104)) ([607faa5](https://github.com/leaflockio/core-actions/commit/607faa55589177d37ba41fb0843344b96c0727b4))
+
 ## [1.4.1](https://github.com/leaflockio/core-actions/compare/v1.4.0...v1.4.1) (2026-04-15)
 
 ### Bug Fixes
