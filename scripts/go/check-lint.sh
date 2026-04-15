@@ -5,13 +5,22 @@
 # software, via any medium, is strictly prohibited without prior
 # written permission from Leaflock.
 
-# Runs golangci-lint on the entire module.
+# Runs golangci-lint on changed Go files only.
 
-. "$(dirname "$0")/../common/utils.sh"
+. "$(dirname "$0")/../common/config.sh"
+
+FILES=$(echo "$CHECK_FILES" | grep '\.go$')
+
+if [ -z "$FILES" ]; then
+  log_info "No Go files to lint."
+  exit 0
+fi
+
+mapfile -t PACKAGES < <(echo "$FILES" | xargs dirname | sort -u | sed 's|^[^./]|./&|')
 
 log_info "Running golangci-lint..."
 
-if ! golangci-lint run ./...; then
+if ! golangci-lint run "${PACKAGES[@]}"; then
   log_error "Go lint check failed. Fix the issues above."
   exit 1
 fi

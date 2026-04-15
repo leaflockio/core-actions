@@ -95,10 +95,20 @@ jobs:
           go-version-file: ${{ inputs.go-version-file }}
           working-directory: ${{ inputs.working-directory }}
 
+      - name: Check for changed Go files
+        id: go-files
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          FILES=$(git diff --name-only --diff-filter=ACMR "$PR_BASE_SHA"...HEAD -- '*.go')
+          echo "changed=$( [ -n "$FILES" ] && echo 'true' || echo 'false' )" >> "$GITHUB_OUTPUT"
+
       - uses: golangci/golangci-lint-action@v6
+        if: steps.go-files.outputs.changed == 'true'
         with:
           version: ${{ inputs.golangci-lint-version }}
           working-directory: ${{ inputs.working-directory }}
+          only-new-issues: true
 
   coverage:
     name: Coverage
