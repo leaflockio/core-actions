@@ -1,3 +1,15 @@
+## [1.4.1](https://github.com/leaflockio/core-actions/compare/v1.4.0...v1.4.1) (2026-04-15)
+
+### Bug Fixes
+
+* **check-paths:** add CHECK_PATHS_SKIP_FILES config to skip Docker paths ([#90](https://github.com/leaflockio/core-actions/issues/90)) ([73a7a1e](https://github.com/leaflockio/core-actions/commit/73a7a1e7f712446eb9dc8aaf93e0bd435cb91504))
+* **coverage:** isolate baseline tag per runner config ([#89](https://github.com/leaflockio/core-actions/issues/89)) ([#92](https://github.com/leaflockio/core-actions/issues/92)) ([d10ef5d](https://github.com/leaflockio/core-actions/commit/d10ef5de7578306e0fdaa8a6aa4114168355e3fe))
+* **go-ci:** auto-resolve Go and golangci-lint versions from go.mod ([#101](https://github.com/leaflockio/core-actions/issues/101)) ([015143d](https://github.com/leaflockio/core-actions/commit/015143dbf27ad28fb85421a281679f83bc42cabf))
+* **hooks:** include root-level .md files in check-markdown-lint glob ([#87](https://github.com/leaflockio/core-actions/issues/87)) ([807f4b3](https://github.com/leaflockio/core-actions/commit/807f4b3e00f78538fddea44351d01ca2310fa391))
+* **tpl-common-ci:** install tools from core-actions not consumer ([#95](https://github.com/leaflockio/core-actions/issues/95)) ([#99](https://github.com/leaflockio/core-actions/issues/99)) ([3699704](https://github.com/leaflockio/core-actions/commit/36997043f0c10ca6bf5a9faef8e0f448ce65615b))
+* **tpl-release:** remove consumer npm ci — unblocks non-Node repos ([#94](https://github.com/leaflockio/core-actions/issues/94)) ([#98](https://github.com/leaflockio/core-actions/issues/98)) ([6ffff15](https://github.com/leaflockio/core-actions/commit/6ffff15e5a90cc1a1e353e63578b77a7fee0baa2))
+* **tpl-shell-ci:** source tools from core-actions, align with templates ([#100](https://github.com/leaflockio/core-actions/issues/100)) ([38fc1b8](https://github.com/leaflockio/core-actions/commit/38fc1b8ca38c0c4bcc48c4f0199916cbb4c189c6))
+
 ## [1.4.1-beta.7](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.6...v1.4.1-beta.7) (2026-04-15)
 
 ### Bug Fixes
