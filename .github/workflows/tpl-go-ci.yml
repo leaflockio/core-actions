@@ -4,10 +4,20 @@ on:
   workflow_call:
     inputs:
       go-version:
-        description: Go version to use
+        description: >
+          Explicit Go version to use (e.g. '1.26'). When set, takes
+          precedence over go-version-file.
         type: string
         required: false
-        default: '1.22'
+        default: ''
+
+      go-version-file:
+        description: >
+          Path to go.mod file to determine the Go version. Used when
+          go-version is not set. Defaults to go.mod in the working directory.
+        type: string
+        required: false
+        default: 'go.mod'
 
       working-directory:
         description: Directory containing go.mod
@@ -16,16 +26,12 @@ on:
         default: '.'
 
       golangci-lint-version:
-        description: golangci-lint version to install
+        description: >
+          golangci-lint version to use (e.g. 'v1.64.5'). Defaults to 'latest'
+          which always resolves to the newest stable release.
         type: string
         required: false
-        default: '1.62.2'
-
-      lint-command:
-        description: Command to run for linting
-        type: string
-        required: false
-        default: golangci-lint run
+        default: 'latest'
 
       build-command:
         description: Command to run for building
@@ -86,22 +92,13 @@ jobs:
       - uses: ./.git/modules/core-actions/actions/go/setup
         with:
           go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.go-version-file }}
           working-directory: ${{ inputs.working-directory }}
 
-      - name: Install golangci-lint
-        env:
-          GOLANGCI_VERSION: ${{ inputs.golangci-lint-version }}
-        run: |
-          curl -sSfL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_VERSION}/golangci-lint-${GOLANGCI_VERSION}-linux-amd64.tar.gz" -o golangci-lint.tar.gz
-          tar -xzf golangci-lint.tar.gz --strip-components=1 "golangci-lint-${GOLANGCI_VERSION}-linux-amd64/golangci-lint"
-          mv golangci-lint "$(go env GOPATH)/bin/"
-          rm golangci-lint.tar.gz
-
-      - name: Lint
-        working-directory: ${{ inputs.working-directory }}
-        env:
-          LINT_CMD: ${{ inputs.lint-command }}
-        run: eval "$LINT_CMD"
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ inputs.golangci-lint-version }}
+          working-directory: ${{ inputs.working-directory }}
 
   coverage:
     name: Coverage
@@ -128,9 +125,11 @@ jobs:
           path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: actions/setup-go@v5
+      - uses: ./.git/modules/core-actions/actions/go/setup
         with:
           go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.go-version-file }}
+          working-directory: ${{ inputs.working-directory }}
 
       - name: Run coverage
         working-directory: ${{ inputs.working-directory }}
@@ -164,6 +163,7 @@ jobs:
       - uses: ./.git/modules/core-actions/actions/go/setup
         with:
           go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.go-version-file }}
           working-directory: ${{ inputs.working-directory }}
 
       - name: Build
