@@ -40,4 +40,5 @@ if [ -z "$METRICS" ] || ! echo "$METRICS" | jq -e '[.lines,.statements,.function
 fi
 
 log_info "Report: ${COVERAGE_DIR}/index.html"
-bash "$(dirname "$0")/../common/check-coverage.sh" "$METRICS" "${COVERAGE_TAG:-}"
+_tag=$(echo "${COVERAGE_CONFIG_NODE:-}" | jq -r '.tag // empty' 2>/dev/null)
+bash "$(dirname "$0")/../common/check-coverage.sh" "$METRICS" "${_tag:-${COVERAGE_TAG:-}}"

@@ -87,19 +87,28 @@ COVERAGE_CONFIG_NODE={"floor":{"lines":80,"statements":80,"functions":75,"branch
 | ------------- | ----------- | -------------------------------------------------------------------------------------------- |
 | `floor`       | JSON object | Per-metric minimum percentage. Fails if any metric drops below its floor.                    |
 | `delta`       | number      | Maximum allowed drop from baseline for any single metric.                                    |
+| `tag`         | string      | Baseline tag to look up in `.coverage-baseline`. Overrides the legacy `COVERAGE_TAG`.        |
 | `summaryFile` | string      | Path to the Istanbul JSON summary file. Defaults to `${COVERAGE_DIR}/coverage-summary.json`. |
 
 If `COVERAGE_CONFIG_NODE` is not set, the legacy `COVERAGE_FLOOR` and `COVERAGE_MAX_DROP` values are used and the same floor applies to all four metrics.
 
 ### Shell / Go / Python
 
-For these runners, `floor` is a plain number that applies to the single overall coverage percentage.
+For these runners, `floor` is a plain number that applies to the single overall coverage percentage. Each runner reads only its own config — `COVERAGE_CONFIG_SHELL` is never used by the Go or Python runner.
 
 ```bash
-COVERAGE_CONFIG_SHELL={"floor":70,"delta":5}
-COVERAGE_CONFIG_GO={"floor":80,"delta":2}
-COVERAGE_CONFIG_PYTHON={"floor":80,"delta":2}
+COVERAGE_CONFIG_SHELL={"floor":70,"delta":5,"tag":"shell"}
+COVERAGE_CONFIG_GO={"floor":80,"delta":2,"tag":"go"}
+COVERAGE_CONFIG_PYTHON={"floor":80,"delta":2,"tag":"python"}
 ```
+
+| Field   | Type   | Description                                                                           |
+| ------- | ------ | ------------------------------------------------------------------------------------- |
+| `floor` | number | Minimum coverage percentage. Fails if coverage drops below this.                      |
+| `delta` | number | Maximum allowed drop from baseline.                                                   |
+| `tag`   | string | Baseline tag to look up in `.coverage-baseline`. Overrides the legacy `COVERAGE_TAG`. |
+
+If a runner-specific config is not set, the runner falls back to the legacy `COVERAGE_FLOOR`, `COVERAGE_MAX_DROP`, and `COVERAGE_TAG` globals.
 
 ---
 
