@@ -26,7 +26,7 @@ on:
           Space-separated list of extra semantic-release plugins to install
         type: string
         required: false
-        default: '@semantic-release/changelog @semantic-release/git @octokit/rest conventional-changelog-conventionalcommits'
+        default: ''
 
       update-major-tag:
         description: Whether to move the major version tag after release (e.g. v1 → v1.2.0)

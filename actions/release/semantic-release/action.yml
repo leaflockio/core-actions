@@ -65,7 +65,9 @@ runs:
       uses: cycjimmy/semantic-release-action@v4.2.0
       with:
         semantic_version: ${{ inputs.semantic-version }}
-        extra_plugins: ${{ inputs.extra-plugins }}
+        extra_plugins: >-
+          @semantic-release/changelog @semantic-release/git @octokit/rest conventional-changelog-conventionalcommits
+          ${{ inputs.extra-plugins }}
         working_directory: ${{ inputs.working-directory }}
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
