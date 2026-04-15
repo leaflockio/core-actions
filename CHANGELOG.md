@@ -1,3 +1,9 @@
+## [1.4.1-beta.5](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.4...v1.4.1-beta.5) (2026-04-15)
+
+### Bug Fixes
+
+* **tpl-common-ci:** install tools from core-actions not consumer ([#95](https://github.com/leaflockio/core-actions/issues/95)) ([#99](https://github.com/leaflockio/core-actions/issues/99)) ([3699704](https://github.com/leaflockio/core-actions/commit/36997043f0c10ca6bf5a9faef8e0f448ce65615b))
+
 ## [1.4.1-beta.4](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.3...v1.4.1-beta.4) (2026-04-15)
 
 ### Bug Fixes
