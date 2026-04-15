@@ -1,3 +1,9 @@
+## [1.4.1-beta.3](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.2...v1.4.1-beta.3) (2026-04-15)
+
+### Bug Fixes
+
+* **coverage:** isolate baseline tag per runner config ([#89](https://github.com/leaflockio/core-actions/issues/89)) ([#92](https://github.com/leaflockio/core-actions/issues/92)) ([d10ef5d](https://github.com/leaflockio/core-actions/commit/d10ef5de7578306e0fdaa8a6aa4114168355e3fe))
+
 ## [1.4.1-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.1...v1.4.1-beta.2) (2026-04-14)
 
 ### Bug Fixes
