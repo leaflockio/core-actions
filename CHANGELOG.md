@@ -1,3 +1,9 @@
+## [1.4.1-beta.6](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.5...v1.4.1-beta.6) (2026-04-15)
+
+### Bug Fixes
+
+* **tpl-shell-ci:** source tools from core-actions, align with templates ([#100](https://github.com/leaflockio/core-actions/issues/100)) ([38fc1b8](https://github.com/leaflockio/core-actions/commit/38fc1b8ca38c0c4bcc48c4f0199916cbb4c189c6))
+
 ## [1.4.1-beta.5](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.4...v1.4.1-beta.5) (2026-04-15)
 
 ### Bug Fixes
