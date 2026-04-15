@@ -154,8 +154,12 @@ if [ -n "$COVERAGE_FILE" ]; then
   PERCENT=$(jq -r '.percent_covered' "$COVERAGE_FILE")
   log_info "Report: ${REPORT_DIR}/index.html" >&2
 
-  # Check against baseline
-  bash "$REPO_ROOT/scripts/common/check-coverage.sh" "$PERCENT" "${COVERAGE_TAG:-}"
+  # Check against baseline — prefer tag from COVERAGE_CONFIG_SHELL, fall back to COVERAGE_TAG
+  _tag=""
+  if command -v jq >/dev/null 2>&1; then
+    _tag=$(echo "${COVERAGE_CONFIG_SHELL:-}" | jq -r '.tag // empty' 2>/dev/null)
+  fi
+  bash "$REPO_ROOT/scripts/common/check-coverage.sh" "$PERCENT" "${_tag:-${COVERAGE_TAG:-}}" "${COVERAGE_CONFIG_SHELL:-}"
 else
   log_error "Could not determine coverage." >&2
   exit 1

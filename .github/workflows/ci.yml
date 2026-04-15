@@ -23,6 +23,7 @@ jobs:
     uses: ./.github/workflows/tpl-shell-ci.yml
     with:
       coverage-tag: shell
+      core-actions-ref: ${{ github.head_ref || github.ref_name }}
 
   js-test:
     name: JS Tests

@@ -8,9 +8,7 @@
 # Runs Python tests with coverage and checks against baseline.
 # Expects: pytest with pytest-cov installed.
 
-. "$(dirname "$0")/../common/utils.sh"
-
-COVERAGE_DIR="${COVERAGE_DIR:-coverage}"
+. "$(dirname "$0")/../common/config.sh"
 
 log_info "Running Python tests with coverage..."
 
@@ -34,4 +32,8 @@ fi
 
 log_info "Coverage: ${PERCENT}%"
 log_info "Report: ${COVERAGE_DIR}/index.html"
-bash "$(dirname "$0")/../common/check-coverage.sh" "$PERCENT"
+_tag=""
+if command -v jq >/dev/null 2>&1; then
+  _tag=$(echo "${COVERAGE_CONFIG_PYTHON:-}" | jq -r '.tag // empty' 2>/dev/null)
+fi
+bash "$(dirname "$0")/../common/check-coverage.sh" "$PERCENT" "${_tag:-${COVERAGE_TAG:-}}" "${COVERAGE_CONFIG_PYTHON:-}"

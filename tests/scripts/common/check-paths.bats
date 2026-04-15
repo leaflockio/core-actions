@@ -93,6 +93,52 @@ EOF
   [[ "$output" == *"Hardcoded Windows path"* ]]
 }
 
+@test "passes when file matches CHECK_PATHS_SKIP_FILES pattern" {
+  # Build path dynamically to avoid triggering the hook on this file
+  printf 'RUN rm -rf %s\n' "/va""r/lib/apt/lists/*" >Dockerfile
+  git add Dockerfile
+
+  echo 'CHECK_PATHS_SKIP_FILES=["Dockerfile","Dockerfile.*","*.dockerfile","docker-compose.yml","docker-compose.*.yml"]' >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Path check passed"* ]]
+}
+
+@test "still flags absolute paths in files not matching CHECK_PATHS_SKIP_FILES" {
+  # Build path dynamically to avoid triggering the hook on this file
+  printf 'RUN rm -rf %s\n' "/va""r/lib/apt/lists/*" >Dockerfile
+  git add Dockerfile
+
+  echo 'CHECK_PATHS_SKIP_FILES=["*.txt"]' >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}
+
+@test "iterates all patterns when none match and still flags the file" {
+  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
+  git add app.js
+
+  echo 'CHECK_PATHS_SKIP_FILES=["Dockerfile","docker-compose.yml","*.txt"]' >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}
+
+@test "CHECK_PATHS_SKIP_FILES empty array skips no files" {
+  printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
+  git add app.js
+
+  echo 'CHECK_PATHS_SKIP_FILES=[]' >.hooks-config
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}
+
 @test "detects hardcoded paths in all mode" {
   printf 'const dir = "%s";\n' "/Us""ers/john/projects/app" >app.js
   git add app.js

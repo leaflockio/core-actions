@@ -185,6 +185,19 @@ EOF
 
 # ── COVERAGE_CONFIG_* keys ────────────────────────────────────────
 
+@test "config defaults CHECK_PATHS_SKIP_FILES to empty array" {
+  [ "$(get_config_var CHECK_PATHS_SKIP_FILES)" = "[]" ]
+}
+
+@test "config reads CHECK_PATHS_SKIP_FILES from .hooks-config" {
+  cat >.hooks-config <<'EOF'
+CHECK_PATHS_SKIP_FILES=["Dockerfile","Dockerfile.*","*.dockerfile"]
+EOF
+
+  result="$(get_config_var CHECK_PATHS_SKIP_FILES)"
+  [ "$result" = '["Dockerfile","Dockerfile.*","*.dockerfile"]' ]
+}
+
 @test "config defaults COVERAGE_CONFIG_* to empty string" {
   [ "$(get_config_var COVERAGE_CONFIG_NODE)" = "" ]
   [ "$(get_config_var COVERAGE_CONFIG_SHELL)" = "" ]

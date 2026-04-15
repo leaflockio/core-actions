@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       node-version:
-        description: Node.js version (for cspell, prettier, markdownlint)
+        description: Node.js version for core-actions tooling
         type: string
         required: false
         default: '22'
@@ -66,6 +66,10 @@ jobs:
           path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
+      - uses: ./.git/modules/core-actions/actions/ci/setup-tools
+        with:
+          node-version: ${{ inputs.node-version }}
+
       - uses: ./.git/modules/core-actions/actions/ci/quality-gate
         with:
           scripts-dir: .git/modules/core-actions/scripts/common
@@ -98,12 +102,9 @@ jobs:
           path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
 
-      - uses: actions/setup-node@v4
+      - uses: ./.git/modules/core-actions/actions/ci/setup-tools
         with:
           node-version: ${{ inputs.node-version }}
-
-      - name: Install tools
-        run: npm ci
 
       - uses: ./.git/modules/core-actions/actions/ci/quality-lint
         with:
@@ -136,6 +137,10 @@ jobs:
           ref: ${{ inputs.core-actions-ref }}
           path: .git/modules/core-actions
           token: ${{ steps.cross-repo-token.outputs.token || github.token }}
+
+      - uses: ./.git/modules/core-actions/actions/ci/setup-tools
+        with:
+          node-version: ${{ inputs.node-version }}
 
       - uses: ./.git/modules/core-actions/actions/ci/quality-links
         with:

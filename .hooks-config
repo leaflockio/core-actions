@@ -16,4 +16,6 @@ COVERAGE_TAG=js
 # Per-runner coverage config: floor (per-metric JSON for node, plain number for others) + delta.
 # JSON values must use compact format (no spaces) and must not contain '=' characters.
 # See docs/hooks-config.md for migration guidance from plain number baseline to JSON format.
-COVERAGE_CONFIG_NODE={"floor":{"lines":100,"statements":100,"functions":100,"branches":100},"delta":0.05}
+COVERAGE_CONFIG_NODE={"floor":{"lines":100,"statements":100,"functions":100,"branches":100},"delta":0.05,"tag":"js"}
+COVERAGE_CONFIG_SHELL={"floor":80,"delta":0.05,"tag":"shell"}
+CHECK_PATHS_SKIP_FILES=["Dockerfile","Dockerfile.*","*.dockerfile","docker-compose.yml","docker-compose.*.yml"]

@@ -16,7 +16,7 @@ inputs:
 
   working-directory:
     description: >
-      Directory containing package.json. Defaults to repo root.
+      Working directory for semantic-release. Defaults to repo root.
     required: false
     default: '.'
 
@@ -52,11 +52,6 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-
-    - name: Install dependencies
-      shell: bash
-      run: npm ci
-      working-directory: ${{ inputs.working-directory }}
 
     - name: Read git identity
       id: git-identity

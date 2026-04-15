@@ -5,9 +5,18 @@ description: >
 
 inputs:
   go-version:
-    description: Go version to use
+    description: >
+      Explicit Go version to use (e.g. '1.26'). When set, takes
+      precedence over go-version-file.
     required: false
-    default: '1.22'
+    default: ''
+
+  go-version-file:
+    description: >
+      Path to go.mod file to determine the Go version. Used when
+      go-version is not set. Defaults to go.mod in the working directory.
+    required: false
+    default: 'go.mod'
 
   working-directory:
     description: >
@@ -26,6 +35,7 @@ runs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go-version }}
+        go-version-file: ${{ inputs.go-version == '' && inputs.go-version-file || '' }}
         cache-dependency-path: ${{ inputs.working-directory }}/go.sum
 
     - name: Verify modules

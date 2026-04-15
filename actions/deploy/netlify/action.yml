@@ -23,7 +23,10 @@ inputs:
     default: './dist'
 
   production:
-    description: Whether this is a production deploy
+    description: >
+      Whether to deploy to this site's production channel (custom domain).
+      Defaults to true. Set to false only if you want a draft/preview URL instead.
+      Note: QA and production environment isolation is handled via site-id, not this flag.
     required: false
     default: 'true'
 
