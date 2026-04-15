@@ -50,7 +50,7 @@
       }
     ],
     [
-      "./src/plugins/verified-commit.js",
+      "./.git/modules/core-actions/src/plugins/verified-commit.js",
       {
         "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
