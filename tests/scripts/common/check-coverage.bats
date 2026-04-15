@@ -162,6 +162,40 @@ teardown() {
   [[ "$output" == *"Skipping delta check"* ]]
 }
 
+# ── Runner config (number mode — shell/go/python) ────────────────
+
+@test "runner config: uses floor from runner config over legacy COVERAGE_FLOOR" {
+  printf 'COVERAGE_FLOOR=95\n' >.hooks-config
+  git add .hooks-config
+  run bash "$SCRIPT" 82 "" '{"floor":80,"delta":0.05}'
+  [ "$status" -eq 0 ]
+}
+
+@test "runner config: uses delta from runner config over legacy COVERAGE_MAX_DROP" {
+  echo "90" >.coverage-baseline
+  printf 'COVERAGE_FLOOR=80\nCOVERAGE_MAX_DROP=0.05\n' >.hooks-config
+  git add .hooks-config
+  run bash "$SCRIPT" 82 "" '{"floor":80,"delta":10}'
+  [ "$status" -eq 0 ]
+}
+
+@test "runner config: falls back to legacy floor when runner config is empty" {
+  printf 'COVERAGE_FLOOR=95\n' >.hooks-config
+  git add .hooks-config
+  run bash "$SCRIPT" 82 "" ""
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"below floor threshold"* ]]
+}
+
+@test "runner config: uses tag from second arg to look up tagged baseline" {
+  printf 'shell: 80\njs: 90\n' >.coverage-baseline
+  printf 'COVERAGE_FLOOR=70\n' >.hooks-config
+  git add .hooks-config
+  run bash "$SCRIPT" 82 "shell" '{"floor":70,"delta":5}'
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"baseline: 80%"* ]]
+}
+
 # ── JSON mode (node — per-metric) ────────────────────────────────
 
 JSON_METRICS='{"lines":85,"statements":82,"functions":78,"branches":72}'

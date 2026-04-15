@@ -135,6 +135,15 @@ fi
 # ── Number mode (shell, go, python — single percent) ─────────────────
 
 PERCENT="$INPUT"
+RUNNER_CONFIG="${3:-}"
+
+# Runner-specific config overrides legacy floor/delta — honours COVERAGE_CONFIG_SHELL/GO/PYTHON
+if [ -n "$RUNNER_CONFIG" ] && command -v jq >/dev/null 2>&1; then
+  _rf=$(echo "$RUNNER_CONFIG" | jq -r '.floor // empty' 2>/dev/null)
+  _rd=$(echo "$RUNNER_CONFIG" | jq -r '.delta // empty' 2>/dev/null)
+  [ -n "$_rf" ] && COVERAGE_FLOOR="$_rf"
+  [ -n "$_rd" ] && COVERAGE_MAX_DROP="$_rd"
+fi
 
 # Floor check — absolute minimum
 BELOW_FLOOR=$(awk -v p="$PERCENT" -v f="$COVERAGE_FLOOR" 'BEGIN { print (p < f) ? 1 : 0 }')
