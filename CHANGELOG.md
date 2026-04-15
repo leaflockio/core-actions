@@ -1,3 +1,9 @@
+## [1.4.1-beta.4](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.3...v1.4.1-beta.4) (2026-04-15)
+
+### Bug Fixes
+
+* **tpl-release:** remove consumer npm ci — unblocks non-Node repos ([#94](https://github.com/leaflockio/core-actions/issues/94)) ([#98](https://github.com/leaflockio/core-actions/issues/98)) ([6ffff15](https://github.com/leaflockio/core-actions/commit/6ffff15e5a90cc1a1e353e63578b77a7fee0baa2))
+
 ## [1.4.1-beta.3](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.2...v1.4.1-beta.3) (2026-04-15)
 
 ### Bug Fixes
