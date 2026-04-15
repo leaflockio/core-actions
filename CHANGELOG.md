@@ -1,3 +1,9 @@
+## [1.4.1-beta.7](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.6...v1.4.1-beta.7) (2026-04-15)
+
+### Bug Fixes
+
+* **go-ci:** auto-resolve Go and golangci-lint versions from go.mod ([#101](https://github.com/leaflockio/core-actions/issues/101)) ([015143d](https://github.com/leaflockio/core-actions/commit/015143dbf27ad28fb85421a281679f83bc42cabf))
+
 ## [1.4.1-beta.6](https://github.com/leaflockio/core-actions/compare/v1.4.1-beta.5...v1.4.1-beta.6) (2026-04-15)
 
 ### Bug Fixes
