@@ -1,3 +1,9 @@
+## [1.4.2-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.1...v1.4.2-beta.2) (2026-04-15)
+
+### Bug Fixes
+
+* **go:** skip lint when no Go files changed, scope to changed files only ([#106](https://github.com/leaflockio/core-actions/issues/106)) ([0b38e5d](https://github.com/leaflockio/core-actions/commit/0b38e5dd1dc1e0694b89d6f635479426bd243a70))
+
 ## [1.4.2-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.1...v1.4.2-beta.1) (2026-04-15)
 
 ### Bug Fixes
