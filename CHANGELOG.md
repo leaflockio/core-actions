@@ -1,3 +1,27 @@
+## [1.4.2-beta.4](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.3...v1.4.2-beta.4) (2026-04-16)
+
+### Bug Fixes
+
+* **go:** add -race flag to coverage test command ([#110](https://github.com/leaflockio/core-actions/issues/110)) ([a7c11cc](https://github.com/leaflockio/core-actions/commit/a7c11cc31245dfcaea806d5b187083b1798bac3b))
+
+## [1.4.2-beta.3](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.2...v1.4.2-beta.3) (2026-04-16)
+
+### Bug Fixes
+
+* **go:** skip coverage when no Go packages exist ([#109](https://github.com/leaflockio/core-actions/issues/109)) ([aacc524](https://github.com/leaflockio/core-actions/commit/aacc5247fa61429c911fa8bd475ef2fb4e1d2277))
+
+## [1.4.2-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.1...v1.4.2-beta.2) (2026-04-15)
+
+### Bug Fixes
+
+* **go:** skip lint when no Go files changed, scope to changed files only ([#106](https://github.com/leaflockio/core-actions/issues/106)) ([0b38e5d](https://github.com/leaflockio/core-actions/commit/0b38e5dd1dc1e0694b89d6f635479426bd243a70))
+
+## [1.4.2-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.1...v1.4.2-beta.1) (2026-04-15)
+
+### Bug Fixes
+
+* **release:** make extra-plugins additive over base plugin set ([#104](https://github.com/leaflockio/core-actions/issues/104)) ([607faa5](https://github.com/leaflockio/core-actions/commit/607faa55589177d37ba41fb0843344b96c0727b4))
+
 ## [1.4.1](https://github.com/leaflockio/core-actions/compare/v1.4.0...v1.4.1) (2026-04-15)
 
 ### Bug Fixes

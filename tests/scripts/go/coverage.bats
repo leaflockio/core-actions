@@ -16,9 +16,24 @@ teardown() {
   _common_teardown
 }
 
+@test "skips when no Go packages found" {
+  create_mock "go" '
+    if [ "$1" = "list" ]; then
+      exit 0
+    fi
+  '
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"No Go packages found, skipping coverage"* ]]
+}
+
 @test "passes when tests pass and coverage meets baseline" {
   create_mock "go" '
-    if [ "$1" = "test" ]; then
+    if [ "$1" = "list" ]; then
+      echo "example.com/pkg"
+      exit 0
+    elif [ "$1" = "test" ]; then
       echo "ok"
       touch coverage.out
       exit 0
@@ -37,9 +52,38 @@ teardown() {
   [[ "$output" == *"Coverage: 96"* ]]
 }
 
+@test "runs tests with race detector" {
+  create_mock "go" '
+    if [ "$1" = "list" ]; then
+      echo "example.com/pkg"
+      exit 0
+    elif [ "$1" = "test" ]; then
+      if ! echo "$*" | grep -q "\-race"; then
+        echo "missing -race flag"
+        exit 1
+      fi
+      touch coverage.out
+      exit 0
+    elif [ "$1" = "tool" ] && [ "$2" = "cover" ] && echo "$*" | grep -q "\-func"; then
+      echo "total:	(statements)	96.0%"
+      exit 0
+    elif [ "$1" = "tool" ] && [ "$2" = "cover" ] && echo "$*" | grep -q "\-html"; then
+      exit 0
+    fi
+  '
+
+  echo "96.0" >.coverage-baseline
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+}
+
 @test "fails when tests fail" {
   create_mock "go" '
-    if [ "$1" = "test" ]; then
+    if [ "$1" = "list" ]; then
+      echo "example.com/pkg"
+      exit 0
+    elif [ "$1" = "test" ]; then
       echo "FAIL"
       exit 1
     fi
@@ -52,7 +96,10 @@ teardown() {
 
 @test "fails when coverage cannot be extracted" {
   create_mock "go" '
-    if [ "$1" = "test" ]; then
+    if [ "$1" = "list" ]; then
+      echo "example.com/pkg"
+      exit 0
+    elif [ "$1" = "test" ]; then
       exit 0
     elif [ "$1" = "tool" ]; then
       echo ""
@@ -67,7 +114,10 @@ teardown() {
 
 @test "shows running message" {
   create_mock "go" '
-    if [ "$1" = "test" ]; then
+    if [ "$1" = "list" ]; then
+      echo "example.com/pkg"
+      exit 0
+    elif [ "$1" = "test" ]; then
       touch coverage.out
       exit 0
     elif [ "$1" = "tool" ] && [ "$2" = "cover" ] && echo "$*" | grep -q "\-func"; then
