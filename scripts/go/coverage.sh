@@ -18,7 +18,7 @@ log_info "Running Go tests with coverage..."
 
 mkdir -p "$COVERAGE_DIR"
 
-OUTPUT=$(go test -coverprofile="$COVERAGE_DIR/coverage.out" ./... 2>&1)
+OUTPUT=$(go test -race -coverprofile="$COVERAGE_DIR/coverage.out" ./... 2>&1)
 STATUS=$?
 
 if [ "$STATUS" -ne 0 ]; then
