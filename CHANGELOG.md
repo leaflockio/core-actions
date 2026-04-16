@@ -1,3 +1,9 @@
+## [1.4.2-beta.4](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.3...v1.4.2-beta.4) (2026-04-16)
+
+### Bug Fixes
+
+* **go:** add -race flag to coverage test command ([#110](https://github.com/leaflockio/core-actions/issues/110)) ([a7c11cc](https://github.com/leaflockio/core-actions/commit/a7c11cc31245dfcaea806d5b187083b1798bac3b))
+
 ## [1.4.2-beta.3](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.2...v1.4.2-beta.3) (2026-04-16)
 
 ### Bug Fixes
