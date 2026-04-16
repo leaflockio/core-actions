@@ -9,6 +9,11 @@
 
 . "$(dirname "$0")/../common/config.sh"
 
+if [ -z "$(go list ./... 2>/dev/null)" ]; then
+  log_info "No Go packages found, skipping coverage."
+  exit 0
+fi
+
 log_info "Running Go tests with coverage..."
 
 mkdir -p "$COVERAGE_DIR"
