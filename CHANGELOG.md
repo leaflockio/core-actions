@@ -1,3 +1,9 @@
+## [1.4.2-beta.3](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.2...v1.4.2-beta.3) (2026-04-16)
+
+### Bug Fixes
+
+* **go:** skip coverage when no Go packages exist ([#109](https://github.com/leaflockio/core-actions/issues/109)) ([aacc524](https://github.com/leaflockio/core-actions/commit/aacc5247fa61429c911fa8bd475ef2fb4e1d2277))
+
 ## [1.4.2-beta.2](https://github.com/leaflockio/core-actions/compare/v1.4.2-beta.1...v1.4.2-beta.2) (2026-04-15)
 
 ### Bug Fixes
