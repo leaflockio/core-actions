@@ -18,7 +18,10 @@ log_info "Running Go tests with coverage..."
 
 mkdir -p "$COVERAGE_DIR"
 
-OUTPUT=$(go test -race -coverprofile="$COVERAGE_DIR/coverage.out" ./... 2>&1)
+_cmd=$(echo "${COVERAGE_CONFIG_GO:-}" | jq -r '.command // empty' 2>/dev/null)
+COVERAGE_CMD="${_cmd:-go test -race -coverprofile="$COVERAGE_DIR/coverage.out" ./...}"
+
+OUTPUT=$(eval "$COVERAGE_CMD" 2>&1)
 STATUS=$?
 
 if [ "$STATUS" -ne 0 ]; then
