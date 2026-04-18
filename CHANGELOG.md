@@ -1,3 +1,9 @@
+## [1.5.0-beta.1](https://github.com/leaflockio/core-actions/compare/v1.4.2...v1.5.0-beta.1) (2026-04-18)
+
+### Features
+
+* **go:** add command field to COVERAGE_CONFIG_GO ([#113](https://github.com/leaflockio/core-actions/issues/113)) ([ccabb42](https://github.com/leaflockio/core-actions/commit/ccabb421505400860a736ba418a52dc34b8b3d54))
+
 ## [1.4.2](https://github.com/leaflockio/core-actions/compare/v1.4.1...v1.4.2) (2026-04-16)
 
 ### Bug Fixes
