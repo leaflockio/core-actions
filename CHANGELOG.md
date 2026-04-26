@@ -1,3 +1,9 @@
+## [1.5.1-beta.3](https://github.com/leaflockio/core-actions/compare/v1.5.1-beta.2...v1.5.1-beta.3) (2026-04-26)
+
+### Bug Fixes
+
+* **go:** scope hook lint to staged changes via --new-from-patch ([#117](https://github.com/leaflockio/core-actions/issues/117)) ([#121](https://github.com/leaflockio/core-actions/issues/121)) ([c4e6a12](https://github.com/leaflockio/core-actions/commit/c4e6a12905a716c863778f22e4885f4f59607c93))
+
 ## [1.5.1-beta.2](https://github.com/leaflockio/core-actions/compare/v1.5.1-beta.1...v1.5.1-beta.2) (2026-04-26)
 
 ### Bug Fixes
