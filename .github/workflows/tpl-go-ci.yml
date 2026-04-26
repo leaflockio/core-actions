@@ -95,6 +95,11 @@ jobs:
           go-version-file: ${{ inputs.go-version-file }}
           working-directory: ${{ inputs.working-directory }}
 
+      - name: Fetch base SHA
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git fetch --depth=1 origin "$PR_BASE_SHA"
+
       - name: Check for changed Go files
         id: go-files
         env:

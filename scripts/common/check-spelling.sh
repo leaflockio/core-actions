@@ -19,7 +19,7 @@ fi
 
 log_info "Checking spelling..."
 
-if ! echo "$CHECK_FILES" | xargs npx cspell --no-progress --no-summary 2>&1; then
+if ! echo "$CHECK_FILES" | xargs npx cspell --no-progress --no-summary --no-must-find-files 2>&1; then
   echo ""
   log_error "Spelling errors detected."
   log_info "Fix the words above or add them to .cspell.json 'words' list."

@@ -1,3 +1,21 @@
+## [1.5.1-beta.3](https://github.com/leaflockio/core-actions/compare/v1.5.1-beta.2...v1.5.1-beta.3) (2026-04-26)
+
+### Bug Fixes
+
+* **go:** scope hook lint to staged changes via --new-from-patch ([#117](https://github.com/leaflockio/core-actions/issues/117)) ([#121](https://github.com/leaflockio/core-actions/issues/121)) ([c4e6a12](https://github.com/leaflockio/core-actions/commit/c4e6a12905a716c863778f22e4885f4f59607c93))
+
+## [1.5.1-beta.2](https://github.com/leaflockio/core-actions/compare/v1.5.1-beta.1...v1.5.1-beta.2) (2026-04-26)
+
+### Bug Fixes
+
+* **go-ci:** fetch base SHA before diff to fix shallow clone error ([#116](https://github.com/leaflockio/core-actions/issues/116)) ([#120](https://github.com/leaflockio/core-actions/issues/120)) ([5835499](https://github.com/leaflockio/core-actions/commit/58354997cefa9f791bc9da63eae58193ee8472cd))
+
+## [1.5.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.5.0...v1.5.1-beta.1) (2026-04-26)
+
+### Bug Fixes
+
+* **shell:** pass --no-must-find-files to cspell ([#115](https://github.com/leaflockio/core-actions/issues/115)) ([#118](https://github.com/leaflockio/core-actions/issues/118)) ([ca1243d](https://github.com/leaflockio/core-actions/commit/ca1243d700313e51b68052fd853502c4fbb58380))
+
 ## [1.5.0](https://github.com/leaflockio/core-actions/compare/v1.4.2...v1.5.0) (2026-04-18)
 
 ### Features
