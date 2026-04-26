@@ -1,3 +1,9 @@
+## [1.5.1-beta.2](https://github.com/leaflockio/core-actions/compare/v1.5.1-beta.1...v1.5.1-beta.2) (2026-04-26)
+
+### Bug Fixes
+
+* **go-ci:** fetch base SHA before diff to fix shallow clone error ([#116](https://github.com/leaflockio/core-actions/issues/116)) ([#120](https://github.com/leaflockio/core-actions/issues/120)) ([5835499](https://github.com/leaflockio/core-actions/commit/58354997cefa9f791bc9da63eae58193ee8472cd))
+
 ## [1.5.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.5.0...v1.5.1-beta.1) (2026-04-26)
 
 ### Bug Fixes
