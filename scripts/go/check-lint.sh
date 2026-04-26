@@ -16,13 +16,16 @@ if [ -z "$FILES" ]; then
   exit 0
 fi
 
-mapfile -t PACKAGES < <(echo "$FILES" | xargs dirname | sort -u | sed 's|^[^./]|./&|')
-
 log_info "Running golangci-lint..."
 
-if ! golangci-lint run "${PACKAGES[@]}"; then
+PATCH=$(mktemp)
+git diff --cached -- '*.go' >"$PATCH"
+
+if ! golangci-lint run --new-from-patch "$PATCH" ./...; then
+  rm -f "$PATCH"
   log_error "Go lint check failed. Fix the issues above."
   exit 1
 fi
 
+rm -f "$PATCH"
 log_success "Go lint check passed."

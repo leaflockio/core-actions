@@ -51,8 +51,8 @@ EOF
   [[ "$output" == *"Go lint check failed"* ]]
 }
 
-@test "lints root package for root-level Go file" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
+@test "passes --new-from-patch flag to golangci-lint" {
+  create_mock "golangci-lint" 'echo "args: $*"; exit 0'
 
   cat >main.go <<'EOF'
 package main
@@ -61,62 +61,24 @@ EOF
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"called: run ."* ]]
+  [[ "$output" == *"--new-from-patch"* ]]
 }
 
-@test "lints correct package for subdirectory Go file" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
+@test "passes ./... as lint target to golangci-lint" {
+  create_mock "golangci-lint" 'echo "args: $*"; exit 0'
 
-  mkdir -p cmd
-  cat >cmd/main.go <<'EOF'
+  cat >main.go <<'EOF'
 package main
 EOF
-  git add cmd/main.go
+  git add main.go
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"./cmd"* ]]
+  [[ "$output" == *"./..."* ]]
 }
 
-@test "deduplicates packages when multiple files in same directory are staged" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
-
-  mkdir -p internal/foo
-  cat >internal/foo/a.go <<'EOF'
-package foo
-EOF
-  cat >internal/foo/b.go <<'EOF'
-package foo
-EOF
-  git add internal/foo/a.go internal/foo/b.go
-
-  run bash "$SCRIPT"
-  [ "$status" -eq 0 ]
-  # ./internal/foo should appear exactly once
-  count=$(echo "$output" | grep -o '\./internal/foo' | wc -l)
-  [ "$count" -eq 1 ]
-}
-
-@test "lints multiple packages when files from different directories are staged" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
-
-  mkdir -p cmd internal/foo
-  cat >cmd/main.go <<'EOF'
-package main
-EOF
-  cat >internal/foo/bar.go <<'EOF'
-package foo
-EOF
-  git add cmd/main.go internal/foo/bar.go
-
-  run bash "$SCRIPT"
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"./cmd"* ]]
-  [[ "$output" == *"./internal/foo"* ]]
-}
-
-@test "does not lint unstaged Go files" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
+@test "patch contains only staged Go files" {
+  create_mock "golangci-lint" 'cat "$3"; exit 0'
 
   cat >staged.go <<'EOF'
 package main
@@ -128,24 +90,34 @@ EOF
 
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" != *"unstaged"* ]]
+  [[ "$output" == *"staged.go"* ]]
+  [[ "$output" != *"unstaged.go"* ]]
 }
 
-@test "lints all packages in CHECK_MODE=all" {
-  create_mock "golangci-lint" 'echo "called: $*"; exit 0'
+@test "cleans up patch file after success" {
+  create_mock "golangci-lint" 'echo "PATCH_PATH=$3"; exit 0'
 
-  mkdir -p cmd
   cat >main.go <<'EOF'
 package main
 EOF
-  cat >cmd/run.go <<'EOF'
-package cmd
-EOF
-  git add main.go cmd/run.go
-  git commit -m "add go files"
+  git add main.go
 
-  CHECK_MODE=all run bash "$SCRIPT"
+  run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"."* ]]
-  [[ "$output" == *"./cmd"* ]]
+  patch_path=$(echo "$output" | grep "PATCH_PATH=" | sed 's/PATCH_PATH=//')
+  [ ! -f "$patch_path" ]
+}
+
+@test "cleans up patch file after failure" {
+  create_mock "golangci-lint" 'echo "PATCH_PATH=$3"; exit 1'
+
+  cat >main.go <<'EOF'
+package main
+EOF
+  git add main.go
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  patch_path=$(echo "$output" | grep "PATCH_PATH=" | sed 's/PATCH_PATH=//')
+  [ ! -f "$patch_path" ]
 }
