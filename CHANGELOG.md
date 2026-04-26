@@ -1,3 +1,9 @@
+## [1.5.1-beta.1](https://github.com/leaflockio/core-actions/compare/v1.5.0...v1.5.1-beta.1) (2026-04-26)
+
+### Bug Fixes
+
+* **shell:** pass --no-must-find-files to cspell ([#115](https://github.com/leaflockio/core-actions/issues/115)) ([#118](https://github.com/leaflockio/core-actions/issues/118)) ([ca1243d](https://github.com/leaflockio/core-actions/commit/ca1243d700313e51b68052fd853502c4fbb58380))
+
 ## [1.5.0](https://github.com/leaflockio/core-actions/compare/v1.4.2...v1.5.0) (2026-04-18)
 
 ### Features
