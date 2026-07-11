@@ -7,7 +7,10 @@
 
 # Detects hardcoded absolute file paths in staged changes.
 # Catches UNIX absolute paths (/) and Windows absolute paths (C:\).
-# Skips shebangs, URLs, and known safe patterns.
+#
+# UNIX paths are only flagged when rooted in a known OS or user directory
+# name. App-relative paths never match, since their first segment isn't
+# one of those known roots.
 #
 # In staged mode: checks only new lines from the diff.
 # In all mode: checks full file content.
@@ -44,16 +47,12 @@ for f in $CHECK_FILES; do
 
   [ -z "$CONTENT" ] && continue
 
-  # UNIX absolute paths: /word/word starting from root (not relative)
+  # UNIX absolute paths: only flag paths rooted in a known OS/user directory.
   # Requires space, quote, or start-of-line before the leading /
-  # Excludes relative paths (../), command substitutions, .git/ paths
-  UNIX_MATCHES=$(echo "$CONTENT" | grep -E '(^|[[:space:]"'\''=])/[a-zA-Z][a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+' || true)
+  UNIX_MATCHES=$(echo "$CONTENT" | grep -E '(^|[[:space:]"'\''=])/(Users|home|root|tmp|var|etc|opt|usr|mnt|private|Volumes|Library|Applications|System)(/[a-zA-Z0-9._-]+)+' || true)
   UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '^\+?\s*#!' || true)
   UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '://' || true)
-  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '/dev/null' || true)
   UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '^\+?\s*(#|//|/\*|\*).*example' || true)
-  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE 'import |from |require\(' || true)
-  UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '/api/|/v[0-9]+/' || true)
   UNIX_MATCHES=$(echo "$UNIX_MATCHES" | grep -vE '\$\(|\.git/' || true)
 
   if [ -n "$UNIX_MATCHES" ]; then
