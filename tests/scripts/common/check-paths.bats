@@ -64,6 +64,29 @@ EOF
   [ "$status" -eq 0 ]
 }
 
+@test "passes with app-relative asset and route paths" {
+  cat >app.js <<'EOF'
+export const favicon = '/branding/favicon.svg';
+export const ogImage = "/branding/og-image.png";
+export const apiUrl = '/api/users';
+EOF
+  git add app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Path check passed"* ]]
+}
+
+@test "detects hardcoded UNIX absolute path rooted in /home" {
+  # Build path dynamically to avoid triggering the hook on this file
+  printf 'const dir = "%s";\n' "/ho""me/john/projects/app" >app.js
+  git add app.js
+
+  run bash "$SCRIPT"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Hardcoded UNIX path"* ]]
+}
+
 @test "skips binary files" {
   echo "binary" >image.png
   git add image.png
