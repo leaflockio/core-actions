@@ -112,6 +112,7 @@ jobs:
         if: steps.go-files.outputs.changed == 'true'
         with:
           version: ${{ inputs.golangci-lint-version }}
+          install-mode: goinstall
           working-directory: ${{ inputs.working-directory }}
           only-new-issues: true
 
