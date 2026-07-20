@@ -105,7 +105,7 @@ jobs:
         env:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          FILES=$(git diff --name-only --diff-filter=ACMR "$PR_BASE_SHA"...HEAD -- '*.go')
+          FILES=$(git diff --name-only --diff-filter=ACMR "$PR_BASE_SHA"..HEAD -- '*.go')
           echo "changed=$( [ -n "$FILES" ] && echo 'true' || echo 'false' )" >> "$GITHUB_OUTPUT"
 
       - uses: golangci/golangci-lint-action@v6
