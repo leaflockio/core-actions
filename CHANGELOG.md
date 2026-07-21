@@ -1,3 +1,5 @@
+## [1.5.4-beta.1](https://github.com/leaflockio/core-actions/compare/v1.5.3...v1.5.4-beta.1) (2026-07-21)
+
 ## [1.5.3](https://github.com/leaflockio/core-actions/compare/v1.5.2...v1.5.3) (2026-07-20)
 
 ## [1.5.2](https://github.com/leaflockio/core-actions/compare/v1.5.1...v1.5.2) (2026-07-11)
